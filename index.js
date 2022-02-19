@@ -6,7 +6,7 @@ let file = editJsonFile(`./blacklist.json`);
 
 const adminID = process.env.CREATOR_ID;  //ID creator
 const botID = 5198012118;   //ID: @DoggoReportBot
-const canaleLOG = process.env.CANALE_LOG;    //canale log attività
+const canaleLOG = process.env.CANALE_LOG;    //Log Channel
 var channelName = process.env.CHANNEL_NAME;
 var privacy=false;  //privacy variable for user forwarded messages
 
@@ -17,14 +17,14 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-//Trasformo unix in data normale
+//Trasform unix time in readable time
 function UnixTimestamp(b){
     const a = new Date(b * 1000);
     const mesi = ['January','February','March','April','May','June','July','August','September','October','November','December'];
     const anno = a.getFullYear();
     const mese = mesi[a.getMonth()];
     const giorno = a.getDate();
-    var ora = a.getHours()+1;  //server gcloud è su fuso orario indietro di un'ora rispetto a Italia
+    var ora = a.getHours()+1;  //server is located in 1 h behind time zone
     var min = a.getMinutes();
     var sec = a.getSeconds();
     if(ora<10) ora='0'+ora;
@@ -46,24 +46,24 @@ function startup(){
 function info(a){
     const data = {
         "id": a.message.chat.id,
-        "nome": a.message.chat.first_name,
-        "cognome": a.message.chat.last_name,
+        "name": a.message.chat.first_name,
+        "surname": a.message.chat.last_name,
         "username": a.message.chat.username,
-        "lingua": a.from.language_code,
-        "data": a.message.date,
-        "messaggio": a.message.text
+        "language": a.from.language_code,
+        "date": a.message.date,
+        "messagge": a.message.text
     }
-    const d=UnixTimestamp(data.data);
-    const lang=data.lingua.toUpperCase();
+    const d=UnixTimestamp(data.date);
+    const lang=data.language.toUpperCase();
     var t="";
-    if(data.cognome == undefined && data.username == undefined)
-        t="*************INFO*************\nID: "+data.id+"\nName: "+data.nome+"\nLanguage: "+lang+"\nDate: "+d+"\n******************************";
+    if(data.surname == undefined && data.username == undefined)
+        t="*************INFO*************\nID: "+data.id+"\nName: "+data.name+"\nLanguage: "+lang+"\nDate: "+d+"\n******************************";
     else if(data.username==undefined)
-        t="*************INFO*************\nID: "+data.id+"\nName: "+data.nome+"\nSurname: "+data.cognome+"\nLanguage: "+lang+"\nDate: "+d+"\n******************************";
-    else if(data.cognome==undefined)
-        t="*************INFO*************\nID: "+data.id+"\nName: "+data.nome+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\nDate: "+d+"\n******************************";
+        t="*************INFO*************\nID: "+data.id+"\nName: "+data.name+"\nSurname: "+data.surname+"\nLanguage: "+lang+"\nDate: "+d+"\n******************************";
+    else if(data.surname==undefined)
+        t="*************INFO*************\nID: "+data.id+"\nName: "+data.name+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\nDate: "+d+"\n******************************";
     else
-        t="*************INFO*************\nID: "+data.id+"\nName: "+data.nome+"\nSurname: "+data.cognome+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\nDate: "+d+"\n******************************";
+        t="*************INFO*************\nID: "+data.id+"\nName: "+data.name+"\nSurname: "+data.surname+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\nDate: "+d+"\n******************************";
     return t;
 }
 
@@ -74,7 +74,7 @@ async function toAdmin(a){
 
         //if the user has strict privacy forwarding settings, send dummy message for admin
         if(privacy==true){
-            await sleep(500);  //delays the next message for 0,5 sec.. this way it's sure it will always be 2nd
+            await sleep(500);  //delays the next message for 0,5 sec. This way it's sure it will always be 2nd
             var m="";
             if(a.from.last_name == undefined && a.from.username == undefined)
                 m='👆 Message sent by '+a.from.first_name+' [<code>'+a.from.id+'</code>]\n'
@@ -93,7 +93,7 @@ async function toAdmin(a){
                 //+'This user has hidden the link to its account from forwarded messages. 👀\n'
                 +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
             a.telegram.sendMessage(adminID,m,{parse_mode: 'HTML'});
-            await sleep(500);  //delays the next message for 0,5 sec.. this way it's sure it will always be 3rd
+            await sleep(500);  //delays the next message for 0,5 sec. This way it's sure it will always be 3rd
             a.telegram.sendMessage(adminID,info(a));
         }
     }
@@ -103,67 +103,31 @@ function infoCommand(a){
     const data={
         "id":a.message.reply_to_message.forward_from.id,
         "isBot":a.message.reply_to_message.forward_from.is_bot,
-        "nome":a.message.reply_to_message.forward_from.first_name,
-        "cognome":a.message.reply_to_message.forward_from.last_name,
+        "name":a.message.reply_to_message.forward_from.first_name,
+        "surname":a.message.reply_to_message.forward_from.last_name,
         "username":a.message.reply_to_message.forward_from.username,
-        "lingua":a.message.reply_to_message.forward_from.language_code,
-        "data":a.message.reply_to_message.forward_date
+        "language":a.message.reply_to_message.forward_from.language_code,
+        "date":a.message.reply_to_message.forward_date
     }
-    const d=UnixTimestamp(data.data);
-    const lang=data.lingua.toUpperCase();
+    const d=UnixTimestamp(data.date);
+    const lang=data.language.toUpperCase();
     var bot="";
     if(data.isBot) bot="✅"; else bot="❌";
     var t="";
-    if(data.cognome == undefined && data.username == undefined)
-        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.nome+"\nLanguage: "+lang+"\n******************************";
+    if(data.surname == undefined && data.username == undefined)
+        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.name+"\nLanguage: "+lang+"\n******************************";
     else if(data.username==undefined)
-        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.nome+"\nSurname: "+data.cognome+"\nLanguage: "+lang+"\n******************************";
-    else if(data.cognome==undefined)
-        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.nome+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
+        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.name+"\nSurname: "+data.surname+"\nLanguage: "+lang+"\n******************************";
+    else if(data.surname==undefined)
+        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.name+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
     else
-        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.nome+"\nSurname: "+data.cognome+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
+        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.name+"\nSurname: "+data.surname+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
     return t;
-}
-
-function infoStrictCommand(a){
-    const s=a.message.reply_to_message.text;
-    const startID = s.indexOf("[")+1;
-    const endID = s.indexOf("]");
-    var newId="";
-    for(let i=startID;i<endID;i++)
-        newId=newId+''+s[i];
-    
-
-    
-    const data={
-        "id":newId,
-        "isBot":a.message.reply_to_message.forward_from.is_bot,
-        "nome":a.message.reply_to_message.forward_from.first_name,
-        "cognome":a.message.reply_to_message.forward_from.last_name,
-        "username":a.message.reply_to_message.forward_from.username,
-        "lingua":a.message.reply_to_message.forward_from.language_code,
-        "data":a.message.reply_to_message.forward_date
-    }
-    const d=UnixTimestamp(data.data);
-    const lang=data.lingua.toUpperCase();
-    var bot="";
-    if(data.isBot) bot="✅"; else bot="❌";
-    var t="";
-    if(data.cognome == undefined && data.username == undefined)
-        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.nome+"\nLanguage: "+lang+"\n******************************";
-    else if(data.username==undefined)
-        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.nome+"\nSurname: "+data.cognome+"\nLanguage: "+lang+"\n******************************";
-    else if(data.cognome==undefined)
-        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.nome+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
-    else
-        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.nome+"\nSurname: "+data.cognome+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
-    return t;
-    
 }
 
 startup();
 
-//Funzione start
+//Bot start
 bot.start((ctx) => {
     if(ctx.message.chat.id == adminID) {
         ctx.reply('Welcome @'+ctx.message.chat.username+'! 🎉🎉\n'
@@ -179,6 +143,7 @@ bot.start((ctx) => {
     }
 });
 
+//Get info about user
 bot.command('info', (ctx) => {
     if(ctx.message.chat.id == adminID) {
         //check if I am actually replying to someone
