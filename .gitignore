@@ -1,0 +1,3 @@
+.env
+.npmignore
+/node_modules/
