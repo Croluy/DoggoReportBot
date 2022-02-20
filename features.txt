@@ -1,5 +1,7 @@
 Set timezone for all admins, so that /info provides the right hour
 
+Creator of the bot can use a comand to list all admins
+
 Create list of users
 
 Set info comand for privacy users

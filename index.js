@@ -1,131 +1,31 @@
-const {Telegraf} = require('telegraf');
 require('dotenv').config();
+const {Telegraf} = require('telegraf');
 const editJsonFile = require("edit-json-file");
+let file = editJsonFile('./blacklist.json');
+const User = require('./User');
+const functions = require('./functions');
 
-let file = editJsonFile(`./blacklist.json`);
+const bot_test=true;
 
-const adminID = process.env.CREATOR_ID;  //ID creator
 const botID = 5198012118;   //ID: @DoggoReportBot
-const canaleLOG = process.env.CANALE_LOG;    //Log Channel
-var channelName = process.env.CHANNEL_NAME;
-var privacy=false;  //privacy variable for user forwarded messages
+
+//set environment variables
+const adminID = process.env.CREATOR_ID;     //ID of the creator
+const adminName = process.env.CREATOR_NAME; //Name && Username of the creator
+const canaleLOG = process.env.CANALE_LOG;   //Log Channel
+let channelName = process.env.CHANNEL_NAME; //Name of Channel linked to bot
+let privacy=false;  //privacy variable for user forwarded messages
+
+global.admins = [];
+global.creator = new User(adminID,adminName,false,undefined,adminName,"EN",1,true,true,false,true);
+global.current_user = new User();
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-//sleep in ms
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+functions.pushAdmin(creator);
 
-//Trasform unix time in readable time
-function UnixTimestamp(b){
-    const a = new Date(b * 1000);
-    const mesi = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const anno = a.getFullYear();
-    const mese = mesi[a.getMonth()];
-    const giorno = a.getDate();
-    var ora = a.getHours()+1;  //server is located in 1 h behind time zone
-    var min = a.getMinutes();
-    var sec = a.getSeconds();
-    if(ora<10) ora='0'+ora;
-    if(min<10) min='0'+min;
-    if(sec<10) sec='0'+sec;
-    return giorno + ' ' + mese + ' ' + anno + '\t-\t' + ora + ':' + min + ':' + sec;
-}
-
-//Set online status on log channel and ask for possible new username of the channel
-function startup(){
-    const testo="---------\n\n@DoggoReportBot: ✅ Online\n\n---------";
-    bot.telegram.sendMessage(canaleLOG,testo);
-    const richiesta="Bot is currently online again.\nIs the channel username still @"+channelName+"?\n\n"
-                   +"If yes then don't do anything. Otherwise set the new username using the command:\n/setusername your_new_username.";
-    bot.telegram.sendMessage(adminID,richiesta);
-    console.log("Bot online\n");
-}
-
-function info(a){
-    const data = {
-        "id": a.message.chat.id,
-        "name": a.message.chat.first_name,
-        "surname": a.message.chat.last_name,
-        "username": a.message.chat.username,
-        "language": a.from.language_code,
-        "date": a.message.date,
-        "messagge": a.message.text
-    }
-    const d=UnixTimestamp(data.date);
-    const lang=data.language.toUpperCase();
-    var t="";
-    if(data.surname == undefined && data.username == undefined)
-        t="*************INFO*************\nID: "+data.id+"\nName: "+data.name+"\nLanguage: "+lang+"\nDate: "+d+"\n******************************";
-    else if(data.username==undefined)
-        t="*************INFO*************\nID: "+data.id+"\nName: "+data.name+"\nSurname: "+data.surname+"\nLanguage: "+lang+"\nDate: "+d+"\n******************************";
-    else if(data.surname==undefined)
-        t="*************INFO*************\nID: "+data.id+"\nName: "+data.name+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\nDate: "+d+"\n******************************";
-    else
-        t="*************INFO*************\nID: "+data.id+"\nName: "+data.name+"\nSurname: "+data.surname+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\nDate: "+d+"\n******************************";
-    return t;
-}
-
-async function toAdmin(a){
-    //if admin didn't reply to himself, forward the reply
-    if(a.message.from.id != adminID){
-        a.forwardMessage(adminID,a.message.text);
-
-        //if the user has strict privacy forwarding settings, send dummy message for admin
-        if(privacy==true){
-            await sleep(500);  //delays the next message for 0,5 sec. This way it's sure it will always be 2nd
-            var m="";
-            if(a.from.last_name == undefined && a.from.username == undefined)
-                m='👆 Message sent by '+a.from.first_name+' [<code>'+a.from.id+'</code>]\n'
-                 //+'This user has hidden the link to its account from forwarded messages. 👀\n'
-                 +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
-            else if(a.from.username == undefined)
-                m='👆 Message sent by '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>]\n'
-                //+'This user has hidden the link to its account from forwarded messages. 👀\n'
-                +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
-            else if(a.from.last_name == undefined)
-                m='👆 Message sent by '+a.from.first_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n'
-                //+'This user has hidden the link to its account from forwarded messages. 👀\n'
-                +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
-            else
-                m='👆 Message sent by '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n'
-                //+'This user has hidden the link to its account from forwarded messages. 👀\n'
-                +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
-            a.telegram.sendMessage(adminID,m,{parse_mode: 'HTML'});
-            await sleep(500);  //delays the next message for 0,5 sec. This way it's sure it will always be 3rd
-            a.telegram.sendMessage(adminID,info(a));
-        }
-    }
-}
-
-function infoCommand(a){
-    const data={
-        "id":a.message.reply_to_message.forward_from.id,
-        "isBot":a.message.reply_to_message.forward_from.is_bot,
-        "name":a.message.reply_to_message.forward_from.first_name,
-        "surname":a.message.reply_to_message.forward_from.last_name,
-        "username":a.message.reply_to_message.forward_from.username,
-        "language":a.message.reply_to_message.forward_from.language_code,
-        "date":a.message.reply_to_message.forward_date
-    }
-    const d=UnixTimestamp(data.date);
-    const lang=data.language.toUpperCase();
-    var bot="";
-    if(data.isBot) bot="✅"; else bot="❌";
-    var t="";
-    if(data.surname == undefined && data.username == undefined)
-        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.name+"\nLanguage: "+lang+"\n******************************";
-    else if(data.username==undefined)
-        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.name+"\nSurname: "+data.surname+"\nLanguage: "+lang+"\n******************************";
-    else if(data.surname==undefined)
-        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.name+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
-    else
-        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.name+"\nSurname: "+data.surname+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
-    return t;
-}
-
-startup();
+//if it's not a test, then send classic log messages
+if(!bot_test) startup();
 
 //Bot start
 bot.start((ctx) => {
@@ -193,6 +93,69 @@ bot.command('setusername', (ctx) => {
         ctx.reply('Username of the channel changed successfully! 🎉\n'
                  +'Please remember to set this username to the main channel too.\n\n'
                  +'Have you done it already?\nThen you should be able to enter the channel from @'+channelName+'.');
+    }
+});
+
+//Make user into admin
+bot.command('admin', (ctx) => {
+    if(ctx.message.chat.id == creator.get_id) {
+        let input=ctx.message.text;
+        let inputArray=input.split(' ');
+
+        inputArray.shift();
+        input=inputArray.join(' ');
+        const newAdminUsername=input;
+
+        if(newAdminUsername==""){
+            //There is no text after the command
+            //check if I am actually replying to someone
+            if(ctx.message.hasOwnProperty('reply_to_message')){
+                if(ctx.message.reply_to_message.hasOwnProperty('forward_from')){
+                    //user has not limited privacy setting of forwarding, bot can know the original id of the forwarded message
+                    functions.setUser(ctx);
+                    current_user.set_isAdmin=true;
+                    functions.pushAdmin(current_user);
+                    console.log(admins);
+
+                    ctx.reply('L\'utente '+current_user.get_firstName+' '+current_user.get_lastName+'\t-\t'+current_user.get_username+' ['+current_user.get_id+']\nè stato aggiunto alla lista degli admin! 🎉');
+                }else{
+                    if(ctx.message.reply_to_message.hasOwnProperty('forward_sender_name')){
+                        //user has blocked the bot from sending his ID alongside forwarded messages
+                        //admin tries to reply to the user message but it will NOT work
+                        //admin has to reply to dummy message instead
+                        ctx.reply('This user has hidden the link to its account from forwarded messages. 👀\n'
+                                +'Check for the bot\'s message immediately below the one you wish and reply to that one instead.');
+                    }else if(ctx.message.reply_to_message.from.id==adminID){
+                        //admin tries to reply to its own message
+                        ctx.reply('You can\'t make yourself admin. You already are one.\n'
+                                 +'Lmao. 😂');
+                    }else if(ctx.message.reply_to_message.from.id==botID && /^👆/.test(ctx.message.reply_to_message.text)){
+                        //admin tries to reply to bot - dummy message
+                        const s=ctx.message.reply_to_message.text;
+                        const startID = s.indexOf("[")+1;
+                        const endID = s.indexOf("]");
+                        var newId="";
+                        for(let i=startID;i<endID;i++)
+                            newId=newId+''+s[i];
+                        ctx.telegram.sendMessage(newId,m);
+                    }else{
+                        //admin tries to reply to bot - no important message
+                        ctx.reply('You can\'t make the bot an admin. He has even more power than you have\n'
+                                 +'There\'s nothing you can offer to him that he doesn\'t already have. Lmao. 😂');
+                    }
+                }
+            }else{
+                //admin hasn't selected any message to reply to
+                ctx.reply('Who should I make admin? You haven\'t given me any hint.\nTry again, please.');
+            }
+        }
+        //write to file with admin list the changes
+        //write a message to the current user to let him know he became an admin
+        //set timezone
+        const m='Congrats! You are now part of the admins of this bot! 🎉\n'
+               +'Discover and enjoy your new commands available to you.\n'
+               +'You can check them out by typing /help. 👀';
+        ctx.telegram.sendMessage(current_user.get_id,m);
     }
 });
 
@@ -303,7 +266,7 @@ bot.hears(/(.+)/, async(ctx) => {
         let id=ctx.from.id;
         const chat = await ctx.tg.getChat(id);
         privacy=chat.has_private_forwards;
-        toAdmin(ctx);
+        functions.toAdmin(ctx);
     }
 });
 
@@ -312,7 +275,6 @@ bot.on('photo', (ctx) => {
         const p=ctx.message.photo;
         //check if I am actually replying to someone
         if(ctx.message.hasOwnProperty('reply_to_message')){
-            console.log(ctx.message.reply_to_message);
             if(ctx.message.reply_to_message.hasOwnProperty('forward_from')){
                 //user has not limited privacy setting of forwarding, bot can know the original id of the forwarded message
                 ctx.telegram.sendPhoto(chatID=ctx.message.reply_to_message.forward_from.id, photo=ctx.message.photo.file_id);
@@ -334,7 +296,7 @@ bot.on('photo', (ctx) => {
         }
     }else{
         //it's a normal user who texted the bot, forward the content to admin
-        toAdmin(ctx);
+        functions.toAdmin(ctx);
     }
 });
 
