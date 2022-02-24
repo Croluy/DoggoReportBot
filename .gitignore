@@ -1,5 +1,4 @@
 .env
 .npmignore
 /node_modules/
-admins.json
-blacklist.json
+*.json
