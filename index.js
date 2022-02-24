@@ -113,6 +113,7 @@ bot.command('admin', (ctx) => {
 
             inputArray.shift();
             input=inputArray.join(' ');
+            if(input[0]=="@") input.shift();    //User started username with @, so I remove that
             const newAdminUsername=input;
 
             const m='Congrats! 🎉 You are now part of the admins of this bot! 👮‍♂️\n'
@@ -124,6 +125,7 @@ bot.command('admin', (ctx) => {
                 //There is no text after the command
                 //check if I am actually replying to someone
                 if(ctx.message.hasOwnProperty('reply_to_message')){
+                    //success condition
                     if(ctx.message.reply_to_message.hasOwnProperty('forward_from')  ||  (ctx.message.reply_to_message.from.id==botID && /^👆/.test(ctx.message.reply_to_message.text))){
                         //user has not limited privacy setting of forwarding, bot can know the original id of the forwarded message
                         //OR
@@ -136,10 +138,10 @@ bot.command('admin', (ctx) => {
                             ctx.reply('User: <b>'+current_user.get_fullName+'</b> [<code>'+current_user.get_id+'</code>]\nhas been added to the admin list! 🎉',{parse_mode: 'HTML'});
                         ctx.telegram.sendMessage(current_user.get_id,m);
                     }else{
+                        //errors
                         if(ctx.message.reply_to_message.hasOwnProperty('forward_sender_name')){
                             //user has blocked the bot from sending his ID alongside forwarded messages
                             //admin tries to reply to the user message but it will NOT work
-                            //admin has to reply to dummy message instead
                             ctx.reply('This user has hidden the link to its account from forwarded messages tweaking privacy settings.\n'
                                      +'Don\'t worry, we\'ll work around this. 👀\n\n'
                                      +'Check for the bot\'s message immediately below the one you wish and reply to that one instead. 😉');
@@ -155,7 +157,7 @@ bot.command('admin', (ctx) => {
                     }
                 }else{
                     //admin hasn't selected any message to reply to
-                    ctx.reply('Who should I make admin? You haven\'t given me any hint.\nReply to the message of the user you want to make admin.');
+                    ctx.reply('Who should I make admin? You haven\'t given me any target.\nReply to the message of the user you want to make admin.');
                 }
             }
             //write to file with admin list the changes
@@ -237,7 +239,9 @@ bot.command(['blacklist','banlist'], (ctx) => {
 //my_chat_member for letting the admin know if an user ended the bot
 
 bot.hears(/(.+)/, async(ctx) => {
-    if(ctx.message.chat.id == adminID) {
+    console.log(ctx.message);
+    functions.setUser(ctx);
+    if(current_user.get_id == adminID) {
         const m=ctx.message.text;
         //check if I am actually replying to someone
         if(ctx.message.hasOwnProperty('reply_to_message')){
