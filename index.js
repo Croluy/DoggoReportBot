@@ -239,7 +239,6 @@ bot.command(['blacklist','banlist'], (ctx) => {
 //my_chat_member for letting the admin know if an user ended the bot
 
 bot.hears(/(.+)/, async(ctx) => {
-    console.log(ctx.message);
     functions.setUser(ctx);
     if(current_user.get_id == adminID) {
         const m=ctx.message.text;

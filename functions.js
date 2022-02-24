@@ -119,7 +119,6 @@ function infoCommand(a){
 //get ctx parameter and create an User object from that
 function setUser(a){
     if(a.message.from.id == creator.get_id){
-        console.log("\nENTRATO Cr\n");
         //Creator of the bot, no need to do anything as this user is already set up
         current_user=creator;
     }else{
@@ -134,12 +133,7 @@ function setUser(a){
             current_user.set_lang       =   a.message.reply_to_message.forward_from.language_code;
             //I set privacy as false, because if the user is able to get here, it means he has free privacy settings
             current_user.set_isPrivate  =   false;
-            console.log("\nENTRATO Est\n");
-        }else if(
-                    a.message.hasOwnProperty('reply_to_message') && a.message.reply_to_message.hasOwnProperty('forward_from') &&
-                    a.message.reply_to_message.from.id==botID && /^👆/.test(a.message.reply_to_message.text)
-                 ){
-            console.log("\nENTRATO L\n");
+        }else if(a.message.reply_to_message.from.id==botID && /^👆/.test(a.message.reply_to_message.text)){
             //the user has restricted privacy settings, only info I can get is full name from the dummy message
             current_user.set_id         =   idFromDummy(a);
             current_user.set_fullName   =   nameFromDummy(a);
