@@ -11,17 +11,68 @@ function sleep(ms) {
 //Trasform unix time in readable time
 function UnixTimestamp(b){
     const a = new Date(b * 1000);
-    const mesi = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-    const anno = a.getFullYear();
-    const mese = mesi[a.getMonth()];
-    const giorno = a.getDate();
-    var ora = a.getHours()+1;  //server is located in 1 h behind time zone
-    var min = a.getMinutes();
-    var sec = a.getSeconds();
-    if(ora<10) ora='0'+ora;
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    let y = a.getFullYear();
+    let m = months[a.getMonth()];
+    let d = a.getDate();
+    let h = a.getHours()+current_user.get_timeZone;
+
+    //Manage edge cases where the hour change (due to timeZone), also changes day and eventually also month and year
+    //  WARNINGS: -  Only works with time zones where difference from UTC is measured in hours
+    //               Users with timezones where also minutes differ, will experience bugs
+    //            -  If February has 29 days (once every 4 years), errors might occur
+    if(h>23){
+        d++;
+        h-=24;
+    }else if(h<0){
+        d--;
+        h+=24;
+    }
+    if(d>28 && m=="February"){
+        //last day of February for UTC - user is a day ahead
+        m=months[a.getMonth()+1];
+        d=1;
+    }else if(d<1 && m=="March"){
+        //first day of March for UTC - user is a day behind
+        m=months[a.getMonth()-1];
+        d=28;
+    }
+    if(d>31 && m=="December"){
+        //last day of December for UTC - user is a day ahead - year changes
+        m=months[0];
+        d=1;
+        y++;
+    }else if(d<1 && m=="January"){
+        //first day of January for UTC - user is a day behind - year changes
+        m=months[11];
+        d=31;
+        y--;
+    }
+    if(d>31 && (m=="January" || m=="March" || m=="May" || m=="July" || m=="August" || m=="October")){
+        //last day of months with 31 days for UTC - user is a day ahead
+        m=months[a.getMonth()+1];
+        d=1;
+    }else if(d<1 && (m=="April" || m=="June" || m=="August" || m=="September" || m=="November")){
+        //first day of months where previous month has 31 days for UTC - user is a day behind
+        m=months[a.getMonth()-1];
+        d=31;
+    }
+    if(d>30 && (m=="April" || m=="June" || m=="September" || m=="November")){
+        //last day of months with 30 days for UTC - user is a day ahead
+        m=months[a.getMonth()+1];
+        d=1;
+    }else if(d<1 && (m=="March" || m=="May" || m=="July" || m=="October" || m=="December")){
+        //first day of months where previous month has 30 days for UTC - user is a day behind
+        m=months[a.getMonth()-1];
+        d=30;
+    }
+
+    let min = a.getMinutes();
+    let sec = a.getSeconds();
+    if(h<10) h='0'+h;
     if(min<10) min='0'+min;
     if(sec<10) sec='0'+sec;
-    return giorno + ' ' + mese + ' ' + anno + '\t-\t' + ora + ':' + min + ':' + sec;
+    return d + ' ' + m + ' ' + y + '\t-\t' + h + ':' + min + ':' + sec;
 }
 
 //Set online status on log channel and ask for possible new username of the channel
