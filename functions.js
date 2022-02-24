@@ -77,12 +77,12 @@ function UnixTimestamp(b){
 
 //Set online status on log channel and ask for possible new username of the channel
 function startup(){
-    const testo="---------\n\n@DoggoReportBot: ✅ Online\n\n---------";
-    bot.telegram.sendMessage(canaleLOG,testo);
-    const richiesta="Bot is currently online again.\nIs the channel username still @"+channelName+"?\n\n"
+    const text="---------\n\n@DoggoReportBot: ✅ Online\n\n---------";
+    bot.telegram.sendMessage(canaleLOG,text);
+    const m="Bot is currently online again.\nIs the channel username still @"+channelName+"?\n\n"
                    +"If yes then don't do anything. Otherwise set the new username using the command:\n/setusername your_new_username.";
-    bot.telegram.sendMessage(adminID,richiesta);
-    console.log("Bot online\n");
+    bot.telegram.sendMessage(adminID,m);
+    console.log("@DoggoReportBot online ✓\n");
 }
 
 function info(a){
@@ -125,18 +125,17 @@ async function toAdmin(a){
             else if(a.from.username == undefined)
                 m='👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>]\n'
                 //+'This user has hidden the link to its account from forwarded messages. 👀\n'
-                +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
+                 +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
             else if(a.from.last_name == undefined)
                 m='👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n'
                 //+'This user has hidden the link to its account from forwarded messages. 👀\n'
-                +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
+                 +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
             else
                 m='👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n'
                 //+'This user has hidden the link to its account from forwarded messages. 👀\n'
-                +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
+                 +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
+            m=m+'\n\n'+info(a);
             a.telegram.sendMessage(adminID,m,{parse_mode: 'HTML'});
-            await sleep(500);  //delays the next message for 0,5 sec. This way it's sure it will always be 3rd
-            a.telegram.sendMessage(adminID,info(a));
         }
     }
 }
@@ -172,9 +171,9 @@ function setUser(a){
     if(a.message.from.id == creator.get_id){
         //Creator of the bot, no need to do anything as this user is already set up
         current_user=creator;
-    }else{
-        if(a.message.hasOwnProperty('reply_to_message') && a.message.reply_to_message.hasOwnProperty('forward_from')){
-            //have to set current user from replied message
+    }else if(a.message.hasOwnProperty('reply_to_message')){
+        if(a.message.reply_to_message.hasOwnProperty('forward_from')){
+            //have to set current user from replied message (free privacy)
             current_user.set_id         =   a.message.reply_to_message.forward_from.id;
             current_user.set_firstName  =   a.message.reply_to_message.forward_from.first_name;
             current_user.set_isBot      =   a.message.reply_to_message.forward_from.isBot;
@@ -185,12 +184,21 @@ function setUser(a){
             //I set privacy as false, because if the user is able to get here, it means he has free privacy settings
             current_user.set_isPrivate  =   false;
         }else if(a.message.reply_to_message.from.id==botID && /^👆/.test(a.message.reply_to_message.text)){
-            //the user has restricted privacy settings, only info I can get is full name from the dummy message
+            //reply to dummy, the user has restricted privacy settings, only info I can get is full name and id
             current_user.set_id         =   idFromDummy(a);
             current_user.set_fullName   =   nameFromDummy(a);
             current_user.set_isBot      =   false; //bots can't restrict privacy settings, so it's not a bot
             current_user.set_isPrivate  =   true;
         }
+    }else{
+        //set user from his normal message to the bot
+        current_user.set_id         =   a.message.from.id;
+        current_user.set_firstName  =   a.message.from.first_name;
+        current_user.set_isBot      =   a.message.from.isBot;
+        current_user.set_lastName   =   a.message.from.last_name;
+        current_user.set_fullName   =   current_user.get_firstName + ' ' + current_user.get_lastName;
+        current_user.set_username   =   a.message.from.username;
+        current_user.set_lang       =   a.message.from.language_code;
     }
 }
 
