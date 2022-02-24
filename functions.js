@@ -68,19 +68,19 @@ async function toAdmin(a){
             await sleep(500);  //delays the next message for 0,5 sec. This way it's sure it will always be 2nd
             var m="";
             if(a.from.last_name == undefined && a.from.username == undefined)
-                m='👆 Message sent by '+a.from.first_name+' [<code>'+a.from.id+'</code>]\n'
+                m='👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>]\n'
                  //+'This user has hidden the link to its account from forwarded messages. 👀\n'
                  +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
             else if(a.from.username == undefined)
-                m='👆 Message sent by '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>]\n'
+                m='👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>]\n'
                 //+'This user has hidden the link to its account from forwarded messages. 👀\n'
                 +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
             else if(a.from.last_name == undefined)
-                m='👆 Message sent by '+a.from.first_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n'
+                m='👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n'
                 //+'This user has hidden the link to its account from forwarded messages. 👀\n'
                 +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
             else
-                m='👆 Message sent by '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n'
+                m='👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n'
                 //+'This user has hidden the link to its account from forwarded messages. 👀\n'
                 +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
             a.telegram.sendMessage(adminID,m,{parse_mode: 'HTML'});
@@ -133,9 +133,41 @@ function setUser(a){
             current_user.set_lang       =   a.message.reply_to_message.forward_from.language_code;
             //I set privacy as false, because if the user is able to get here, it means he has free privacy settings
             current_user.set_isPrivate  =   false;
+        }else if(a.message.reply_to_message.from.id==botID && /^👆/.test(a.message.reply_to_message.text)){
+            //the user has restricted privacy settings, only info I can get is full name from the dummy message
+            current_user.set_id         =   idFromDummy(a);
+            current_user.set_fullName   =   nameFromDummy(a);
+            current_user.set_isBot      =   false; //bots can't restrict privacy settings, so it's not a bot
+            current_user.set_isPrivate  =   true;
         }
     }
 }
+
+function idFromDummy(a){
+    const t = a.message.reply_to_message.text;
+    const startID = t.indexOf("[")+1;
+    const endID = t.indexOf("]");
+    var newId = "";
+    for(let i=startID; i<endID; i++)
+        newId = newId +''+ t[i];
+    return newId;
+}
+
+function nameFromDummy(a){
+    const t = a.message.reply_to_message.text;
+    const startID = t.indexOf(":")+2;
+    const endID = t.indexOf("[")-1;
+    var name = "";
+    for(let i=startID; i<endID; i++)
+        name = name +''+ t[i];
+    return name;
+}
+
+function isAdmin(a){
+    //check from admin.json if user with id=a è admin
+}
+
+
 
 module.exports = {
     pushAdmin,
@@ -145,5 +177,8 @@ module.exports = {
     info,
     toAdmin,
     infoCommand,
-    setUser
+    setUser,
+    idFromDummy,
+    nameFromDummy,
+    isAdmin
 }

@@ -2,22 +2,23 @@ require('dotenv').config();
 const {Telegraf} = require('telegraf');
 const editJsonFile = require("edit-json-file");
 let file = editJsonFile('./blacklist.json');
+let admin = editJsonFile('./admin.json');
 const User = require('./User');
 const functions = require('./functions');
 
 const bot_test=true;
 
-const botID = 5198012118;   //ID: @DoggoReportBot
+global.botID = 5198012118;   //ID: @DoggoReportBot
 
 //set environment variables
-const adminID = process.env.CREATOR_ID;     //ID of the creator
-const adminName = process.env.CREATOR_NAME; //Name && Username of the creator
-const canaleLOG = process.env.CANALE_LOG;   //Log Channel
-let channelName = process.env.CHANNEL_NAME; //Name of Channel linked to bot
-let privacy=false;  //privacy variable for user forwarded messages
+global.adminID = process.env.CREATOR_ID;     //ID of the creator
+global.adminName = process.env.CREATOR_NAME; //Name && Username of the creator
+global.canaleLOG = process.env.CANALE_LOG;   //Log Channel
+global.channelName = process.env.CHANNEL_NAME; //Name of Channel linked to bot
+global.privacy=false;  //privacy variable for user forwarded messages
 
 global.admins = [];
-global.creator = new User(adminID,adminName,false,undefined,adminName,"EN",1,true,true,false,true);
+global.creator = new User(adminID,adminName,false,undefined,adminName,adminName,"EN",1,true,true,false,true);
 global.current_user = new User();
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
@@ -25,10 +26,11 @@ const bot = new Telegraf(process.env.BOT_TOKEN);
 functions.pushAdmin(creator);
 
 //if it's not a test, then send classic log messages
-if(!bot_test) startup();
+if(!bot_test) functions.startup();
 
 //Bot start
 bot.start((ctx) => {
+    functions.setUser(ctx);
     if(ctx.message.chat.id == adminID) {
         ctx.reply('Welcome @'+ctx.message.chat.username+'! 🎉🎉\n'
                  +'This bot lets you manage messages from users on behalf of @'+channelName+'.\n'
@@ -39,7 +41,7 @@ bot.start((ctx) => {
                  +'This bot lets you contact the admins of @'+channelName+'.\n'
                  +'Just write to me anything and admins will see and reply to your message. 👨‍💻\n'
                  +'You can send me funny images of scammers. 🤡');
-        toAdmin(ctx);
+        functions.toAdmin(ctx);
     }
 });
 
@@ -50,7 +52,7 @@ bot.command('info', (ctx) => {
         if(ctx.message.hasOwnProperty('reply_to_message')){
             if(ctx.message.reply_to_message.hasOwnProperty('forward_from')){
                 //user has not limited privacy setting of forwarding, bot can know the original id of the forwarded message
-                ctx.telegram.sendMessage(ctx.message.chat.id, infoCommand(ctx));
+                ctx.telegram.sendMessage(ctx.message.chat.id, functions.infoCommand(ctx));
             }else{
                 if(ctx.message.reply_to_message.forward_sender_name !== undefined){
                     //user has blocked the bot from sending his ID alongside forwarded messages
@@ -88,6 +90,7 @@ bot.command('setusername', (ctx) => {
 
         inputArray.shift();
         input=inputArray.join(' ');
+        if(input[0]=="@") input.shift();    //User started username with @, so I remove that
         channelName=input;
 
         ctx.reply('Username of the channel changed successfully! 🎉\n'
@@ -99,64 +102,69 @@ bot.command('setusername', (ctx) => {
 //Make user into admin
 bot.command('admin', (ctx) => {
     if(ctx.message.chat.id == creator.get_id) {
-        let input=ctx.message.text;
-        let inputArray=input.split(' ');
+        functions.setUser(ctx);
+        //check if username with userId is an admin, scrolling through admin.json
+        if(functions.isAdmin(current_user.get_id)) ctx.reply('This user is already Admin! 🙈');
+        else{
+            //Make sure only bot creator can use this command
+            //also make sure the user isn't already Admin
+            let input=ctx.message.text;
+            let inputArray=input.split(' ');
 
-        inputArray.shift();
-        input=inputArray.join(' ');
-        const newAdminUsername=input;
+            inputArray.shift();
+            input=inputArray.join(' ');
+            const newAdminUsername=input;
 
-        if(newAdminUsername==""){
-            //There is no text after the command
-            //check if I am actually replying to someone
-            if(ctx.message.hasOwnProperty('reply_to_message')){
-                if(ctx.message.reply_to_message.hasOwnProperty('forward_from')){
-                    //user has not limited privacy setting of forwarding, bot can know the original id of the forwarded message
-                    functions.setUser(ctx);
-                    current_user.set_isAdmin=true;
-                    functions.pushAdmin(current_user);
-                    console.log(admins);
+            const m='Congrats! 🎉 You are now part of the admins of this bot! 👮‍♂️\n'
+                +'Discover the new commands available to you.\n'
+                +'You can check them out by typing /help in the chat.\n'
+                +'When you do that, you\'ll see the status set to Admin. 👀';
 
-                    ctx.reply('L\'utente '+current_user.get_firstName+' '+current_user.get_lastName+'\t-\t'+current_user.get_username+' ['+current_user.get_id+']\nè stato aggiunto alla lista degli admin! 🎉');
-                }else{
-                    if(ctx.message.reply_to_message.hasOwnProperty('forward_sender_name')){
-                        //user has blocked the bot from sending his ID alongside forwarded messages
-                        //admin tries to reply to the user message but it will NOT work
-                        //admin has to reply to dummy message instead
-                        ctx.reply('This user has hidden the link to its account from forwarded messages. 👀\n'
-                                +'Check for the bot\'s message immediately below the one you wish and reply to that one instead.');
-                    }else if(ctx.message.reply_to_message.from.id==adminID){
-                        //admin tries to reply to its own message
-                        ctx.reply('You can\'t make yourself admin. You already are one.\n'
-                                 +'Lmao. 😂');
-                    }else if(ctx.message.reply_to_message.from.id==botID && /^👆/.test(ctx.message.reply_to_message.text)){
-                        //admin tries to reply to bot - dummy message
-                        const s=ctx.message.reply_to_message.text;
-                        const startID = s.indexOf("[")+1;
-                        const endID = s.indexOf("]");
-                        var newId="";
-                        for(let i=startID;i<endID;i++)
-                            newId=newId+''+s[i];
-                        ctx.telegram.sendMessage(newId,m);
+            if(newAdminUsername=="") {
+                //There is no text after the command
+                //check if I am actually replying to someone
+                if(ctx.message.hasOwnProperty('reply_to_message')){
+                    if(ctx.message.reply_to_message.hasOwnProperty('forward_from')  ||  (ctx.message.reply_to_message.from.id==botID && /^👆/.test(ctx.message.reply_to_message.text))){
+                        //user has not limited privacy setting of forwarding, bot can know the original id of the forwarded message
+                        //OR
+                        //user has limited privacy and I can only print up a little amount of info
+                        current_user.set_isAdmin=true;
+                        functions.pushAdmin(current_user);
+                        if(current_user.get_username != undefined)
+                            ctx.reply('User: <b>'+current_user.get_firstName+' '+current_user.get_lastName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>]\nhas been added to the admin list! 🎉',{parse_mode: 'HTML'});
+                        else
+                            ctx.reply('User: <b>'+current_user.get_fullName+'</b> [<code>'+current_user.get_id+'</code>]\nhas been added to the admin list! 🎉',{parse_mode: 'HTML'});
+                        ctx.telegram.sendMessage(current_user.get_id,m);
                     }else{
-                        //admin tries to reply to bot - no important message
-                        ctx.reply('You can\'t make the bot an admin. He has even more power than you have\n'
-                                 +'There\'s nothing you can offer to him that he doesn\'t already have. Lmao. 😂');
+                        if(ctx.message.reply_to_message.hasOwnProperty('forward_sender_name')){
+                            //user has blocked the bot from sending his ID alongside forwarded messages
+                            //admin tries to reply to the user message but it will NOT work
+                            //admin has to reply to dummy message instead
+                            ctx.reply('This user has hidden the link to its account from forwarded messages tweaking privacy settings.\n'
+                                     +'Don\'t worry, we\'ll work around this. 👀\n\n'
+                                     +'Check for the bot\'s message immediately below the one you wish and reply to that one instead. 😉');
+                        }else if(ctx.message.reply_to_message.from.id==adminID){
+                            //admin tries to reply to its own message
+                            ctx.reply('You can\'t make yourself admin. You already are one.\n'
+                                     +'Lmao. 😂');
+                        }else{
+                            //admin tries to reply to bot - no important message
+                            ctx.reply('You can\'t make the bot an admin. He has even more power than you have\n'
+                                     +'There\'s nothing you can offer to him that he doesn\'t already have. Lmao. 😂');
+                        }
                     }
+                }else{
+                    //admin hasn't selected any message to reply to
+                    ctx.reply('Who should I make admin? You haven\'t given me any hint.\nReply to the message of the user you want to make admin.');
                 }
-            }else{
-                //admin hasn't selected any message to reply to
-                ctx.reply('Who should I make admin? You haven\'t given me any hint.\nTry again, please.');
             }
+            //write to file with admin list the changes
+            //write a message to the current user to let him know he became an admin
+            //set timezone
+            
         }
-        //write to file with admin list the changes
-        //write a message to the current user to let him know he became an admin
-        //set timezone
-        const m='Congrats! You are now part of the admins of this bot! 🎉\n'
-               +'Discover and enjoy your new commands available to you.\n'
-               +'You can check them out by typing /help. 👀';
-        ctx.telegram.sendMessage(current_user.get_id,m);
-    }
+    }else ctx.reply('I am sorry, you are not allowed to use this command.\n'
+                   +'Only the creator of the bot can add or remove admins.');
 });
 
 //ban user from the bot, impeding him to write to admins
@@ -191,20 +199,25 @@ bot.help((ctx) => {
     if(ctx.message.chat.id == adminID) {
         //admin help
         ctx.reply('❔ Help for @DoggoReportBot:\n\n'
-                 +'Your status: Admin 👮‍♀️\n'
-                 +'\nCommands:\n'
+                 +'\t\t# Your status: Admin 👮‍♀️\n'
+                 +'\nBot-related commands:\n'
                  +'~ /help \t=>\t this command;\n'
                  +'~ /setusername [new_username] \t=>\t lets the bot know the new linked channel username;\n'
-                 +'~ /info \t=>\t reply to a message with this command to get infos about the user;\n\n'
-                 +'~ /ban OR /terminate \t=>\t forbids an user to keep using the bot;\n'
-                 +'~ /blackli \t=>\t this command;\n'
-                 +'Do you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
+                 +'~ /adminlist \t=>\t see a list of admin users;\n'
+                 +'~ /blacklist \t=>\t see a list of banned users;\n'
+                 +'\nUser-related commands:\n'
+                 +'~ /info \t=>\t reply to a message with this command to get infos about the user;\n'
+                 +'~ /admin \t=>\t set an user as an admin of the bot;\n'
+                 +'~ /unadmin \t=>\t set an admin as an user of the bot;\n'
+                 +'~ /ban [username] OR /terminate [username] \t=>\t forbids an user to keep using the bot;\n'
+                 +'~ /unban [username] \t=>\t allows a banned user to keep using the bot;\n\n'
+                 +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
     }else{
         //user help
         ctx.reply('❔ Help for @DoggoReportBot:\n\n'
-                 +'Your status: User 👤\n'
-                 +'\nCommands:\n'
-                 +'~ /help \t=>\t this command;\n'
+                 +'\t\t# Your status: User 👤\n'
+                 +'\nCommand:\n'
+                 +'~ /help \t=>\t this command;\n\n'
                  +'\nThis bot lets you contact the admins of @'+channelName+'.\n'
                  +'Just write to me anything and admins will eventually reply to your message. 👨‍💻\n'
                  +'You can send me screenshots of funny scammers chat. 🤡');
@@ -259,7 +272,8 @@ bot.hears(/(.+)/, async(ctx) => {
             }
         }else{
             //admin hasn't selected any message to reply to
-            ctx.reply('Please select a message to reply to! 👍🏻');
+            ctx.reply('Please select a message to reply to! 👍🏻\n'
+                     +'Or check out your available commands typing /help in chat.');
         }
     }else{
         //it's a normal user who texted the bot, forward the content to admin
