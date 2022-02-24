@@ -2,7 +2,7 @@ require('dotenv').config();
 const {Telegraf} = require('telegraf');
 const editJsonFile = require("edit-json-file");
 let file = editJsonFile('./blacklist.json');
-let admin = editJsonFile('./admin.json');
+let admins = editJsonFile('./admins.json');
 const User = require('./User');
 const functions = require('./functions');
 
