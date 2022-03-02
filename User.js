@@ -12,11 +12,12 @@ class User{
      * @param {string}  lang        = [DEFAULT: EN]                 User's IETF Language Tag (device dependant).
      * @param {int}     timeZone    = [DEFAULT: 0]                  User's time zone relative to (UTC) Coordinated Universal Time.
      * @param {bool}    isPrivate   = [DEFAULT: false]              Has the User restricted it's privacy forwarding settings?
+     * @param {bool}    isSuperior  = [DEFAULT: false]              Has the User permission to use superior admin commands?
      * @param {bool}    isAdmin     = [DEFAULT: false]              Is User admin?
      * @param {bool}    isBan       = [DEFAULT: false]              Is User banned?
      * @param {bool}    isActive    = [DEFAULT: true]               Does User have active chat with BOT?
      */
-     constructor(id, firstName, isBot=false, lastName=undefined, fullName=firstName+' '+lastName, username=undefined, lang="EN", timeZone=0, isPrivate=false, isAdmin=false, isBan=false, isActive=true){
+     constructor(id, firstName, isBot=false, lastName=undefined, fullName=firstName+' '+lastName, username=undefined, lang="EN", timeZone=0, isPrivate=false, isSuperior=false, isAdmin=false, isBan=false, isActive=true){
         //User infos
         this.id = id;
         this.firstName = firstName;
@@ -27,6 +28,7 @@ class User{
         this.lang = lang;
         this.timeZone = timeZone;
         this.isPrivate = isPrivate;
+        this.isSuperior = isSuperior;
 
         //Chat infos
         this.isAdmin=isAdmin;
@@ -78,6 +80,11 @@ class User{
      * @return {bool} Has the User restricted it's privacy forwarding settings?
      */
     get get_isPrivate(){return this.isPrivate;}
+
+    /**
+     * @return {bool} Can user use superior admin commands?
+     */
+     get get_isSuperior(){return this.isSuperior;}
     
     /**
      * @return {bool} Is User admin?
@@ -147,6 +154,12 @@ class User{
      * @param {bool} [DEFAULT = false] Has the User restricted it's privacy forwarding settings?
      */
     set set_isPrivate(isPrivate){this.isPrivate = isPrivate;}
+
+    /**
+     * 
+     * @param {bool} [DEFAULT = false] Can use superior admin commands?
+     */
+     set set_isSuperior(isSuperior){this.isSuperior = isSuperior;}
 
     /**
      * 
