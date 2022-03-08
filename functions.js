@@ -197,21 +197,33 @@ function setUser(a){
             //have to set current user from replied message (free privacy)
             current_user.set_id         =   a.message.reply_to_message.forward_from.id.toString();
             current_user.set_firstName  =   a.message.reply_to_message.forward_from.first_name;
+            current_user.set_isSuperior =   false;
             current_user.set_isBot      =   a.message.reply_to_message.forward_from.isBot;
             current_user.set_lastName   =   a.message.reply_to_message.forward_from.last_name;
             current_user.set_fullName   =   current_user.get_firstName + ' ' + current_user.get_lastName;
             current_user.set_username   =   a.message.reply_to_message.forward_from.username;
             current_user.set_lang       =   a.message.reply_to_message.forward_from.language_code.toUpperCase();
+            current_user.set_timeZone   =   0;
             //I set privacy as false, because if the user is able to get here, it means he has free privacy settings
             current_user.set_isPrivate  =   false;
+            current_user.set_isBan      =   false;
+            current_user.set_isActive   =   true;
+            current_user.set_isCreator  =   false;
         }else if(a.message.reply_to_message.from.id==botID && /^👆/.test(a.message.reply_to_message.text)){
             //reply to dummy, the user has restricted privacy settings, only info I can get is full name and id
             current_user.set_id         =   idFromDummy(a);
+            current_user.set_firstName  =   undefined;
+            current_user.set_lastName   =   undefined;
             current_user.set_fullName   =   nameFromDummy(a);
+            current_user.set_isSuperior =   false;
             current_user.set_username   =   usernameFromDummy(a);
             current_user.set_lang       =   langFromDummy(a);
+            current_user.set_timeZone   =   0;
             current_user.set_isBot      =   false; //bots can't restrict privacy settings, so it's not a bot
             current_user.set_isPrivate  =   true;
+            current_user.set_isBan      =   false;
+            current_user.set_isActive   =   true;
+            current_user.set_isCreator  =   false;
         }
     }else{
         //set user from his normal message to the bot
@@ -245,13 +257,45 @@ function initFiles(){
 
 function add_AdminToFile(u,d){
     admins.append("List", {"Admin #":adminListIndex, "ID":u.get_id,
-                           "Full Name":u.get_fullName, "isSuperior":u.get_isSuperior,
+                           "Full Name":u.get_fullName, "isAdmin":u.get_isAdmin, "isSuperior":u.get_isSuperior,
                            "Username":u.get_username, "Language":u.get_lang,
                            "isPrivate":u.get_isPrivate, "Time Zone (UTC)":u.get_timeZone,
                            "Date of Promotion":UnixTimestamp(d)});
     adminListIndex++;   //increment number of the next admin
     admins.set("Admins Number",adminListIndex);  //update admin index
     admins.save();
+}
+
+function removeFromFile(id,i){
+    let n=admins.get("Admins Number");
+    const a=admins.toObject();
+
+    //use parameter i to determine which admin has to be removed from the list
+    a.List.splice(i,1);
+    admins.set("Admins Number",n-1);    //update admin index
+    admins.save();
+}
+
+function demote_AdminToFile(id){
+    let i=1;    //start check at index 1, because index 0 of List will always be creator and creator can't be demoted
+    const a=admins.toObject();
+
+    //there is only an element in Admin array (creator) - user can't be demoted if he's not even an admin
+    if(a.List.length==1) return -1000;
+
+    //loop though all the admins except the 1st one (because he is creator)
+    do{
+        //if user's ID attribute is equal to id (parameter) and the user has isAdmin set to true, transfom user in normal user and return success
+        if(a.List[i].ID==id && a.List[i].isAdmin==true){
+            if(a.List[i].isSuperior==true) return -1010;    //if admin is superior, he can't be demoted
+            removeFromFile(id,i);
+            return 1;
+        }
+        i++;
+    }while(i<adminListIndex);
+
+    //if loop ends without finding a match, error has occoured, possible cause: user never was admin
+    return -1005;
 }
 
 function setSuperiorId(id){
@@ -299,8 +343,9 @@ function checkAdmin(u){
 }
 
 function checkCreator(u){
-    //check id provided with creator ID
-    if(u.get_id==creator.get_id) return true;
+    //u can be either User object or an ID to check
+    //check if u is Object or an ID of the creator - otherwise return false
+    if(u.get_id==creator.get_id || u==creator.get_id) return true;
     else return false;
 }
 
@@ -421,6 +466,8 @@ module.exports = {
     setUser,
     initFiles,
     add_AdminToFile,
+    removeFromFile,
+    demote_AdminToFile,
     setSuperiorId,
     checkAdmin,
     checkCreator,
