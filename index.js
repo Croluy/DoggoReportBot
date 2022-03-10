@@ -360,8 +360,6 @@ bot.command('superior', (ctx) => {
         input=inputArray.join(' ');
         const id=input;
 
-        console.log("ID utente:\t"+id);
-
         if(id==undefined || id==null || id=='') {
             //creator has not specified an ID to promote
             ctx.reply('You have not specified an ID to promote.\n'
@@ -424,36 +422,27 @@ bot.command('resetadmins', (ctx) => {
 //deleteMessage for deleting a message the admin has sent
 //my_chat_member for letting the admin know if an user ended the bot
 
-//FIXME: after admin writes messages without replying to anyone, his next message doesn't get sent
+//Bot manages normal messages from/to admins
 bot.hears(/(.+)/, async(ctx) => {
-    functions.setUser(ctx);
-    console.log(ctx.message);
-    if(functions.checkAdminId(ctx.message.from.id)) {
-        console.log("Utente è admin.\n"+current_user);
+    if(functions.checkAdminId(ctx.message.chat.id)) {
         const m=ctx.message.text;
         //check if I am actually replying to someone
         if(ctx.message.hasOwnProperty('reply_to_message')){
-            console.log("Sto rispondendo a qualcuno");
             if(ctx.message.reply_to_message.hasOwnProperty('forward_from')){
-                console.log("Privacy non limitata.");
                 //user has not limited privacy setting of forwarding, bot can know the original id of the forwarded message
                 ctx.telegram.sendMessage(ctx.message.reply_to_message.forward_from.id, m);
             }else{
-                console.log("Privacy limitata.");
                 if(ctx.message.reply_to_message.hasOwnProperty('forward_sender_name')){
-                    console.log("Stai rispondendo al messaggio sbagliato. Rispondi a quello del bot.");
                     //user has blocked the bot from sending his ID alongside forwarded messages
                     //admin tries to reply to the user message but it will NOT work
                     //admin has to reply to dummy message instead
                     ctx.reply('This user has hidden the link to its account from forwarded messages. 👀\n'
                              +'Check for the bot\'s message immediately below the one you wish and reply to that one instead.');
                 }else if(ctx.message.reply_to_message.from.id==adminID){
-                    console.log("Stai rispondendo al tuo stesso messaggio.");
                     //admin tries to reply to its own message
                     ctx.reply('You can\'t message yourself. Who should I forward that to?\n'
                              +'To yourself? Lmao. 😂');
                 }else if(ctx.message.reply_to_message.from.id==botID && /^👆/.test(ctx.message.reply_to_message.text)){
-                    console.log("Messaggio corretto, entrato in condizione.");
                     //admin tries to reply to bot - dummy message
                     const t = ctx.message.reply_to_message.text;
                     const start = t.indexOf("[")+1;
@@ -469,20 +458,17 @@ bot.hears(/(.+)/, async(ctx) => {
                 }
             }
         }else{
-            console.log("Non rispondi a nessun messaggio.");
             //admin hasn't selected any message to reply to
             ctx.reply('Please select a message to reply to! 👍🏻\n'
                      +'Or check out your available commands typing /help in chat.');
         }
     }else{
-        console.log("Invio messaggio ad admin.");
         //it's a normal user who texted the bot, forward the content to admin
         let id=ctx.from.id;
         const chat = await ctx.telegram.getChat(id);
         privacy=chat.has_private_forwards;
         functions.toAdmin(ctx);
     }
-    //functions.clearUser(current_user);
 });
 
 bot.on('photo', (ctx) => {

@@ -197,7 +197,9 @@ function setUser(a){
             //have to set current user from replied message (free privacy)
             current_user.set_id         =   a.message.reply_to_message.forward_from.id.toString();
             current_user.set_firstName  =   a.message.reply_to_message.forward_from.first_name;
-            current_user.set_isSuperior =   false;
+            //current_user.set_isSuperior =   false;
+            current_user.set_isAdmin    =   checkAdminId(current_user.get_id);
+            current_user.set_isSuperior =   checkSuperiorId(current_user.get_id);
             current_user.set_isBot      =   a.message.reply_to_message.forward_from.isBot;
             current_user.set_lastName   =   a.message.reply_to_message.forward_from.last_name;
             current_user.set_fullName   =   current_user.get_firstName + ' ' + current_user.get_lastName;
@@ -215,7 +217,9 @@ function setUser(a){
             current_user.set_firstName  =   undefined;
             current_user.set_lastName   =   undefined;
             current_user.set_fullName   =   nameFromDummy(a);
-            current_user.set_isSuperior =   false;
+            //current_user.set_isSuperior =   false;
+            current_user.set_isAdmin    =   checkAdminId(current_user.get_id);
+            current_user.set_isSuperior =   checkSuperiorId(current_user.get_id);
             current_user.set_username   =   usernameFromDummy(a);
             current_user.set_lang       =   langFromDummy(a);
             current_user.set_timeZone   =   0;
@@ -404,7 +408,6 @@ function checkSuperiorId(id){
 
     //loop though all the admins except the 1st one
     do{
-        //console.log("ID: "+a.List[i].ID);
         const test=admins.get('List['+i+'].ID');
         //if user's ID attribute is equal to id, exit condition, he is superior
         if(test==id && a.List[i].isSuperior) return true;
