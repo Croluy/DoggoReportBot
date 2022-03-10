@@ -128,7 +128,7 @@ function info(a){
     return t;
 }
 
-//FIXME: MAYBE BUG - sends message from user to admin
+//sends message from user to admin
 async function toAdmin(a){
     //if admin didn't reply to himself, forward the reply
     if(a.message.from.id != adminID){
