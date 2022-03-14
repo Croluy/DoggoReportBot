@@ -11,6 +11,8 @@ const bot_test=false;
 
 global.botID = 5198012118;   //ID: @DoggoReportBot
 
+//TODO: make all the bot commands with current_user and remember to clear the user at the end of the command
+
 //set environment variables
 global.adminID = process.env.CREATOR_ID;     //ID of the creator
 global.adminName = process.env.CREATOR_NAME; //Name && Username of the creator
@@ -30,18 +32,141 @@ if(!bot_test) functions.startup();
 //Bot start
 bot.start((ctx) => {
     functions.setUser(ctx);
-    if(ctx.message.chat.id == adminID) {
-        ctx.reply('Welcome @'+ctx.message.chat.username+'! 🎉🎉\n'
-                 +'This bot lets you manage messages from users on behalf of @'+channelName+'.\n'
-                 +'You\'re set as an admin for this bot! 👮\n'
-                 +'Just reply to any message I forward you and I will send your reply to the selected user! 🚀');
+    if(functions.checkCreator(current_user)) {
+        //creator started the bot
+        if(creator.get_username != undefined || creator.get_username != null){
+            //has username set
+            ctx.reply('Welcome My Lord <b>@'+creator.get_username+'</b>! 🎉🎉\n'
+                     +'I\'m going to explain how this whole things works even if you should know already since you literally created me! 👀\n'
+                     +'This bot lets you manage messages from users on behalf of @'+channelName+'.\n\n'
+                     +'You\'re set as the <b><u>CREATOR</u></b> of this bot! 👑\n'
+                     +'Just reply to any message I forward you and I will send your reply to the selected user! 🚀\n'
+                     +'You can check anytime for all your available commands by typing /help in chat! 💡\n', {parse_mode: 'HTML'});
+        }else{
+            //doesn't have username set
+            ctx.reply('Welcome My Lord <b>'+creator.get_fullName+'</b>! 🎉🎉\n'
+                     +'I\'m going to explain how this whole things works even if you should know already since you literally created me! 👀\n'
+                     +'This bot lets you manage messages from users on behalf of @'+channelName+'.\n\n'
+                     +'You\'re set as the <b><u>CREATOR</u></b> of this bot! 👑\n'
+                     +'Just reply to any message I forward you and I will send your reply to the selected user! 🚀\n'
+                     +'You can check anytime for all your available commands by typing /help in chat! 💡\n', {parse_mode: 'HTML'});
+        }
+    }else if(functions.checkSuperior(current_user)) {
+        //superior admin started the bot
+        if(current_user.get_username != undefined || current_user.get_username != null){
+            //has username set
+            ctx.reply('Welcome <b>@'+ctx.message.chat.username+'</b>! 🎉🎉\n'
+                     +'This bot lets you manage messages from users on behalf of @'+channelName+'.\n\n'
+                     +'You\'re set as a <b><u>SUPERIOR ADMINISTRATOR</u></b> for this bot! 💎\n'
+                     +'Just reply to any message I forward you and I will send your reply to the selected user! 🚀\n'
+                     +'You can check anytime for all your available commands by typing /help in chat! 💡\n', {parse_mode: 'HTML'});
+        }else{
+            //doesn't have username set
+            ctx.reply('Welcome <b>'+ctx.message.chat.firstName+'</b>! 🎉🎉\n'
+                     +'This bot lets you manage messages from users on behalf of @'+channelName+'.\n\n'
+                     +'You\'re set as a <b><u>SUPERIOR ADMINISTRATOR</u></b> for this bot! 💎\n'
+                     +'Just reply to any message I forward you and I will send your reply to the selected user! 🚀\n'
+                     +'You can check anytime for all your available commands by typing /help in chat! 💡\n', {parse_mode: 'HTML'});
+        }
+    }else if(functions.checkAdmin(current_user)) {
+        //admin started the bot
+        if(current_user.get_username != undefined || current_user.get_username != null){
+            //has username set
+            ctx.reply('Welcome <b>@'+ctx.message.chat.username+'</b>! 🎉🎉\n'
+                     +'This bot lets you manage messages from users on behalf of @'+channelName+'.\n\n'
+                     +'You\'re set as an <b><u>ADMINISTRATOR</u></b> for this bot! 👮\n'
+                     +'Just reply to any message I forward you and I will send your reply to the selected user! 🚀\n'
+                     +'You can check anytime for all your available commands by typing /help in chat! 💡\n', {parse_mode: 'HTML'});
+        }else{
+            //doesn't have username set
+            ctx.reply('Welcome <b>'+ctx.message.chat.firstName+'</b>! 🎉🎉\n'
+                     +'This bot lets you manage messages from users on behalf of @'+channelName+'.\n\n'
+                     +'You\'re set as an <b><u>ADMINISTRATOR</u></b> for this bot! 👮\n'
+                     +'Just reply to any message I forward you and I will send your reply to the selected user! 🚀\n'
+                     +'You can check anytime for all your available commands by typing /help in chat! 💡\n', {parse_mode: 'HTML'});
+        }
     }else{
-        ctx.reply('Hey, thanks for dropping by. 👋🏻\n'
-                 +'This bot lets you contact the admins of @'+channelName+'.\n'
-                 +'Just write to me anything and admins will see and reply to your message. 👨‍💻\n'
-                 +'You can send me funny images of scammers. 🤡');
+        //normal user started the bot
+        if(current_user.get_username != undefined || current_user.get_username != null){
+            //has username set
+            ctx.reply('Hey <b>@'+ctx.message.chat.username+'</b>, thanks for dropping by. 👋🏻\n'
+                     +'This bot lets you contact the admins of @'+channelName+'.\n\n'
+                     +'Just write to me anything and admins will see and reply to your message. 👨‍💻\n'
+                     +'You can send me funny images of scammers if you wish. 🤡', {parse_mode: 'HTML'});
+        }else{
+            //doesn't have username set
+            ctx.reply('Hey <b>'+ctx.message.chat.firstName+'</b>, thanks for dropping by. 👋🏻\n'
+                     +'This bot lets you contact the admins of @'+channelName+'.\n\n'
+                     +'Just write to me anything and admins will see and reply to your message. 👨‍💻\n'
+                     +'You can send me funny images of scammers if you wish. 🤡', {parse_mode: 'HTML'});
+        }
         functions.toAdmin(ctx);
     }
+    functions.clearUser();
+});
+
+//help command
+bot.help((ctx) => {
+    functions.setUser(ctx);
+    //if(functions.checkCreator(current_user)){
+    if(ctx.message.from.id == creator.get_id){
+        //creator help
+        ctx.reply('❔ Help for @DoggoReportBot:\n\n'
+                 +'\t\t# Your status: Creator 👑\n'
+                 +'\nBot-related commands:\nIn order to use this commands just type them in chat normally.\n'
+                 +'~ /help \t=>\t this command;\n'
+                 +'~ /setusername [new_username] \t=>\t lets the bot know the new linked channel username;\n'
+                 +'~ /resetadmins \t=>\t demotes all admins and superior admins to normal users;\n'
+                 +'~ /adminlist \t=>\t see a list of all admins of this bot with infos about everyone;\n'
+                 +'~ /blacklist \t=>\t see a list of banned users;\n'
+                 +'\nUser-related commands:\nIn order to use this commands reply to user\'s message\n'
+                 +'~ /info \t=>\t reply to a message with this command to get infos about the user;\n'
+                 +'~ /admin \t=>\t set an user as an admin of the bot;\n'
+                 +'~ /demote \t=>\t if an user is superior admin, he will become admin and if he\'s admin he will become normal user;\n'
+                 +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID\n'
+                 +'~ /superior [id] \t=>\t set an admin as a superior admin of the bot;\n'
+                 +'~ /ban [id] \t=>\t forbids an user to keep using the bot;\n'
+                 +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\n'
+                 +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
+    } else if(functions.checkSuperior(current_user)) {
+        //superior admin help
+        ctx.reply('❔ Help for @DoggoReportBot:\n\n'
+                 +'\t\t# Your status: Superior Admin 💎\n'
+                 +'\nBot-related commands:\nIn order to use this commands just type them in chat normally.\n'
+                 +'~ /help \t=>\t this command;\n'
+                 +'~ /setusername [new_username] \t=>\t lets the bot know the new linked channel username;\n'
+                 +'~ /adminlist \t=>\t see a list of all admins of this bot with infos about everyone;\n'
+                 +'~ /blacklist \t=>\t see a list of banned users;\n'
+                 +'\nUser-related commands:\nIn order to use this commands reply to user\'s message\n'
+                 +'~ /info \t=>\t reply to a message with this command to get infos about the user;\n'
+                 +'~ /admin \t=>\t set an user as an admin of the bot;\n'
+                 +'~ /demote \t=>\t demote admin to normal user;\n'
+                 +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID\n'
+                 +'~ /ban [id] \t=>\t forbids an user to keep using the bot;\n'
+                 +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\n'
+                 +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
+    }else if(functions.checkAdmin(current_user)) {
+        //admin help
+        ctx.reply('❔ Help for @DoggoReportBot:\n\n'
+                 +'\t\t# Your status: Admin 👮‍♀️\nIn order to use this commands just type them in chat\n'
+                 +'\nBot-related commands:\n'
+                 +'~ /help \t=>\t this command;\n'
+                 +'~ /blacklist \t=>\t see a list of banned users;\n'
+                 +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID'
+                 +'~ /ban [id] \t=>\t forbids an user to keep using the bot;\n'
+                 +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\n'
+                 +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
+    }else{
+        //user help
+        ctx.reply('❔ Help for @DoggoReportBot:\n\n'
+                 +'\t\t# Your status: User 👤\n'
+                 +'\nCommand:\n'
+                 +'~ /help \t=>\t this command;\n\n'
+                 +'\nThis bot lets you contact the admins of @'+channelName+'.\n'
+                 +'Just write to me anything and admins will eventually reply to your message. 👨‍💻\n'
+                 +'You can send me screenshots of funny scammers chat. 🤡');
+    }
+    functions.clearUser();
 });
 
 //Get info about user
@@ -84,7 +209,8 @@ bot.command('info', (ctx) => {
 
 //set username for the channel - it's used to print it during the "/start" comand
 bot.command('setusername', (ctx) => {
-    if(ctx.message.chat.id == adminID) {
+    functions.setUser(ctx);
+    if(functions.checkSuperior(current_user)) {
         let input=ctx.message.text;
         let inputArray=input.split(' ');
 
@@ -97,11 +223,11 @@ bot.command('setusername', (ctx) => {
                  +'Please remember to set this username to the main channel too.\n\n'
                  +'Have you done it already?\nThen you should be able to enter the channel from @'+channelName+'.');
     }
+    functions.clearUser();
 });
 
 //Make user into admin
 bot.command('admin', (ctx) => {
-    functions.clearUser(current_user);
     //only superior admins can add an admin
     if(functions.checkSuperiorId(ctx.message.chat.id)) {
         functions.setUser(ctx);
@@ -176,9 +302,8 @@ bot.command('admin', (ctx) => {
                          +'Just reply to the message of the user you want to make admin.');
             }
         }
-        //functions.clearUser(current_user);
-    }else ctx.reply('I\'m sorry, you are not allowed to use this command.\n'
-                   +'Only the creator of the bot can add or remove admins.');
+        functions.clearUser();
+    }
 });
 
 //Demote an user from admin
@@ -282,8 +407,8 @@ bot.command(['unadmin','demote'], (ctx) => {
             //TOFIX
             console.log('BRUH... HOW DID YOU END UP HERE? YOU\'RE NOT SUPPOSED TO.');
         }
-    }else ctx.reply('I\'m sorry, you are not allowed to use this command.\n'
-                   +'Only the creator of the bot can add or remove admins.');
+    }
+    functions.clearUser();
 });
 
 //ban user from the bot, impeding him to write to admins
@@ -301,69 +426,6 @@ bot.command(['ban','terminate'], (ctx) => {
                  +'That moron won\'t be able to disturb you anymore. 😈\n'
                  +'\nIf for whatever reason you\'ll change your mind, use /unban or /save command.');
     }
-});
-
-//help command
-bot.help((ctx) => {
-    functions.setUser(ctx);
-    //if(functions.checkCreator(current_user)){
-    if(ctx.message.from.id == creator.get_id){
-        //creator help
-        ctx.reply('❔ Help for @DoggoReportBot:\n\n'
-                 +'\t\t# Your status: Creator 👑\n'
-                 +'\nBot-related commands:\nIn order to use this commands just type them in chat normally.\n'
-                 +'~ /help \t=>\t this command;\n'
-                 +'~ /setusername [new_username] \t=>\t lets the bot know the new linked channel username;\n'
-                 +'~ /adminlist \t=>\t see a list of all admins of this bot with infos about everyone;\n'
-                 +'~ /blacklist \t=>\t see a list of banned users;\n'
-                 +'\nUser-related commands:\nIn order to use this commands reply to user\'s message\n'
-                 +'~ /info \t=>\t reply to a message with this command to get infos about the user;\n'
-                 +'~ /admin \t=>\t set an user as an admin of the bot;\n'
-                 +'~ /demote \t=>\t if an user is superior admin, he will become admin and if he\'s admin he will become normal user;\n'
-                 +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID\n'
-                 +'~ /superior [id] \t=>\t set an admin as a superior admin of the bot;\n'
-                 +'~ /ban [id] \t=>\t forbids an user to keep using the bot;\n'
-                 +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\n'
-                 +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
-    } else if(functions.checkSuperior(current_user)) {
-        //superior admin help
-        ctx.reply('❔ Help for @DoggoReportBot:\n\n'
-                 +'\t\t# Your status: Superior Admin 💎\n'
-                 +'\nBot-related commands:\nIn order to use this commands just type them in chat normally.\n'
-                 +'~ /help \t=>\t this command;\n'
-                 +'~ /setusername [new_username] \t=>\t lets the bot know the new linked channel username;\n'
-                 +'~ /adminlist \t=>\t see a list of all admins of this bot with infos about everyone;\n'
-                 +'~ /blacklist \t=>\t see a list of banned users;\n'
-                 +'\nUser-related commands:\nIn order to use this commands reply to user\'s message\n'
-                 +'~ /info \t=>\t reply to a message with this command to get infos about the user;\n'
-                 +'~ /admin \t=>\t set an user as an admin of the bot;\n'
-                 +'~ /demote \t=>\t if an user is admin he will become normal user;\n'
-                 +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID\n'
-                 +'~ /ban [id] \t=>\t forbids an user to keep using the bot;\n'
-                 +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\n'
-                 +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
-    }else if(functions.checkAdmin(current_user)) {
-        //admin help
-        ctx.reply('❔ Help for @DoggoReportBot:\n\n'
-                 +'\t\t# Your status: Admin 👮‍♀️\nIn order to use this commands just type them in chat\n'
-                 +'\nBot-related commands:\n'
-                 +'~ /help \t=>\t this command;\n'
-                 +'~ /blacklist \t=>\t see a list of banned users;\n'
-                 +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID'
-                 +'~ /ban [id] \t=>\t forbids an user to keep using the bot;\n'
-                 +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\n'
-                 +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
-    }else{
-        //user help
-        ctx.reply('❔ Help for @DoggoReportBot:\n\n'
-                 +'\t\t# Your status: User 👤\n'
-                 +'\nCommand:\n'
-                 +'~ /help \t=>\t this command;\n\n'
-                 +'\nThis bot lets you contact the admins of @'+channelName+'.\n'
-                 +'Just write to me anything and admins will eventually reply to your message. 👨‍💻\n'
-                 +'You can send me screenshots of funny scammers chat. 🤡');
-    }
-    functions.clearUser(current_user);
 });
 
 //list admin users
@@ -387,6 +449,7 @@ bot.command('adminlist', (ctx) => {
                  +'He will decide if you should be allowed to use this command. 🧐\n\n'
                  +'You will get notified with a message if he grants you this permission. 😎\nGood luck!');
     }
+    functions.clearUser();
 });
 
 //grant an admin the superior admin permissions
@@ -465,6 +528,7 @@ bot.command('resetadmins', (ctx) => {
         functions.initFiles();
         ctx.reply('Admin list successfully cleared! 👌🏻');
     }
+    functions.clearUser();
 });
 
 //sender_chat

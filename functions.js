@@ -10,7 +10,7 @@ function sleep(ms) {
 }
 
 //Reset all User parameters to default values
-function clearUser(u){
+function clearUser(){
     current_user = new User(undefined,undefined,false,undefined,undefined,undefined,undefined,0,false,false,false,false,true);
 }
 
