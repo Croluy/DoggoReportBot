@@ -1,6 +1,7 @@
 const editJsonFile = require("edit-json-file");
 const admins = editJsonFile('./admins.json');
 let adminListIndex=admins.get("Admins Number");
+const User = require('./User');
 
 
 //Sleep in ms
@@ -10,19 +11,7 @@ function sleep(ms) {
 
 //Reset all User parameters to default values
 function clearUser(u){
-    u.set_firstName=undefined;
-    u.set_id=undefined;
-    u.set_lastName='';
-    u.set_fullName='';
-    u.set_username='';
-    u.set_lang='';
-    u.set_isBot=false;
-    u.set_isAdmin=false;
-    u.set_isSuperior=false;
-    u.set_isActive=true;
-    u.set_timeZone=0;
-    u.set_isBan=false;
-    u.set_isPrivate=false;
+    current_user = new User(undefined,undefined,false,undefined,undefined,undefined,undefined,0,false,false,false,false,true);
 }
 
 //Trasform unix time in readable time
@@ -197,7 +186,6 @@ function setUser(a){
             //have to set current user from replied message (free privacy)
             current_user.set_id         =   a.message.reply_to_message.forward_from.id.toString();
             current_user.set_firstName  =   a.message.reply_to_message.forward_from.first_name;
-            //current_user.set_isSuperior =   false;
             current_user.set_isAdmin    =   checkAdminId(current_user.get_id);
             current_user.set_isSuperior =   checkSuperiorId(current_user.get_id);
             current_user.set_isBot      =   a.message.reply_to_message.forward_from.isBot;
@@ -206,8 +194,7 @@ function setUser(a){
             current_user.set_username   =   a.message.reply_to_message.forward_from.username;
             current_user.set_lang       =   a.message.reply_to_message.forward_from.language_code.toUpperCase();
             current_user.set_timeZone   =   0;
-            //I set privacy as false, because if the user is able to get here, it means he has free privacy settings
-            current_user.set_isPrivate  =   false;
+            current_user.set_isPrivate  =   false;      //if user gets to this condition, it means he has free privacy settings
             current_user.set_isBan      =   false;
             current_user.set_isActive   =   true;
             current_user.set_isCreator  =   false;
@@ -217,13 +204,12 @@ function setUser(a){
             current_user.set_firstName  =   undefined;
             current_user.set_lastName   =   undefined;
             current_user.set_fullName   =   nameFromDummy(a);
-            //current_user.set_isSuperior =   false;
             current_user.set_isAdmin    =   checkAdminId(current_user.get_id);
             current_user.set_isSuperior =   checkSuperiorId(current_user.get_id);
             current_user.set_username   =   usernameFromDummy(a);
-            current_user.set_lang       =   langFromDummy(a);
+            current_user.set_lang       =   langFromDummy(a).toUpperCase();
             current_user.set_timeZone   =   0;
-            current_user.set_isBot      =   false; //bots can't restrict privacy settings, so it's not a bot
+            current_user.set_isBot      =   false;  //bots can't restrict privacy settings, so it's not a bot
             current_user.set_isPrivate  =   true;
             current_user.set_isBan      =   false;
             current_user.set_isActive   =   true;
@@ -270,7 +256,7 @@ function add_AdminToFile(u,d){
     admins.save();
 }
 
-function removeFromFile(id,i){
+function removeFromFile(i){
     let n=admins.get("Admins Number");
     const a=admins.toObject();
 
@@ -291,8 +277,13 @@ function demote_AdminToFile(id){
     do{
         //if user's ID attribute is equal to id (parameter) and the user has isAdmin set to true, transfom user in normal user and return success
         if(a.List[i].ID==id && a.List[i].isAdmin==true){
-            if(a.List[i].isSuperior==true) return -1010;    //if admin is superior, he can't be demoted
-            removeFromFile(id,i);
+            //if admin is superior, he will be demoted to normal admin
+            if(a.List[i].isSuperior==true) {
+                a.List[i].isSuperior=false;
+                admins.save();
+                return -1;
+            }
+            removeFromFile(i);
             return 1;
         }
         i++;
@@ -408,9 +399,8 @@ function checkSuperiorId(id){
 
     //loop though all the admins except the 1st one
     do{
-        const test=admins.get('List['+i+'].ID');
-        //if user's ID attribute is equal to id, exit condition, he is superior
-        if(test==id && a.List[i].isSuperior) return true;
+        //if user's ID attribute is equal to id and his isSuperior is set to 1, exit condition, he is superior
+        if(a.List[i].ID==id && a.List[i].isSuperior) return true;
         i++;
     }while(i<adminListIndex);
 
