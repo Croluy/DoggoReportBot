@@ -275,11 +275,13 @@ function removeFromFile(i){
     //use parameter i to determine which admin has to be removed from the list
     a.List.splice(i,1);
 
-    //decrements "admin #" of all admins who have been promoted after the demoted admin
-    do{
-        a.List[k]["Admin #"]--;
-        k++;
-    }while(k < a.List.length);
+    if(i!=a.List.length){
+        //decrements "admin #" of all admins who have been promoted after the demoted admin
+        do{
+            a.List[k]["Admin #"]=a.List[k]["Admin #"]-1;
+            k++;
+        }while(k < a.List.length);
+    }
 
     //update admin index
     adminListIndex--;
@@ -337,6 +339,8 @@ function setSuperiorId(id){
     //if loop ends without finding a match, error has occoured, possible cause: user is already superior
     return -1005;
 }
+
+
 
 //Checks if parameter user is admin by running through admins.json file
 function checkAdmin(u){
