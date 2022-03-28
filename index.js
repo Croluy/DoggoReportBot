@@ -16,7 +16,7 @@ global.botID = 5198012118;   //ID: @DoggoReportBot
 //set environment variables
 global.adminID = process.env.CREATOR_ID;     //ID of the creator
 global.adminName = process.env.CREATOR_NAME; //Name && Username of the creator
-global.canaleLOG = process.env.CANALE_LOG;   //Log Channel
+global.LogChannel = process.env.LOG_CHANNEL;   //Log Channel
 global.channelName = process.env.CHANNEL_NAME; //Name of Channel linked to bot
 global.privacy=false;  //privacy variable for user forwarded messages
 
@@ -108,8 +108,7 @@ bot.start((ctx) => {
 //help command
 bot.help((ctx) => {
     functions.setUser(ctx);
-    //if(functions.checkCreator(current_user)){
-    if(ctx.message.from.id == creator.get_id){
+    if(functions.checkCreator(current_user)){
         //creator help
         ctx.reply('❔ Help for @DoggoReportBot:\n\n'
                  +'\t\t# Your status: Creator 👑\n'
@@ -121,14 +120,14 @@ bot.help((ctx) => {
                  +'~ /blacklist \t=>\t see a list of banned users;\n'
                  +'\nUser-related commands:\nIn order to use this commands reply to user\'s message\n'
                  +'~ /info \t=>\t reply to a message with this command to get infos about the user;\n'
-                 +'~ /admin \t=>\t set an user as an admin of the bot;\n'
-                 +'~ /demote \t=>\t if an user is superior admin, he will become admin and if he\'s admin he will become normal user;\n'
+                 +'~ /admin OR /promote \t=>\t set an user as an admin of the bot;\n'
+                 +'~ /unadmin OR /demote \t=>\t if an user is superior admin, he will become admin and if he\'s admin he will become normal user;\n'
                  +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID\n'
                  +'~ /superior [id] \t=>\t set an admin as a superior admin of the bot;\n'
                  +'~ /ban [id] \t=>\t forbids an user to keep using the bot;\n'
                  +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\n'
                  +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
-    } else if(functions.checkSuperior(current_user)) {
+    }else if(functions.checkSuperior(current_user)) {
         //superior admin help
         ctx.reply('❔ Help for @DoggoReportBot:\n\n'
                  +'\t\t# Your status: Superior Admin 💎\n'
@@ -139,8 +138,8 @@ bot.help((ctx) => {
                  +'~ /blacklist \t=>\t see a list of banned users;\n'
                  +'\nUser-related commands:\nIn order to use this commands reply to user\'s message\n'
                  +'~ /info \t=>\t reply to a message with this command to get infos about the user;\n'
-                 +'~ /admin \t=>\t set an user as an admin of the bot;\n'
-                 +'~ /demote \t=>\t demote admin to normal user;\n'
+                 +'~ /admin OR /promote \t=>\t set an user as an admin of the bot;\n'
+                 +'~ /unadmin OR /demote \t=>\t demote admin to normal user;\n'
                  +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID\n'
                  +'~ /ban [id] \t=>\t forbids an user to keep using the bot;\n'
                  +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\n'
@@ -227,7 +226,7 @@ bot.command('setusername', (ctx) => {
 });
 
 //Make user into admin
-bot.command('admin', (ctx) => {
+bot.command(['admin','promote'], (ctx) => {
     //only superior admins can add an admin
     if(functions.checkSuperiorId(ctx.message.chat.id)) {
         functions.setUser(ctx);
@@ -248,8 +247,8 @@ bot.command('admin', (ctx) => {
             const m='Congrats! 🎉 You are now part of the admins of this bot! 👮‍♂️\n'
                    +'Discover the new commands available to you.\n'
                    +'You can check them out by typing /help in the chat.\n'
-                   +'When you do that, you\'ll see the status set to Admin. 👀\n\n\n';
-                   //+'Now that you\'ve joined the admins, you should provide us with your timezone.\n'
+                   +'When you do that, you\'ll see the status set to Admin. 👀';
+                   //+'\n\n\nNow that you\'ve joined the admins, you should provide us with your timezone.\n'
                    //+'So that we can show you your correct local time when it\'s needed.\n'
                    //+'Just type /timezone in chat.\n'
                    //+'NOTICE: You are free to skip this step if you aren\'t interested. ✌🏻';
@@ -307,6 +306,7 @@ bot.command('admin', (ctx) => {
 });
 
 //Demote an user from admin
+//FIXME: issue when demoting user (from admin to normal user) with non-strict privacy settingw
 bot.command(['unadmin','demote'], (ctx) => {
     //only creator can demote an admin
     if(ctx.message.chat.id == creator.get_id) {
@@ -407,8 +407,8 @@ bot.command(['unadmin','demote'], (ctx) => {
             //TOFIX
             console.log('BRUH... HOW DID YOU END UP HERE? YOU\'RE NOT SUPPOSED TO.');
         }
+        functions.clearUser();
     }
-    functions.clearUser();
 });
 
 //ban user from the bot, impeding him to write to admins
@@ -429,17 +429,18 @@ bot.command(['ban','terminate'], (ctx) => {
 });
 
 //list admin users
+//FIXME: issue when admin is added / demoted while bot is running, the list doesn't get updated
 bot.command('adminlist', (ctx) => {
     functions.setUser(ctx);
-    if(functions.checkCreator(current_user) || functions.checkSuperior(current_user)) {
-        //creator of the bot or superior admin
+    if(functions.checkSuperior(current_user)) {
+        //only superior admins can use this command
         const list=JSON.stringify(admins.toObject(),null,'\t\t');
         ctx.reply(list);
     }else if(functions.checkAdmin(current_user)){
         //normal admins
         const m='Admin: <b>'+current_user.get_fullName+'</b> [<code>'+current_user.get_id+'</code>]\n'
                +'has requested the permission to use the command \'/adminlist\' in order to list all the admins.\n'
-               +'If you wish to grant him this permission, use /superior [his_id]';
+               +'If you wish to grant him this permission, use /superior '+current_user.get_id;
         //only creator can grant Superior permissions to an admin
         bot.sendMessage(creator.get_id,m,{parse_mode: 'HTML'});
 

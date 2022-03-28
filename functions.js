@@ -9,7 +9,7 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-//Reset all User parameters to default values
+//Reset all current_user parameters to default values
 function clearUser(){
     current_user = new User(undefined,undefined,false,undefined,undefined,undefined,undefined,0,false,false,false,false,true);
 }
@@ -75,20 +75,24 @@ function UnixTimestamp(b){
 
     let min = a.getMinutes();
     let sec = a.getSeconds();
+
+    //if number is lower than 10, it gets represented as 2 digit number starting with 0
     if(h<10) h='0'+h;
     if(min<10) min='0'+min;
     if(sec<10) sec='0'+sec;
+
+    //Format  ->  DD Month YYYY  -  hh:mm:ss
     return d + ' ' + m + ' ' + y + '\t-\t' + h + ':' + min + ':' + sec;
 }
 
-//Set online status on log channel and ask for possible new username of the channel
+//Set online status on log channel, ask for possible new username of the channel and initializes admin.json file
 function startup(){
     const text="---------\n\n@DoggoReportBot: ✅ Online\n\n---------";
-    //bot.telegram.sendMessage(canaleLOG,text);
+    //bot.telegram.sendMessage(LogChannel,text);     //logs on log_channel that bot is online
     const m="Bot is currently online again. ✅\nIs the channel's username still @"+channelName+"?\n\n"
            +"If yes then don't do anything. Otherwise set the new username using the command:\n/setusername your_new_username.";
-    //bot.telegram.sendMessage(adminID,m);
-    console.log("@DoggoReportBot online ✓\n");
+    //bot.telegram.sendMessage(adminID,m);          //asks creator if the channel name is still correct
+    console.log("@DoggoReportBot online ✓\n");      //logs on console that bot is online
     //initialize the files
     initFiles();
 }
@@ -105,28 +109,33 @@ function info(a){
         "messagge": a.message.text
     }
     const lang=data.language.toUpperCase();
-    var t="";
+    let t="";
+    //last name AND username unset
     if(data.surname == undefined && data.username == undefined)
         t="*************INFO*************\nID: "+data.id+"\nName: "+data.name+"\nLanguage: "+lang+"\n******************************";
+    //username unset
     else if(data.username==undefined)
         t="*************INFO*************\nID: "+data.id+"\nName: "+data.name+"\nSurname: "+data.surname+"\nLanguage: "+lang+"\n******************************";
+    //last name unset
     else if(data.surname==undefined)
         t="*************INFO*************\nID: "+data.id+"\nName: "+data.name+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
+    //last name AND username set
     else
         t="*************INFO*************\nID: "+data.id+"\nName: "+data.name+"\nSurname: "+data.surname+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
+    
     return t;
 }
 
-//sends message from user to admin
+//Sends message from user to admin
 async function toAdmin(a){
     //if admin didn't reply to himself, forward the reply
     if(a.message.from.id != adminID){
         a.forwardMessage(adminID,a.message.text);
 
-        //if the user has strict privacy forwarding settings, send dummy message for admin
+        //if the user has strict privacy forwarding settings, also send dummy message for admin
         if(privacy==true){
             await sleep(500);  //delays the next message for 0,5 sec. This way it's sure it will always be 2nd
-            var m="";
+            let m="";
             if(a.from.last_name == undefined && a.from.username == undefined)
                 m='👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>]\n'
                  //+'This user has hidden the link to its account from forwarded messages. 👀\n'
@@ -150,6 +159,7 @@ async function toAdmin(a){
     }
 }
 
+//Sends user's info to admin when /info command is run
 function infoCommand(a){
     const data={
         "id":a.message.reply_to_message.forward_from.id,
@@ -162,9 +172,9 @@ function infoCommand(a){
     }
     //const d=UnixTimestamp(data.date);
     const lang=data.language.toUpperCase();
-    var bot="";
+    let bot="";
     if(data.isBot) bot="✅"; else bot="❌";
-    var t="";
+    let t="";
     if(data.surname == undefined && data.username == undefined)
         t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.name+"\nLanguage: "+lang+"\n******************************";
     else if(data.username==undefined)
@@ -176,8 +186,9 @@ function infoCommand(a){
     return t;
 }
 
-//get ctx parameter and create an User object from that
+//Using ctx parameter and sets an User object from that (current_user)
 function setUser(a){
+    clearUser();
     if(a.message.from.id == creator.get_id && a.message.hasOwnProperty('reply_to_message')==false){
         //Creator of the bot, no need to do anything as this user is already set up
         current_user=creator;
@@ -195,7 +206,6 @@ function setUser(a){
             current_user.set_lang       =   a.message.reply_to_message.forward_from.language_code.toUpperCase();
             current_user.set_timeZone   =   0;
             current_user.set_isPrivate  =   false;      //if user gets to this condition, it means he has free privacy settings
-            current_user.set_isBan      =   false;
             current_user.set_isActive   =   true;
             current_user.set_isCreator  =   false;
         }else if(a.message.reply_to_message.from.id==botID && /^👆/.test(a.message.reply_to_message.text)){
@@ -211,7 +221,6 @@ function setUser(a){
             current_user.set_timeZone   =   0;
             current_user.set_isBot      =   false;  //bots can't restrict privacy settings, so it's not a bot
             current_user.set_isPrivate  =   true;
-            current_user.set_isBan      =   false;
             current_user.set_isActive   =   true;
             current_user.set_isCreator  =   false;
         }
@@ -223,12 +232,13 @@ function setUser(a){
         current_user.set_lastName   =   a.message.from.last_name;
         current_user.set_fullName   =   current_user.get_firstName + ' ' + current_user.get_lastName;
         current_user.set_username   =   a.message.from.username;
-        current_user.set_lang       =   a.message.from.language_code;
+        current_user.set_lang       =   a.message.from.language_code.toUpperCase();
     }
 }
 
+//Initializes admins.json file with admins number and the creator
 function initFiles(){
-    //if the file is empty (admin number doesn't exist), set admin number to 0
+    //if the file is empty (admin number doesn't exist), set admins number to 0
     if(admins.get("Admins Number") == null || admins.get("Admins Number") == undefined) adminListIndex=0;
     admins.set("Admins Number",adminListIndex);  //write the number of admins at the beginning of the file
     //if there is no admin
@@ -245,6 +255,7 @@ function initFiles(){
     }
 }
 
+//Adds user to admins.json file
 function add_AdminToFile(u,d){
     admins.append("List", {"Admin #":adminListIndex, "ID":u.get_id,
                            "Full Name":u.get_fullName, "isAdmin":u.get_isAdmin, "isSuperior":u.get_isSuperior,
@@ -256,16 +267,27 @@ function add_AdminToFile(u,d){
     admins.save();
 }
 
+//Remove admin at index i from admins.json List array
 function removeFromFile(i){
-    let n=admins.get("Admins Number");
     const a=admins.toObject();
+    let k=i;
 
     //use parameter i to determine which admin has to be removed from the list
     a.List.splice(i,1);
-    admins.set("Admins Number",n-1);    //update admin index
+
+    //decrements "admin #" of all admins who have been promoted after the demoted admin
+    do{
+        a.List[k]["Admin #"]--;
+        k++;
+    }while(k < a.List.length);
+
+    //update admin index
+    adminListIndex--;
+    admins.set("Admins Number",adminListIndex);
     admins.save();
 }
 
+//Demotes superior admins to admins OR admins to normal users given an id
 function demote_AdminToFile(id){
     let i=1;    //start check at index 1, because index 0 of List will always be creator and creator can't be demoted
     const a=admins.toObject();
@@ -293,6 +315,7 @@ function demote_AdminToFile(id){
     return -1005;
 }
 
+//Sets an admin as superior admin
 function setSuperiorId(id){
     let i=1;    //start check at index 1, because index 0 of List will always be creator
     const a=admins.toObject();
@@ -315,6 +338,7 @@ function setSuperiorId(id){
     return -1005;
 }
 
+//Checks if parameter user is admin by running through admins.json file
 function checkAdmin(u){
     const id=u.get_id;
     //creator is always admin
@@ -337,6 +361,7 @@ function checkAdmin(u){
     return false;
 }
 
+//Checks if parameter user OR parameter user_id is creator comparing to "creator" User
 function checkCreator(u){
     //u can be either User object or an ID to check
     //check if u is Object or an ID of the creator - otherwise return false
@@ -344,6 +369,7 @@ function checkCreator(u){
     else return false;
 }
 
+//Checks if parameter user is superior admin by running through admins.json file
 function checkSuperior(u){
     const id=u.get_id;
     //creator is always superior
@@ -366,6 +392,7 @@ function checkSuperior(u){
     return false;
 }
 
+//Checks if parameter user_id is admin by running through admins.json file
 function checkAdminId(id){
     //creator is always admin
     if(id==creator.get_id) return true;
@@ -387,6 +414,7 @@ function checkAdminId(id){
     return false;
 }
 
+//Checks if parameter user_id is superior admin by running through admins.json file
 function checkSuperiorId(id){
     //creator is always superior
     if(id==creator.get_id) return true;
@@ -408,6 +436,7 @@ function checkSuperiorId(id){
     return false;
 }
 
+//Using ctx parameter returns id from dummy message for every user with restricted privacy settings
 function idFromDummy(a){
     const t = a.message.reply_to_message.text;
     const start = t.indexOf("[")+1;
@@ -418,6 +447,7 @@ function idFromDummy(a){
     return newId;
 }
 
+//Using ctx parameter returns full_name from dummy message for every user with restricted privacy settings
 function nameFromDummy(a){
     const t = a.message.reply_to_message.text;
     const start = t.indexOf("by")+4;
@@ -428,6 +458,7 @@ function nameFromDummy(a){
     return name;
 }
 
+//Using ctx parameter returns username from dummy message for every user with restricted privacy settings
 function usernameFromDummy(a){
     const t = a.message.reply_to_message.text;
     const start = t.indexOf("@")+1;
@@ -438,6 +469,7 @@ function usernameFromDummy(a){
     return username;
 }
 
+//Using ctx parameter returns sys language from dummy message for every user with restricted privacy settings
 function langFromDummy(a){
     const t = a.message.reply_to_message.text;
     const start = t.indexOf("\nLanguage:")+11;
@@ -448,6 +480,7 @@ function langFromDummy(a){
     return lang;
 }
 
+//Export functions
 module.exports = {
     sleep,
     clearUser,
