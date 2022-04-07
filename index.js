@@ -265,20 +265,19 @@ bot.command(['admin'], (ctx) => {
                         if(functions.add_AdminToFile(current_user,ctx.message.date)){
                             //User can be promoted, he is not banned
                             current_user.set_isAdmin=true;
-                            if(current_user.get_username != undefined)
+                            if(current_user.get_username != undefined)  //user has username
                                 ctx.reply('User: <b>'+current_user.get_fullName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>]\nhas been added to the admin list! 🎉',{parse_mode: 'HTML'});
-                            else
+                            else  //user doesn't have an username
                                 ctx.reply('User: <b>'+current_user.get_fullName+'</b> [<code>'+current_user.get_id+'</code>]\nhas been added to the admin list! 🎉',{parse_mode: 'HTML'});
                             ctx.telegram.sendMessage(current_user.get_id,m);
                         }else if(functions.add_AdminToFile(current_user,ctx.message.date) == -1){
-                            //User can NOT be promoted, he is currently banned
-                            if(current_user.get_username != undefined)
+                            //User can NOT be promoted, he is currently banned.. have to unban first
+                            if(current_user.get_username != undefined)  //user has username
                                 ctx.reply('User: <b>'+current_user.get_fullName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>]\nhas can\'t be added to the admin list! 🎉\n'+
                                           'The probable reason is cause he is currently banned. You have to unban him first by running /unban '+current_user.get_id,{parse_mode: 'HTML'});
-                            else
-                            ctx.reply('User: <b>'+current_user.get_fullName+'</b> [<code>'+current_user.get_id+'</code>]\nhas can\'t be added to the admin list! 🎉\n'+
-                                      'The probable reason is cause he is currently banned. You have to unban him first by running /unban '+current_user.get_id,{parse_mode: 'HTML'});
-                            ctx.telegram.sendMessage(current_user.get_id,m);
+                            else  //user doesn't have an username
+                                ctx.reply('User: <b>'+current_user.get_fullName+'</b> [<code>'+current_user.get_id+'</code>]\nhas can\'t be added to the admin list! 🎉\n'+
+                                          'The probable reason is cause he is currently banned. You have to unban him first by running /unban '+current_user.get_id,{parse_mode: 'HTML'});
                         }
                     }else{
                         //errors

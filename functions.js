@@ -266,7 +266,9 @@ function initFiles(){
 
 //Adds user to admins.json file
 function add_AdminToFile(u,d){
-    //TODO: check if user to make admin is banned
+    //user is banned, can't promote banned user. You have to unban first
+    if(checkBanned(u)) return -1;
+
     admins.append("List", {"Admin #":adminListIndex, "ID":u.get_id,
                            "Full Name":u.get_fullName, "isAdmin":u.get_isAdmin, "isSuperior":u.get_isSuperior,
                            "Username":u.get_username, "Language":u.get_lang,
@@ -275,15 +277,13 @@ function add_AdminToFile(u,d){
     adminListIndex++;   //increment number of the next admin
     admins.set("Admins Number",adminListIndex);  //update admin index
     admins.save();
+    return 1;
 }
 
 //Adds user to blacklist.json
 function add_BannedToFile(u,d){
-    //TODO: check if user to ban is admin or superior admin
-    if(checkAdmin(u)){
-        //user is admin, can't ban admin. He has to get demoted first
-        
-    }
+    //user is admin, can't ban admin. He has to get demoted first
+    if(checkAdmin(u)) return -1;
 
     banned.append("List", {"Banned User #":bannedListIndex, "ID":u.get_id,
                            "Full Name":u.get_fullName,
@@ -293,6 +293,7 @@ function add_BannedToFile(u,d){
     bannedListIndex++;   //increment number of the next admin
     banned.set("Banned Users",bannedListIndex);  //update admin index
     banned.save();
+    return 1;
 }
 
 //Remove admin at index i from admins.json List array
@@ -368,7 +369,25 @@ function setSuperiorId(id){
     return -1005;
 }
 
+//Checks if parameter user is banned by running through blacklist.json file
+function checkBanned(u){
+    const id=u.get_id;
+    //creator is never banned
+    if(id==creator.get_id) return false;
 
+    let i=0;
+    const b=banned.toObject();
+
+    //loop though all the banned users
+    do{
+        //if user's id is listed in 'blacklist.json' he is banned
+        if(b.List[i].ID==id) return true;
+        i++;
+    }while(i<bannedListIndex);
+
+    //if loop ends without finding a match, user is not banned
+    return false;
+}
 
 //Checks if parameter user is admin by running through admins.json file
 function checkAdmin(u){
@@ -421,6 +440,25 @@ function checkSuperior(u){
     }while(i<adminListIndex);
 
     //if loop ends without finding a match, user is not superior
+    return false;
+}
+
+//Checks if parameter user_id is admin by running through admins.json file
+function checkBannedId(id){
+    //creator is never banned
+    if(id==creator.get_id) return false;
+
+    let i=0;
+    const a=admins.toObject();
+
+    //loop though all the banned users
+    do{
+        //if user's ID attribute is equal to id, exit condition, he is banned
+        if(a.List[i].ID==id) return true;
+        i++;
+    }while(i<adminListIndex);
+
+    //if loop ends without finding a match, user is not banned
     return false;
 }
 
@@ -528,9 +566,11 @@ module.exports = {
     removeFromFile,
     demote_AdminToFile,
     setSuperiorId,
+    checkBanned,
     checkAdmin,
     checkCreator,
     checkSuperior,
+    checkBannedId,
     checkAdminId,
     checkSuperiorId,
     idFromDummy,
