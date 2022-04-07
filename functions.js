@@ -1,6 +1,8 @@
 const editJsonFile = require("edit-json-file");
 const admins = editJsonFile('./admins.json');
 let adminListIndex=admins.get("Admins Number");
+const banned = editJsonFile('./blacklist.json');
+let bannedListIndex=admins.get("Banned Users");
 const User = require('./User');
 
 
@@ -238,6 +240,7 @@ function setUser(a){
 
 //Initializes admins.json file with admins number and the creator
 function initFiles(){
+    /**ADMIN FILE */
     //if the file is empty (admin number doesn't exist), set admins number to 0
     if(admins.get("Admins Number") == null || admins.get("Admins Number") == undefined) adminListIndex=0;
     admins.set("Admins Number",adminListIndex);  //write the number of admins at the beginning of the file
@@ -253,10 +256,17 @@ function initFiles(){
         admins.set("Admins Number",adminListIndex);  //update admin index
         admins.save();      //save file
     }
+
+    /**BAN FILE */
+    //if the file is empty (banned users number doesn't exist), set banned users to 0
+    if(banned.get("Banned Users") == null || banned.get("Banned Users") == undefined) bannedListIndex=0;
+    banned.set("Banned Users",bannedListIndex);    //write the number of banned users at the beginning of the file
+    banned.save();      //save file
 }
 
 //Adds user to admins.json file
 function add_AdminToFile(u,d){
+    //TODO: check if user to make admin is banned
     admins.append("List", {"Admin #":adminListIndex, "ID":u.get_id,
                            "Full Name":u.get_fullName, "isAdmin":u.get_isAdmin, "isSuperior":u.get_isSuperior,
                            "Username":u.get_username, "Language":u.get_lang,
@@ -265,6 +275,24 @@ function add_AdminToFile(u,d){
     adminListIndex++;   //increment number of the next admin
     admins.set("Admins Number",adminListIndex);  //update admin index
     admins.save();
+}
+
+//Adds user to blacklist.json
+function add_BannedToFile(u,d){
+    //TODO: check if user to ban is admin or superior admin
+    if(checkAdmin(u)){
+        //user is admin, can't ban admin. He has to get demoted first
+        
+    }
+
+    banned.append("List", {"Banned User #":bannedListIndex, "ID":u.get_id,
+                           "Full Name":u.get_fullName,
+                           "Username":u.get_username, "Language":u.get_lang,
+                           "isPrivate":u.get_isPrivate, "Time Zone (UTC)":u.get_timeZone,
+                           "Date of Ban":UnixTimestamp(d)});
+    bannedListIndex++;   //increment number of the next admin
+    banned.set("Banned Users",bannedListIndex);  //update admin index
+    banned.save();
 }
 
 //Remove admin at index i from admins.json List array
@@ -496,6 +524,7 @@ module.exports = {
     setUser,
     initFiles,
     add_AdminToFile,
+    add_BannedToFile,
     removeFromFile,
     demote_AdminToFile,
     setSuperiorId,

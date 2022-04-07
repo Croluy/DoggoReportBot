@@ -119,10 +119,9 @@ bot.help((ctx) => {
                  +'\nUser-related commands:\nIn order to use this commands reply to user\'s message\n'
                  +'~ /info \t=>\t reply to a message with this command to get infos about the user;\n'
                  +'~ /admin \t=>\t set an user as an admin of the bot;\n'
-                 +'~ /promote \t=>\t set an user as a superior admin of the bot;\n'
                  +'~ /unadmin OR /demote \t=>\t if an user is superior admin, he will become admin and if he\'s admin he will become normal user;\n'
                  +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID\n'
-                 +'~ /superior [id] \t=>\t set an admin as a superior admin of the bot;\n'
+                 +'~ /superior [id] OR /promote [id] \t=>\t set an admin as a superior admin of the bot;\n'
                  +'~ /ban [id] \t=>\t forbids an user to keep using the bot;\n'
                  +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\n'
                  +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
@@ -263,14 +262,24 @@ bot.command(['admin'], (ctx) => {
                         //OR
                         //user has limited privacy and I can only print up a little amount of info
 
-                        current_user.set_isAdmin=true;
-                        functions.add_AdminToFile(current_user,ctx.message.date);
-
-                        if(current_user.get_username != undefined)
-                            ctx.reply('User: <b>'+current_user.get_fullName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>]\nhas been added to the admin list! 🎉',{parse_mode: 'HTML'});
-                        else
-                            ctx.reply('User: <b>'+current_user.get_fullName+'</b> [<code>'+current_user.get_id+'</code>]\nhas been added to the admin list! 🎉',{parse_mode: 'HTML'});
-                        ctx.telegram.sendMessage(current_user.get_id,m);
+                        if(functions.add_AdminToFile(current_user,ctx.message.date)){
+                            //User can be promoted, he is not banned
+                            current_user.set_isAdmin=true;
+                            if(current_user.get_username != undefined)
+                                ctx.reply('User: <b>'+current_user.get_fullName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>]\nhas been added to the admin list! 🎉',{parse_mode: 'HTML'});
+                            else
+                                ctx.reply('User: <b>'+current_user.get_fullName+'</b> [<code>'+current_user.get_id+'</code>]\nhas been added to the admin list! 🎉',{parse_mode: 'HTML'});
+                            ctx.telegram.sendMessage(current_user.get_id,m);
+                        }else if(functions.add_AdminToFile(current_user,ctx.message.date) == -1){
+                            //User can NOT be promoted, he is currently banned
+                            if(current_user.get_username != undefined)
+                                ctx.reply('User: <b>'+current_user.get_fullName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>]\nhas can\'t be added to the admin list! 🎉\n'+
+                                          'The probable reason is cause he is currently banned. You have to unban him first by running /unban '+current_user.get_id,{parse_mode: 'HTML'});
+                            else
+                            ctx.reply('User: <b>'+current_user.get_fullName+'</b> [<code>'+current_user.get_id+'</code>]\nhas can\'t be added to the admin list! 🎉\n'+
+                                      'The probable reason is cause he is currently banned. You have to unban him first by running /unban '+current_user.get_id,{parse_mode: 'HTML'});
+                            ctx.telegram.sendMessage(current_user.get_id,m);
+                        }
                     }else{
                         //errors
                         if(ctx.message.reply_to_message.hasOwnProperty('forward_sender_name')){
@@ -422,7 +431,10 @@ bot.command(['ban','terminate'], (ctx) => {
         inputArray.shift();
         input=inputArray.join(' ');
 
-
+        if(input==""){
+            //there is no parameter/id specified
+            
+        }
 
         ctx.reply('User '+current_user.get_fullName+' [<code>'+current_user.get_id+'</code>] terminated successfully! 🎉\n'
                  +'That moron won\'t be able to disturb you anymore. 😈\n'
@@ -458,7 +470,7 @@ bot.command('adminlist', (ctx) => {
 });
 
 //grant an admin the superior admin permissions
-bot.command('promote', (ctx) => {
+bot.command(['promote','superior'], (ctx) => {
     functions.setUser(ctx);
     if(functions.checkCreator(current_user)) {
         //only creator of the bot can use the superior command
