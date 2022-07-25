@@ -132,7 +132,13 @@ function info(a){
 async function toAdmin(a){
     //if admin didn't reply to himself, forward the reply
     if(a.message.from.id != adminID){
-        a.forwardMessage(adminID,a.message.text);
+        //send message to all admins
+        let err=toAllAdmins(a,a.message.text);
+        if(err!=0){
+            a.telegram.sendMessage(LogChannel,'User has tried to send a message to bot, but it failed.\n'+
+                                              'Here\'s the message:\n'+a.message.text+'\n'+
+                                              '\n👆 Message sent by: '+a.from.first_name+' ['+a.from.id+']\n');
+        }
 
         //if the user has strict privacy forwarding settings, also send dummy message for admin
         if(privacy==true){
@@ -156,9 +162,33 @@ async function toAdmin(a){
                  +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
             //m=m+'\n\n'+info(a);
             const newMessage=m.concat('\n\n',info(a));
-            a.telegram.sendMessage(adminID,newMessage,{parse_mode: 'HTML'});
+
+            //send message to all admins
+            err=toAllAdmins(a,newMessage)
+            if(err!=0){
+                a.telegram.sendMessage(LogChannel,'User has tried to send a message to bot, but it failed.\n'+
+                                                  'Here\'s the message:\n'+a.message.text+'\n'+
+                                                  '\n👆 Message sent by: '+a.from.first_name+' ['+a.from.id+']\n');
+            }
         }
     }
+}
+
+function toAllAdmins(ctx,m){
+    let adminsNumber=admins.get("Admins Number");
+    if(adminsNumber==0 || adminsNumber==null){
+        return -1;  //ERROR: no admins found
+    }
+    const a = admins.toObject();
+
+    let adminID=null;
+    //Loop through the admins and send them message
+    for(let i=0;i<adminsNumber;i++){
+        //update the admin id
+        adminID=a.List[i].ID;
+        ctx.telegram.sendMessage(adminID,m,{parse_mode: 'HTML'});
+    }
+    return 0;
 }
 
 //Sends user's info to admin when /info command is run
@@ -378,6 +408,9 @@ function checkBanned(u){
     let i=0;
     const b=banned.toObject();
 
+    //there is no one in the file, so user can't be banned
+    if(b["Banned Users"]==0 || bannedListIndex == 0) return false;
+
     //loop though all the banned users
     do{
         //if user's id is listed in 'blacklist.json' he is banned
@@ -558,6 +591,7 @@ module.exports = {
     startup,
     info,
     toAdmin,
+    toAllAdmins,
     infoCommand,
     setUser,
     initFiles,
