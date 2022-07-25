@@ -130,14 +130,31 @@ function info(a){
 
 //Sends message from user to admin
 async function toAdmin(a){
-    //if admin didn't reply to himself, forward the reply
+    //if admin didn't reply to creator, forward the reply
     if(a.message.from.id != adminID){
         //send message to all admins
         let err=toAllAdmins(a,a.message.text);
-        if(err!=0){
-            a.telegram.sendMessage(LogChannel,'User has tried to send a message to bot, but it failed.\n'+
-                                              'Here\'s the message:\n'+a.message.text+'\n'+
-                                              '\n👆 Message sent by: '+a.from.first_name+' ['+a.from.id+']\n');
+        //if there is an error, send it to the log channel
+        if(err){
+            let m="";
+            if(a.from.last_name == undefined && a.from.username == undefined)
+                m='A user has tried to send a message to bot, but it failed.\n'+
+                  'Here\'s the message:\n'+a.message.text+'\n'+
+                  '\n👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>].\n';
+            else if(a.from.username == undefined)
+                m='A user has tried to send a message to bot, but it failed.\n'+
+                  'Here\'s the message:\n'+a.message.text+'\n'+
+                  '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>].\n'
+            else if(a.from.last_name == undefined)
+                m='A user has tried to send a message to bot, but it failed.\n'+
+                  'Here\'s the message:\n'+a.message.text+'\n'+
+                  '\n👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
+            else
+                m='A user has tried to send a message to bot, but it failed.\n'+
+                  'Here\'s the message:\n'+a.message.text+'\n'+
+                  '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
+            
+            a.telegram.sendMessage(LogChannel,m);
         }
 
         //if the user has strict privacy forwarding settings, also send dummy message for admin
@@ -164,20 +181,38 @@ async function toAdmin(a){
             const newMessage=m.concat('\n\n',info(a));
 
             //send message to all admins
-            err=toAllAdmins(a,newMessage)
-            if(err!=0){
-                a.telegram.sendMessage(LogChannel,'User has tried to send a message to bot, but it failed.\n'+
-                                                  'Here\'s the message:\n'+a.message.text+'\n'+
-                                                  '\n👆 Message sent by: '+a.from.first_name+' ['+a.from.id+']\n');
+            let err=toAllAdmins(a,a.message.text);
+            //if there is an error, send it to the log channel
+            if(err){
+                let m="";
+                if(a.from.last_name == undefined && a.from.username == undefined)
+                    m='A user has tried to send a message to bot, but it failed.\n'+
+                    'Here\'s the message:\n'+a.message.text+'\n'+
+                    '\n👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>].\n';
+                else if(a.from.username == undefined)
+                    m='A user has tried to send a message to bot, but it failed.\n'+
+                    'Here\'s the message:\n'+a.message.text+'\n'+
+                    '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>].\n'
+                else if(a.from.last_name == undefined)
+                    m='A user has tried to send a message to bot, but it failed.\n'+
+                    'Here\'s the message:\n'+a.message.text+'\n'+
+                    '\n👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
+                else
+                    m='A user has tried to send a message to bot, but it failed.\n'+
+                    'Here\'s the message:\n'+a.message.text+'\n'+
+                    '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
+                
+                a.telegram.sendMessage(LogChannel,m);
             }
         }
     }
 }
 
+//Sends a specific message to all admins
 function toAllAdmins(ctx,m){
     let adminsNumber=admins.get("Admins Number");
     if(adminsNumber==0 || adminsNumber==null){
-        return -1;  //ERROR: no admins found
+        return 1;  //ERROR: no admins found
     }
     const a = admins.toObject();
 
