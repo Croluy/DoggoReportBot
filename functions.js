@@ -154,7 +154,7 @@ async function toAdmin(a){
                   'Here\'s the message:\n'+a.message.text+'\n'+
                   '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
             
-            a.telegram.sendMessage(LogChannel,m);
+            a.telegram.sendMessage(LogChannel,m,{parse_mode: 'HTML'});
         }
 
         //if the user has strict privacy forwarding settings, also send dummy message for admin
@@ -181,7 +181,7 @@ async function toAdmin(a){
             const newMessage=m.concat('\n\n',info(a));
 
             //send message to all admins
-            let err=toAllAdmins(a,a.message.text);
+            let err=toAllAdmins(a,newMessage,{parse_mode: 'HTML'});
             //if there is an error, send it to the log channel
             if(err){
                 let m="";
@@ -202,7 +202,7 @@ async function toAdmin(a){
                     'Here\'s the message:\n'+a.message.text+'\n'+
                     '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
                 
-                a.telegram.sendMessage(LogChannel,m);
+                a.telegram.sendMessage(LogChannel,m,{parse_mode: 'HTML'});
             }
         }
     }

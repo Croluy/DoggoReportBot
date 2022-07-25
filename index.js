@@ -2,7 +2,7 @@
 require('dotenv').config();
 const {Telegraf} = require('telegraf');
 const editJsonFile = require("edit-json-file");
-let file = editJsonFile('./blacklist.json');
+let blacklist = editJsonFile('./blacklist.json');
 let admins = editJsonFile('./admins.json');
 const User = require('./User');
 const functions = require('./functions');
@@ -115,14 +115,14 @@ bot.help((ctx) => {
                  +'\nBot-related commands:\nIn order to use this commands just type them in chat normally.\n'
                  +'~ /help \t=>\t this command;\n'
                  +'~ /setusername [new_username] \t=>\t lets the bot know the new linked channel username;\n'
-                 +'~ /resetadmins \t=>\t demotes all admins and superior admins to normal users;\n'
+                 +'~ /resetadmins \t=>\t demotes all admins and superior admins to normal users except for creator;\n'
                  +'~ /adminlist \t=>\t see a list of all admins of this bot with infos about everyone;\n'
                  +'~ /blacklist \t=>\t see a list of banned users;\n'
-                 +'\nUser-related commands:\nIn order to use this commands reply to user\'s message\n'
+                 +'\nUser-related commands:\nIn order to use this commands reply to user\'s message.\n'
                  +'~ /info \t=>\t reply to a message with this command to get infos about the user;\n'
                  +'~ /admin \t=>\t set an user as an admin of the bot;\n'
                  +'~ /unadmin OR /demote \t=>\t if an user is superior admin, he will become admin and if he\'s admin he will become normal user;\n'
-                 +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID\n'
+                 +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID.\n'
                  +'~ /superior [id] OR /promote [id] \t=>\t set an admin as a superior admin of the bot;\n'
                  +'~ /ban [id] \t=>\t forbids an user to keep using the bot;\n'
                  +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\n'
@@ -136,11 +136,11 @@ bot.help((ctx) => {
                  +'~ /setusername [new_username] \t=>\t lets the bot know the new linked channel username;\n'
                  +'~ /adminlist \t=>\t see a list of all admins of this bot with infos about everyone;\n'
                  +'~ /blacklist \t=>\t see a list of banned users;\n'
-                 +'\nUser-related commands:\nIn order to use this commands reply to user\'s message\n'
+                 +'\nUser-related commands:\nIn order to use this commands reply to user\'s message.\n'
                  +'~ /info \t=>\t reply to a message with this command to get infos about the user;\n'
                  +'~ /admin \t=>\t set an user as an admin of the bot;\n'
                  +'~ /unadmin OR /demote \t=>\t demote admin to normal user;\n'
-                 +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID\n'
+                 +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID.\n'
                  +'~ /ban [id] \t=>\t forbids an user to keep using the bot;\n'
                  +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\n'
                  +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
@@ -151,7 +151,7 @@ bot.help((ctx) => {
                  +'\nBot-related commands:\n'
                  +'~ /help \t=>\t this command;\n'
                  +'~ /blacklist \t=>\t see a list of banned users;\n'
-                 +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID'
+                 +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID.'
                  +'~ /ban [id] \t=>\t forbids an user to keep using the bot;\n'
                  +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\n'
                  +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
@@ -537,6 +537,19 @@ bot.command('adminlist', (ctx) => {
                  +'But your request has been sent to the bot\'s creator. 🤩\n'
                  +'He will decide if you should be allowed to use this command. 🧐\n\n'
                  +'You will get notified with a message if he grants you this permission. 😎\nGood luck!');
+    }
+    functions.clearUser();
+});
+
+//list banned users
+bot.command('blacklist', (ctx) => {
+    functions.setUser(ctx);
+    if(functions.checkBanned(current_user)) return;
+    if(functions.checkAdmin(current_user)) {
+        blacklist = editJsonFile('./blacklist.json');
+        //only admins can use this command
+        const list=JSON.stringify(blacklist.toObject(),null,'\t\t');
+        ctx.reply(list);
     }
     functions.clearUser();
 });
