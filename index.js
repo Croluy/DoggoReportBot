@@ -448,9 +448,8 @@ bot.command(['ban','terminate'], (ctx) => {
         input=inputArray.join(' ');
 
         const m='I\'m sad to announce that you\'ve been banned from using this bot! 😅\n'
-               +'You\'ll get informed if and when an admin will unban you.\n'
-               +'Until then every message you\'ll send here, won\'t be delivered to admins.\n'
-               +'Effectively the bot will ignore every message of yours. 👀';
+               +'You\'ll get notified if an admin will eventually unban you. 🤷🏻‍♂️\n'
+               +'Until then every message you\'ll send here, won\'t be delivered to admins. 👀';
 
         if(input==""){
             //there is no parameter/id specified
@@ -519,12 +518,9 @@ bot.command(['ban','terminate'], (ctx) => {
 bot.command('unban', (ctx) => {
     //only admin can unban users
     if(functions.checkAdminId(ctx.message.chat.id)) {
-        console.log("User who required the unban is admin...");
         functions.setUser(ctx);
-        console.log("\nUser set: "+current_user);
         //check if user is admin and isn't a bot
         if(functions.checkBanned(current_user)) {
-            console.log("\nUser is currently banned");
             let input=ctx.message.text;
             let inputArray=input.split(' ');
 
@@ -534,15 +530,12 @@ bot.command('unban', (ctx) => {
             const newUnbanUsername=input;
 
             if(newUnbanUsername=="") {
-                console.log("\nNo username specified");
                 //There is no text after the command
                 //check if I am actually replying to someone
                 if(ctx.message.hasOwnProperty('reply_to_message')){
-                    console.log("\nAdmin is replying to someone");
                     //success condition - admin replied to user message or bot message if the user had privacy setting up
                     if(ctx.message.reply_to_message.hasOwnProperty('forward_from')  ||  (ctx.message.reply_to_message.from.id==botID && /^👆/.test(ctx.message.reply_to_message.text))){
 
-                        console.log("\nUser has not limited privacy setting of forwarding");
                         //user has not limited privacy setting of forwarding, bot can know the original id of the forwarded message
                         //OR
                         //user has limited privacy and I can only print up a little amount of info
@@ -551,13 +544,11 @@ bot.command('unban', (ctx) => {
                             case -1000:
                                 //ERROR: There is no banned user
                                 ctx.reply('There doesn\'t seem to be any banned user. Therefore I can\'t unban him. 👀');
-                                console.log("\nERROR: There is no banned user");
                                 break;
                             
                             case -1005:
                                 //ERROR: Loop ended without finding a match to unban
                                 ctx.reply('The user is not banned so he can\'t be unbanned.');
-                                console.log("\nERROR: Loop ended without finding a match to unban");
                                 break;
 
                             case 1:
@@ -570,26 +561,22 @@ bot.command('unban', (ctx) => {
                                 const mm='You have been unbanned from this bot. From now on, you are free to use it normally. 👀\n'+
                                          'For more infos about this bot please execute /help.';
                                 ctx.telegram.sendMessage(current_user.get_id,mm);
-                                console.log("\nSUCCESS: User has been successfully unbanned");
                                 break;
                         }
                         current_user.set_isBan=false;
                     }else{
                         //errors
                         if(ctx.message.reply_to_message.hasOwnProperty('forward_sender_name')){
-                            console.log("\nUser has limited privacy setting of forwarding");
                             //user has blocked the bot from sending his ID alongside forwarded messages
                             //admin tries to reply to the user message but it will NOT work
                             ctx.reply('This user has hidden the link to its account from forwarded messages tweaking privacy settings.\n'
                                      +'Don\'t worry, we\'ll work around this. 👀\n\n'
                                      +'Check for the bot\'s message immediately below the one you wish and reply to that one instead. 😉');
                         }else if(ctx.message.reply_to_message.from.id==adminID){
-                            console.log("\nUser is trying to unban creator")
                             //admin tries to reply to its own message
                             ctx.reply('You can\'t unban yourself.\n'
                                      +'Lmao. 😂');
                         }else{
-                            console.log("\nUser is trying to unban bot")
                             //admin tries to unban the bot
                             ctx.reply('Bruh 😐, I\'m not even angry, just disappointed.\n'
                                      +'Please remember I have more power than you do.\n'
@@ -597,13 +584,11 @@ bot.command('unban', (ctx) => {
                         }
                     }
                 }else{
-                    console.log("\nAdmin is not replying to someone");
                     //admin hasn't selected any message to reply to
                     ctx.reply('Who should I remove from the banned list? You haven\'t given me any target.\n'
                              +'Reply to the message of the user you want to unban.');
                 }
             }else{
-                console.log("\nUsername specified");
                 //admin has written something after the admin command
                 ctx.reply('I\'m sorry, I can\'t unban an user this way yet.\n'
                          +'Just reply to the message of the user you want to demote from admin position, no further text is allowed.');
@@ -611,7 +596,6 @@ bot.command('unban', (ctx) => {
         }
         else if(current_user.get_id==creator.get_id) ctx.reply('You can\'t unban yourself! ✌🏻\nBut you already knew that, since you developed me. 💡');
         else{
-            console.log("\nUser is not banned");
             //User is not banned, he can't be unbanned
             ctx.reply('The user is not banned so he can\'t be unbanned. 👀');
         }

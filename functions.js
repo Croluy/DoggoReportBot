@@ -84,7 +84,7 @@ function UnixTimestamp(b){
     if(sec<10) sec='0'+sec;
 
     //Format  ->  DD Month YYYY  -  hh:mm:ss
-    return d + ' ' + m + ' ' + y + '\t-\t' + h + ':' + min + ':' + sec;
+    return d + ' ' + m + ' ' + y + '  -  ' + h + ':' + min + ':' + sec;
 }
 
 //Set online status on log channel, ask for possible new username of the channel and initializes admin.json file
@@ -163,26 +163,22 @@ async function toAdmin(a){
             await sleep(500);  //delays the next message for 0,5 sec. This way it's sure it will always be 2nd
             let m="";
             if(a.from.last_name == undefined && a.from.username == undefined)
-                m='👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>]\n'
-                 //+'This user has hidden the link to its account from forwarded messages. 👀\n'
-                 +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
+                m='👆 Message sent by: \n'+a.from.first_name+' [<code>'+a.from.id+'</code>]\n'
+                 +'\n<b><u>Reply to this message instead of the one above.</u></b>';
             else if(a.from.username == undefined)
-                m='👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>]\n'
-                //+'This user has hidden the link to its account from forwarded messages. 👀\n'
-                 +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
+                m='👆 Message sent by: \n'+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>]\n'
+                 +'\n<b><u>Reply to this message instead of the one above.</u></b>';
             else if(a.from.last_name == undefined)
-                m='👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n'
-                //+'This user has hidden the link to its account from forwarded messages. 👀\n'
-                 +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
+                m='👆 Message sent by: \n'+a.from.first_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n'
+                 +'\n<b><u>Reply to this message instead of the one above.</u></b>';
             else
-                m='👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n'
-                //+'This user has hidden the link to its account from forwarded messages. 👀\n'
-                 +'\n<b><u>Reply to this message instead of the one above.</u></b>\nThis way I can still send your reply.';
+                m='👆 Message sent by: \n'+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n'
+                 +'\n<b><u>Reply to this message instead of the one above.</u></b>';
             //m=m+'\n\n'+info(a);
             const newMessage=m.concat('\n\n',info(a));
 
             //send message to all admins
-            let err=toAllAdmins(a,newMessage,{parse_mode: 'HTML'});
+            let err=toAllAdmins(a,newMessage,false);
             //if there is an error, send it to the log channel
             if(err){
                 let m="";
@@ -210,7 +206,7 @@ async function toAdmin(a){
 }
 
 //Sends a specific message to all admins
-function toAllAdmins(ctx,m){
+function toAllAdmins(ctx,m,forward){
     if(adminListIndex==0 || adminListIndex==null){
         return 1;  //ERROR: no admins found
     }
@@ -221,8 +217,9 @@ function toAllAdmins(ctx,m){
     for(let i=0;i<adminListIndex;i++){
         //update the admin id
         aID=a.List[i].ID;
-        //TODO: fix error with forwarding not working properly
-        ctx.forwardMessage(aID,m);
+        //the message is being forwarded by default, if the 3rd parameter is set to false, it will be sent as a regular message
+        if(forward==false) ctx.telegram.sendMessage(aID,m,{parse_mode: 'HTML'});
+        else ctx.forwardMessage(aID,m);
     }
     return 0;
 }
@@ -421,7 +418,7 @@ function demote_AdminToFile(id){
     return -1005;
 }
 
-//Demotes superior admins to admins OR admins to normal users given an id
+//Removes banned user given an id
 function remove_BannedFromFile(id){
     let i=0;    //start check at index 0 of List
     const a=banned.toObject();
