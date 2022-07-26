@@ -2,7 +2,7 @@ const editJsonFile = require("edit-json-file");
 const admins = editJsonFile('./admins.json');
 let adminListIndex=admins.get("Admins Number");
 const banned = editJsonFile('./blacklist.json');
-let bannedListIndex=admins.get("Banned Users");
+let bannedListIndex=banned.get("Banned Users");
 const User = require('./User');
 
 
@@ -88,12 +88,13 @@ function UnixTimestamp(b){
 }
 
 //Set online status on log channel, ask for possible new username of the channel and initializes admin.json file
-function startup(){
+function startup(b){
+    clearUser();
     const text="---------\n\n@DoggoReportBot: ✅ Online\n\n---------";
-    //bot.telegram.sendMessage(LogChannel,text);     //logs on log_channel that bot is online
+    b.telegram.sendMessage(LogChannel,text);     //logs on log_channel that bot is online
     const m="Bot is currently online again. ✅\nIs the channel's username still @"+channelName+"?\n\n"
            +"If yes then don't do anything. Otherwise set the new username using the command:\n/setusername your_new_username.";
-    //bot.telegram.sendMessage(adminID,m);          //asks creator if the channel name is still correct
+    b.telegram.sendMessage(adminID,m);          //asks creator if the channel name is still correct
     console.log("@DoggoReportBot online ✓\n");      //logs on console that bot is online
     //initialize the files
     initFiles();
@@ -210,18 +211,18 @@ async function toAdmin(a){
 
 //Sends a specific message to all admins
 function toAllAdmins(ctx,m){
-    let adminsNumber=admins.get("Admins Number");
-    if(adminsNumber==0 || adminsNumber==null){
+    if(adminListIndex==0 || adminListIndex==null){
         return 1;  //ERROR: no admins found
     }
     const a = admins.toObject();
 
-    let adminID=null;
+    let aID=null;
     //Loop through the admins and send them message
-    for(let i=0;i<adminsNumber;i++){
+    for(let i=0;i<adminListIndex;i++){
         //update the admin id
-        adminID=a.List[i].ID;
-        ctx.telegram.sendMessage(adminID,m,{parse_mode: 'HTML'});
+        aID=a.List[i].ID;
+        //TODO: fix error with forwarding not working properly
+        ctx.forwardMessage(aID,m);
     }
     return 0;
 }
@@ -362,8 +363,10 @@ function add_BannedToFile(u,d){
 }
 
 //Remove admin at index i from admins.json List array
-function removeFromFile(i){
-    const a=admins.toObject();
+function removeFromFile(i,bannedORadmin){
+    let a=null;
+    if(bannedORadmin=="admin") a=admins.toObject();
+    else if(bannedORadmin=="banned") a=banned.toObject();
     let k=i;
 
     //use parameter i to determine which admin has to be removed from the list
@@ -372,15 +375,22 @@ function removeFromFile(i){
     if(i!=a.List.length){
         //decrements "admin #" of all admins who have been promoted after the demoted admin
         do{
-            a.List[k]["Admin #"]=a.List[k]["Admin #"]-1;
+            if(bannedORadmin=="admin") a.List[k]["Admin #"]=a.List[k]["Admin #"]-1;
+            else if(bannedORadmin=="banned") a.List[k]["Banned User #"]=a.List[k]["Banned User #"]-1;
             k++;
         }while(k < a.List.length);
     }
 
-    //update admin index
-    adminListIndex--;
-    admins.set("Admins Number",adminListIndex);
-    admins.save();
+    //update index
+    if(bannedORadmin=="admin"){
+        adminListIndex--;
+        admins.set("Admins Number",adminListIndex);
+        admins.save();
+    }else if(bannedORadmin=="banned"){
+        bannedListIndex--;
+        banned.set("Banned Users",bannedListIndex);
+        banned.save();
+    }
 }
 
 //Demotes superior admins to admins OR admins to normal users given an id
@@ -401,13 +411,35 @@ function demote_AdminToFile(id){
                 admins.save();
                 return -1;
             }
-            removeFromFile(i);
+            removeFromFile(i,"admin");
             return 1;
         }
         i++;
     }while(i<adminListIndex);
 
     //if loop ends without finding a match, error has occoured, possible cause: user never was admin
+    return -1005;
+}
+
+//Demotes superior admins to admins OR admins to normal users given an id
+function remove_BannedFromFile(id){
+    let i=0;    //start check at index 0 of List
+    const a=banned.toObject();
+
+    //there are no banned users - user can't be demoted if he's not even banned
+    if(a.List.length==0) return -1000;
+
+    //loop though all the banned users
+    do{
+        //if user's ID attribute is equal to id (parameter), remove him from the list
+        if(a.List[i].ID==id){
+            removeFromFile(i, "banned");
+            return 1;
+        }
+        i++;
+    }while(i<bannedListIndex);
+
+    //if loop ends without finding a match, error has occoured, possible cause: user never was banned
     return -1005;
 }
 
@@ -634,6 +666,7 @@ module.exports = {
     add_BannedToFile,
     removeFromFile,
     demote_AdminToFile,
+    remove_BannedFromFile,
     setSuperiorId,
     checkBanned,
     checkAdmin,
