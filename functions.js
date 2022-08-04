@@ -131,8 +131,8 @@ function info(a){
 
 //Sends message from user to admin
 async function toAdmin(a){
-    //if admin didn't reply to creator, forward the reply
-    if(a.message.from.id != adminID){
+    //if it was not ad admin to reply, send the message to all admins
+    if(!checkAdminId(a.message.from.id)){
         //send message to all admins
         let err=toAllAdmins(a,a.message.text);
         //if there is an error, send it to the log channel
@@ -174,7 +174,6 @@ async function toAdmin(a){
             else
                 m='👆 Message sent by: \n'+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n'
                  +'\n<b><u>Reply to this message instead of the one above.</u></b>';
-            //m=m+'\n\n'+info(a);
             const newMessage=m.concat('\n\n',info(a));
 
             //send message to all admins
@@ -202,24 +201,103 @@ async function toAdmin(a){
                 a.telegram.sendMessage(LogChannel,m,{parse_mode: 'HTML'});
             }
         }
+    }else if(checkAdminId(a.message.from.id)){
+        //if the user is an admin, send the message to all admins except himself
+        let err=toAllAdmins(a,a.message.text,true,a.message.from.id);
+        //if there is an error, send it to the log channel
+        if(err){
+            let m="";
+            if(a.from.last_name == undefined && a.from.username == undefined)
+                m='An admin has tried to send a message to bot, but it failed.\n'+
+                  'Here\'s the message:\n'+a.message.text+'\n'+
+                  '\n👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>].\n';
+            else if(a.from.username == undefined)
+                m='An admin has tried to send a message to bot, but it failed.\n'+
+                  'Here\'s the message:\n'+a.message.text+'\n'+
+                  '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>].\n'
+            else if(a.from.last_name == undefined)
+                m='An admin has tried to send a message to bot, but it failed.\n'+
+                  'Here\'s the message:\n'+a.message.text+'\n'+
+                  '\n👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
+            else
+                m='An admin has tried to send a message to bot, but it failed.\n'+
+                  'Here\'s the message:\n'+a.message.text+'\n'+
+                  '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
+            
+            a.telegram.sendMessage(LogChannel,m,{parse_mode: 'HTML'});
+        }
+
+        //if the user has strict privacy forwarding settings, also send dummy message for admin
+        if(privacy==true){
+            await sleep(500);  //delays the next message for 0,5 sec. This way it's sure it will always be 2nd
+            let m="";
+            if(a.from.last_name == undefined && a.from.username == undefined)
+                m='👆 Message sent by Admin: \n'+a.from.first_name+' [<code>'+a.from.id+'</code>]\n';
+            else if(a.from.username == undefined)
+                m='👆 Message sent by Admin: \n'+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>]\n';
+            else if(a.from.last_name == undefined)
+                m='👆 Message sent by Admin: \n'+a.from.first_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n';
+            else
+                m='👆 Message sent by Admin: \n'+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n';
+            const newMessage=m.concat('\n\n',info(a));
+
+            //send message to all admins
+            let err=toAllAdmins(a,newMessage,false,a.message.from.id);
+            //if there is an error, send it to the log channel
+            if(err){
+                let m="";
+                if(a.from.last_name == undefined && a.from.username == undefined)
+                    m='An admin has tried to send a message to bot, but it failed.\n'+
+                    'Here\'s the message:\n'+a.message.text+'\n'+
+                    '\n👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>].\n';
+                else if(a.from.username == undefined)
+                    m='An admin has tried to send a message to bot, but it failed.\n'+
+                    'Here\'s the message:\n'+a.message.text+'\n'+
+                    '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>].\n'
+                else if(a.from.last_name == undefined)
+                    m='An admin has tried to send a message to bot, but it failed.\n'+
+                    'Here\'s the message:\n'+a.message.text+'\n'+
+                    '\n👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
+                else
+                    m='An admin has tried to send a message to bot, but it failed.\n'+
+                    'Here\'s the message:\n'+a.message.text+'\n'+
+                    '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
+                
+                a.telegram.sendMessage(LogChannel,m,{parse_mode: 'HTML'});
+            }
+        }
     }
 }
 
 //Sends a specific message to all admins
-function toAllAdmins(ctx,m,forward){
+function toAllAdmins(ctx,m,forward=true,adminsender=null){
     if(adminListIndex==0 || adminListIndex==null){
         return 1;  //ERROR: no admins found
     }
     const a = admins.toObject();
 
     let aID=null;
-    //Loop through the admins and send them message
-    for(let i=0;i<adminListIndex;i++){
-        //update the admin id
-        aID=a.List[i].ID;
-        //the message is being forwarded by default, if the 3rd parameter is set to false, it will be sent as a regular message
-        if(forward==false) ctx.telegram.sendMessage(aID,m,{parse_mode: 'HTML'});
-        else ctx.forwardMessage(aID,m);
+
+    if(adminsender==null){
+        //Loop through the admins and send them message
+        for(let i=0;i<adminListIndex;i++){
+            //update the admin id
+            aID=a.List[i].ID;
+            //the message is being forwarded by default, if the 3rd parameter is set to false, it will be sent as a regular message
+            if(forward==false) ctx.telegram.sendMessage(aID,m,{parse_mode: 'HTML'});
+            else if(forward==true) ctx.forwardMessage(aID,m);
+        }
+    }else{
+        //Loop through the admins and send the message to everyone except the one who sent the message
+        for(let i=0;i<adminListIndex;i++){
+            //update the admin id
+            aID=a.List[i].ID;
+            if(aID!=adminsender){
+                //the message is being forwarded by default, if the 3rd parameter is set to false, it will be sent as a regular message
+                if(forward==false) ctx.telegram.sendMessage(aID,m,{parse_mode: 'HTML'});
+                else if(forward==true) ctx.forwardMessage(aID,m);
+            }
+        }
     }
     return 0;
 }

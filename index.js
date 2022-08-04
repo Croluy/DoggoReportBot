@@ -747,6 +747,10 @@ bot.hears(/(.+)/, async(ctx) => {
             if(ctx.message.reply_to_message.hasOwnProperty('forward_from')){
                 //user has not limited privacy setting of forwarding, bot can know the original id of the forwarded message
                 ctx.telegram.sendMessage(ctx.message.reply_to_message.forward_from.id, m);
+                let id=ctx.from.id;
+                const chat = await ctx.telegram.getChat(id);
+                privacy=chat.has_private_forwards;
+                functions.toAdmin(ctx);
             }else{
                 if(ctx.message.reply_to_message.hasOwnProperty('forward_sender_name')){
                     //user has blocked the bot from sending his ID alongside forwarded messages
