@@ -122,10 +122,10 @@ bot.help((ctx) => {
                  +'~ /info \t=>\t reply to a message with this command to get infos about the user;\n'
                  +'~ /admin \t=>\t set an user as an admin of the bot;\n'
                  +'~ /unadmin OR /demote \t=>\t if an user is superior admin, he will become admin and if he\'s admin he will become normal user;\n'
+                 +'~ /ban \t=>\t forbids an user to keep using the bot;\n'
+                 +'~ /unban \t=>\t allows a banned user to keep using the bot;\n'
                  +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID.\n'
                  +'~ /superior [id] OR /promote [id] \t=>\t set an admin as a superior admin of the bot;\n'
-                 +'~ /ban [id] \t=>\t forbids an user to keep using the bot;\n'
-                 +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\n'
                  +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
     }else if(functions.checkSuperior(current_user)) {
         //superior admin help
@@ -140,9 +140,8 @@ bot.help((ctx) => {
                  +'~ /info \t=>\t reply to a message with this command to get infos about the user;\n'
                  +'~ /admin \t=>\t set an user as an admin of the bot;\n'
                  +'~ /unadmin OR /demote \t=>\t demote admin to normal user;\n'
-                 +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID.\n'
-                 +'~ /ban [id] \t=>\t forbids an user to keep using the bot;\n'
-                 +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\n'
+                 +'~ /ban \t=>\t forbids an user to keep using the bot;\n'
+                 +'~ /unban \t=>\t allows a banned user to keep using the bot;\n'
                  +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
     }else if(functions.checkAdmin(current_user)) {
         //admin help
@@ -151,9 +150,8 @@ bot.help((ctx) => {
                  +'\nBot-related commands:\n'
                  +'~ /help \t=>\t this command;\n'
                  +'~ /blacklist \t=>\t see a list of banned users;\n'
-                 +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID.'
-                 +'~ /ban [id] \t=>\t forbids an user to keep using the bot;\n'
-                 +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\n'
+                 +'~ /ban \t=>\t forbids an user to keep using the bot;\n'
+                 +'~ /unban \t=>\t allows a banned user to keep using the bot;\n'
                  +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
     }else{
         //user help
@@ -236,7 +234,7 @@ bot.command(['admin'], (ctx) => {
         functions.setUser(ctx);
         if(functions.checkBanned(current_user)){
             //User can NOT be promoted, he is currently banned.. have to unban first
-            if(current_user.get_username != undefined)  //user has username
+            if(current_user.get_username != undefined && current_user.get_username != "")  //user has username
                 ctx.reply('User: <b>'+current_user.get_fullName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>]\n can\'t be added to the admin list! 🎉\n'+
                           'The probable reason is cause he is currently banned. You have to unban him first by running /unban '+current_user.get_id,{parse_mode: 'HTML'});
             else  //user doesn't have an username
@@ -281,14 +279,14 @@ bot.command(['admin'], (ctx) => {
                         if(functions.add_AdminToFile(current_user,ctx.message.date)){
                             //User can be promoted, he is not banned
                             //FIXME: bug, user in admins.json isn't "isAdmin" field isn't set to true
-                            if(current_user.get_username != undefined)  //user has username
+                            if(current_user.get_username != undefined && current_user.get_username != "")  //user has username
                                 ctx.reply('User: <b>'+current_user.get_fullName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>]\nhas been added to the admin list! 🎉',{parse_mode: 'HTML'});
                             else  //user doesn't have an username
                                 ctx.reply('User: <b>'+current_user.get_fullName+'</b> [<code>'+current_user.get_id+'</code>]\nhas been added to the admin list! 🎉',{parse_mode: 'HTML'});
                             ctx.telegram.sendMessage(current_user.get_id,m);
                         }else if(functions.add_AdminToFile(current_user,ctx.message.date) == -1){
                             //User can NOT be promoted, he is currently banned.. have to unban first
-                            if(current_user.get_username != undefined)  //user has username
+                            if(current_user.get_username != undefined && current_user.get_username != "")  //user has username
                                 ctx.reply('User: <b>'+current_user.get_fullName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>]\n can\'t be added to the admin list! 🎉\n'+
                                           'The probable reason is cause he is currently banned. You have to unban him first by running /unban '+current_user.get_id,{parse_mode: 'HTML'});
                             else  //user doesn't have an username
@@ -368,7 +366,7 @@ bot.command(['unadmin','demote'], (ctx) => {
 
                             case -1:
                                 //SUCCESS: User has been successfully demoted back to admin role
-                                if(current_user.get_username != undefined)
+                                if(current_user.get_username != undefined && current_user.get_username != "")
                                     ctx.reply('User: <b>'+current_user.get_fullName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>]\nhas been demoted from Superior Admin to Admin! ✓',{parse_mode: 'HTML'});
                                 else
                                     ctx.reply('User: <b>'+current_user.get_fullName+'</b> [<code>'+current_user.get_id+'</code>]\nhas been demoted from Superior Admin to Admin! ✓',{parse_mode: 'HTML'});
@@ -382,7 +380,7 @@ bot.command(['unadmin','demote'], (ctx) => {
 
                             case 1:
                                 //SUCCESS: User has been successfully demoted back to user role
-                                if(current_user.get_username != undefined)
+                                if(current_user.get_username != undefined && current_user.get_username != "")
                                     ctx.reply('User: <b>'+current_user.get_fullName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>]\nhas been removed to the admin list! ✓',{parse_mode: 'HTML'});
                                 else
                                     ctx.reply('User: <b>'+current_user.get_fullName+'</b> [<code>'+current_user.get_id+'</code>]\nhas been removed to the admin list! ✓',{parse_mode: 'HTML'});
@@ -467,7 +465,7 @@ bot.command(['ban','terminate'], (ctx) => {
                         //User can be banned, he is not admin
                         current_user.set_isBan=true;
 
-                        if(current_user.get_username != undefined)  //user has username
+                        if(current_user.get_username != undefined && current_user.get_username != "")  //user has username
                             ctx.reply('User: <b>'+current_user.get_fullName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>] terminated successfully! 🎉\n'
                                      +'It won\'t be able to disturb you anymore. 😈\n', {parse_mode: 'HTML'});
                         else  //user doesn't have an username
@@ -476,7 +474,7 @@ bot.command(['ban','terminate'], (ctx) => {
                         ctx.telegram.sendMessage(current_user.get_id,m);
                     }else if(functions.add_BannedToFile(current_user,ctx.message.date) == -1){
                         //User can NOT be banned, he is currently admin.. have to unadmin first
-                        if(current_user.get_username != undefined)  //user has username
+                        if(current_user.get_username != undefined && current_user.get_username != "")  //user has username
                             ctx.reply('User: <b>'+current_user.get_fullName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>]\n can\'t be banned! 👀\n'+
                                       'The probable reason is cause he is currently set as admin. You have to unadmin him first by running /unadmin in reply to his message.',{parse_mode: 'HTML'});
                         else  //user doesn't have an username
@@ -553,7 +551,7 @@ bot.command('unban', (ctx) => {
 
                             case 1:
                                 //SUCCESS: User has been successfully unbanned
-                                if(current_user.get_username != undefined)
+                                if(current_user.get_username != undefined && current_user.get_username != "")
                                     ctx.reply('User: <b>'+current_user.get_fullName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>]\nhas been unbanned! ✓',{parse_mode: 'HTML'});
                                 else
                                     ctx.reply('User: <b>'+current_user.get_fullName+'</b> [<code>'+current_user.get_id+'</code>]\nhas been unbanned! ✓',{parse_mode: 'HTML'});
@@ -608,10 +606,10 @@ bot.command('adminlist', (ctx) => {
     functions.setUser(ctx);
     if(functions.checkBanned(current_user)) return;
     if(functions.checkSuperior(current_user)) {
-        admins = editJsonFile('./admins.json');
         //only superior admins can use this command
-        const list=JSON.stringify(admins.toObject(),null,'\t\t');
-        ctx.reply(list);
+        functions.adminsToMessage(ctx);
+        /**OLD MODE //const list=JSON.stringify(admins.toObject(),null,'\t\t');
+        //ctx.reply(list);*/
     }else if(functions.checkAdmin(current_user)){
         //normal admins
         const m='Admin: <b>'+current_user.get_fullName+'</b> [<code>'+current_user.get_id+'</code>]\n'
@@ -632,8 +630,17 @@ bot.command('adminlist', (ctx) => {
 //list banned users
 bot.command('blacklist', (ctx) => {
     functions.setUser(ctx);
-    if(functions.checkBanned(current_user)) return;
+    //if the user who wrote the command is banned from the bot, ignore message
+    if(functions.checkBanned(current_user)){
+        functions.clearUser();
+        return;
+    }
     if(functions.checkAdmin(current_user)) {
+        if(functions.existsBannedUsers()){
+            ctx.reply('There are no banned users. 🎉\nApparently everyone is behaving well!');
+            functions.clearUser();
+            return;
+        }
         blacklist = editJsonFile('./blacklist.json');
         //only admins can use this command
         const list=JSON.stringify(blacklist.toObject(),null,'\t\t');
@@ -744,6 +751,11 @@ bot.hears(/(.+)/, async(ctx) => {
         const m=ctx.message.text;
         //check if I am actually replying to someone
         if(ctx.message.hasOwnProperty('reply_to_message')){
+            if(ctx.message.text.startsWith('/')){
+                //I am writing a command to an user and I don't want to forward it to him
+                ctx.reply('This command wasn\'t found. 🤷🏻‍♂️\nPlease consult /help and try again. 👀\n\nIf you were trying to send a message to the user, you can\'t send him one which starts with the character /.');
+                return;
+            }
             if(ctx.message.reply_to_message.hasOwnProperty('forward_from')){
                 //user has not limited privacy setting of forwarding, bot can know the original id of the forwarded message
                 ctx.telegram.sendMessage(ctx.message.reply_to_message.forward_from.id, m);

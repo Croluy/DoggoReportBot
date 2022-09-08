@@ -331,6 +331,8 @@ function infoCommand(a){
 
 //Using ctx parameter and sets an User object from that (current_user)
 function setUser(a){
+    //TODO: fix the function so that when replying to an admin dummy message, it will get the correct full name
+    /////// use the "adminNameFromDummy" function
     clearUser();
     if(a.message.from.id == creator.get_id && a.message.hasOwnProperty('reply_to_message')==false){
         //Creator of the bot, no need to do anything as this user is already set up
@@ -624,14 +626,14 @@ function checkBannedId(id){
     if(id==creator.get_id) return false;
 
     let i=0;
-    const a=admins.toObject();
+    const b=banned.toObject();
 
     //loop though all the banned users
     do{
         //if user's ID attribute is equal to id, exit condition, he is banned
-        if(a.List[i].ID==id) return true;
+        if(b.List[i].ID==id) return true;
         i++;
-    }while(i<adminListIndex);
+    }while(i<bannedListIndex);
 
     //if loop ends without finding a match, user is not banned
     return false;
@@ -681,6 +683,13 @@ function checkSuperiorId(id){
     return false;
 }
 
+//Check if there are banned users
+function existsBannedUsers(){
+    //if the number of banned users is 0 or null, there are no banned users
+    if(banned.get("Banned Users")== null || banned.get("Banned Users")== 0) return true;
+    else return false;
+}
+
 //Using ctx parameter returns id from dummy message for every user with restricted privacy settings
 function idFromDummy(a){
     const t = a.message.reply_to_message.text;
@@ -696,6 +705,17 @@ function idFromDummy(a){
 function nameFromDummy(a){
     const t = a.message.reply_to_message.text;
     const start = t.indexOf("by")+4;
+    const end = t.indexOf("[")-1;
+    var name = "";
+    for(let i=start; i<end; i++)
+        name = name +''+ t[i];
+    return name;
+}
+
+//Using ctx parameter returns full_name from dummy message for every admin with restricted privacy settings
+function adminNameFromDummy(a){
+    const t = a.message.reply_to_message.text;
+    const start = t.indexOf("Admin:")+4;
     const end = t.indexOf("[")-1;
     var name = "";
     for(let i=start; i<end; i++)
@@ -725,6 +745,41 @@ function langFromDummy(a){
     return lang;
 }
 
+//Using ctx parameter returns the list of admins in an ordered way
+function adminsToMessage(context){
+    const a = admins.toObject();
+
+    let sup='';
+    let priv='';
+    for(let i=0; i<admins.get("Admins Number"); i++){
+        if(a.List[i].isSuperior) sup='✅';
+        else sup='🚫';
+
+        if(a.List[i].isPrivate) priv='✅';
+        else priv='🚫';
+
+        if(a.List[i].Username != null || a.List[i].Username != undefined || a.List[i].Username != "")
+            context.reply("******************************\n"
+                        +"<i>~ ID: </i>\t\t<b><code>"+a.List[i].ID+"</code></b>\n"
+                        +"<i>~ Full Name: </i>\t\t<b>"+a.List[i]["Full Name"]+"</b>\n"
+                        +"<i>~ Superior Admin: </i>\t\t<b>"+sup+"</b>\n"
+                        +"<i>~ Username: </i>\t\t<b>@"+a.List[i].Username+"</b>\n"
+                        +"<i>~ Language: </i>\t\t<b>"+a.List[i].Language+"</b>\n"
+                        +"<i>~ Has Restricted Privacy Settings: </i>\t\t<b>"+priv+"</b>\n"
+                        +"<i>~ Time of Promotion (UTC): </i>\t\t<b>"+a.List[i]["Date of Promotion"]+"</b>\n"
+                        +"******************************",{parse_mode: 'HTML'});
+        else context.reply("******************************\n"
+                          +"<i>~ ID: </i>\t\t<b><code>"+a.List[i].ID+"</code></b>\n"
+                          +"<i>~ Full Name: </i>\t\t<b>"+a.List[i]["Full Name"]+"</b>\n"
+                          +"<i>~ Superior Admin: </i>\t\t<b>"+sup+"</b>\n"
+                          +"<i>~ Username: </i>\t\t<b>NO USERNAME SET</b>\n"
+                          +"<i>~ Language: </i>\t\t<b>"+a.List[i].Language+"</b>\n"
+                          +"<i>~ Has Restricted Privacy Settings: </i>\t\t<b>"+priv+"</b>\n"
+                          +"<i>~ Time of Promotion (UTC): </i>\t\t<b>"+a.List[i]["Date of Promotion"]+"</b>\n"
+                          +"******************************",{parse_mode: 'HTML'});
+    }
+}
+
 //Export functions
 module.exports = {
     sleep,
@@ -750,8 +805,11 @@ module.exports = {
     checkBannedId,
     checkAdminId,
     checkSuperiorId,
+    existsBannedUsers,
     idFromDummy,
     nameFromDummy,
+    adminNameFromDummy,
     usernameFromDummy,
-    langFromDummy
+    langFromDummy,
+    adminsToMessage
 }
