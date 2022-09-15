@@ -143,16 +143,19 @@ bot.help((ctx) => {
                  +'~ /ban \t=>\t forbids an user to keep using the bot;\n'
                  +'~ /unban \t=>\t allows a banned user to keep using the bot;\n'
                  +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
+        functions.update_admin(ctx,current_user);
     }else if(functions.checkAdmin(current_user)) {
         //admin help
         ctx.reply('❔ Help for @DoggoReportBot:\n\n'
-                 +'\t\t# Your status: Admin 👮‍♀️\nIn order to use this commands just type them in chat\n'
-                 +'\nBot-related commands:\n'
+                 +'\t\t# Your status: Admin 👮‍♀️\n'
+                 +'\nBot-related commands:\nIn order to use this commands just type them in chat\n'
                  +'~ /help \t=>\t this command;\n'
                  +'~ /blacklist \t=>\t see a list of banned users;\n'
+                 +'\nUser-related commands:\nIn order to use this commands reply to user\'s message.\n'
                  +'~ /ban \t=>\t forbids an user to keep using the bot;\n'
                  +'~ /unban \t=>\t allows a banned user to keep using the bot;\n'
                  +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
+        functions.update_admin(ctx,current_user);
     }else{
         //user help
         ctx.reply('❔ Help for @DoggoReportBot:\n\n'
@@ -376,6 +379,7 @@ bot.command(['unadmin','demote'], (ctx) => {
                                         +'You can get more infos by typing /help in the chat.\n'
                                         +'When you do that, you\'ll see the status set to Admin. 👀';
                                 ctx.telegram.sendMessage(current_user.get_id,mm);
+                                current_user.set_isSuperior=false;
                                 break;
 
                             case 1:
@@ -390,9 +394,9 @@ bot.command(['unadmin','demote'], (ctx) => {
                                        +'You can get more infos by typing /help in the chat.\n'
                                        +'When you do that, you\'ll see the status set to User. 👀';
                                 ctx.telegram.sendMessage(current_user.get_id,m);
+                                current_user.set_isAdmin=false;
                                 break;
                         }
-                        current_user.set_isAdmin=false;
                     }else{
                         //errors
                         if(ctx.message.reply_to_message.hasOwnProperty('forward_sender_name')){

@@ -331,8 +331,6 @@ function infoCommand(a){
 
 //Using ctx parameter and sets an User object from that (current_user)
 function setUser(a){
-    //TODO: fix the function so that when replying to an admin dummy message, it will get the correct full name
-    /////// use the "adminNameFromDummy" function
     clearUser();
     if(a.message.from.id == creator.get_id && a.message.hasOwnProperty('reply_to_message')==false){
         //Creator of the bot, no need to do anything as this user is already set up
@@ -359,6 +357,8 @@ function setUser(a){
             current_user.set_firstName  =   undefined;
             current_user.set_lastName   =   undefined;
             current_user.set_fullName   =   nameFromDummy(a);
+            //if the user name was set from admin dummy message, correct the full name
+            if(current_user.get_fullName.startsWith("dmin:")) current_user.set_fullName = adminNameFromDummy(a);
             current_user.set_isAdmin    =   checkAdminId(current_user.get_id);
             current_user.set_isSuperior =   checkSuperiorId(current_user.get_id);
             current_user.set_username   =   usernameFromDummy(a);
@@ -712,10 +712,10 @@ function nameFromDummy(a){
     return name;
 }
 
-//Using ctx parameter returns full_name from dummy message for every admin with restricted privacy settings
+//Using ctx parameter returns full_name from admin dummy message for every admin with restricted privacy settings
 function adminNameFromDummy(a){
     const t = a.message.reply_to_message.text;
-    const start = t.indexOf("Admin:")+4;
+    const start = t.indexOf("Admin:")+8;
     const end = t.indexOf("[")-1;
     var name = "";
     for(let i=start; i<end; i++)
@@ -780,6 +780,54 @@ function adminsToMessage(context){
     }
 }
 
+//Update info about admin whenever he sends a message to the bot
+function update_admin(ctx,user) {
+    //Check if the user is admin
+    if(checkAdminId(ctx.message.from.id)){
+        //Gets the position of that admin user
+        let pos=null;
+        const a = admins.toObject();
+        for(let i=0;i<adminListIndex;i++) {
+            if(a.List[i].ID == user.id) {
+                pos=i;
+                break;
+            }
+        }
+
+        update_admin_fullname(pos,user);
+        update_admin_username(pos,user);
+        update_admin_private(pos,user);
+    }
+}
+
+//Update admin full name
+function update_admin_fullname(pos,user){
+    const a = admins.toObject();
+    if(a.List[pos]["Full Name"] != user.fullname){
+        a.List[pos]["Full Name"] = user.fullName;
+        admins.save();
+    }
+}
+
+//Update admin username
+function update_admin_username(pos,user){
+    const a = admins.toObject();
+    if(a.List[pos].Username != user.username){
+        console.log("User " + a.List[pos].Username + " has changed to " + user.username);
+        a.List[pos].Username = user.username;
+        admins.save();
+    }
+}
+
+//Update admin private state
+function update_admin_private(pos,user){
+    const a = admins.toObject();
+    if(a.List[pos].isPrivate != user.isPrivate){
+        a.List[pos].isPrivate = user.isPrivate;
+        admins.save();
+    }
+}
+
 //Export functions
 module.exports = {
     sleep,
@@ -811,5 +859,6 @@ module.exports = {
     adminNameFromDummy,
     usernameFromDummy,
     langFromDummy,
-    adminsToMessage
+    adminsToMessage,
+    update_admin
 }
