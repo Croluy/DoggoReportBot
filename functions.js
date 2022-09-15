@@ -813,7 +813,6 @@ function update_admin_fullname(pos,user){
 function update_admin_username(pos,user){
     const a = admins.toObject();
     if(a.List[pos].Username != user.username){
-        console.log("User " + a.List[pos].Username + " has changed to " + user.username);
         a.List[pos].Username = user.username;
         admins.save();
     }

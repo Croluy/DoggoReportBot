@@ -31,6 +31,7 @@ if(!bot_test) functions.startup(bot);
 bot.start((ctx) => {
     functions.setUser(ctx);
     if(functions.checkBanned(current_user)) return;
+    functions.update_admin(ctx,current_user);
     if(functions.checkCreator(current_user)) {
         //creator started the bot
         if(creator.get_username != undefined || creator.get_username != null){
@@ -172,6 +173,7 @@ bot.help((ctx) => {
 //Get info about user
 bot.command('info', (ctx) => {
     functions.setUser(ctx);
+    functions.update_admin(ctx,current_user);
     if(functions.checkBanned(current_user)) return;
     //only superior admins can use this command
     if(functions.checkSuperiorId(ctx.message.chat.id)) {
@@ -213,6 +215,7 @@ bot.command('info', (ctx) => {
 //set username for the channel - it's used to print it during the "/start" comand
 bot.command('setusername', (ctx) => {
     functions.setUser(ctx);
+    functions.update_admin(ctx,current_user);
     if(functions.checkBanned(current_user)) return;
     if(functions.checkSuperior(current_user)) {
         let input=ctx.message.text;
@@ -235,6 +238,7 @@ bot.command(['admin'], (ctx) => {
     //only superior admins can add an admin
     if(functions.checkSuperiorId(ctx.message.chat.id)) {
         functions.setUser(ctx);
+        functions.update_admin(ctx,current_user);
         if(functions.checkBanned(current_user)){
             //User can NOT be promoted, he is currently banned.. have to unban first
             if(current_user.get_username != undefined && current_user.get_username != "")  //user has username
@@ -334,6 +338,7 @@ bot.command(['unadmin','demote'], (ctx) => {
     //only creator can demote an admin
     if(ctx.message.chat.id == creator.get_id) {
         functions.setUser(ctx);
+        functions.update_admin(ctx,current_user);
         if(functions.checkBanned(current_user)) return;
         //check if user is creator and isn't a bot
         if(functions.checkAdmin(current_user) && !current_user.get_isBot) {
@@ -441,6 +446,7 @@ bot.command(['ban','terminate'], (ctx) => {
     //check if the person who sent the command is admin
     if(functions.checkAdminId(ctx.message.chat.id)) {
         functions.setUser(ctx);
+        functions.update_admin(ctx,current_user);
         if(functions.checkBanned(current_user)) return;
 
         let input=ctx.message.text;
@@ -521,6 +527,7 @@ bot.command('unban', (ctx) => {
     //only admin can unban users
     if(functions.checkAdminId(ctx.message.chat.id)) {
         functions.setUser(ctx);
+        functions.update_admin(ctx,current_user);
         //check if user is admin and isn't a bot
         if(functions.checkBanned(current_user)) {
             let input=ctx.message.text;
@@ -608,6 +615,7 @@ bot.command('unban', (ctx) => {
 //list admin users
 bot.command('adminlist', (ctx) => {
     functions.setUser(ctx);
+    functions.update_admin(ctx,current_user);
     if(functions.checkBanned(current_user)) return;
     if(functions.checkSuperior(current_user)) {
         //only superior admins can use this command
@@ -634,6 +642,7 @@ bot.command('adminlist', (ctx) => {
 //list banned users
 bot.command('blacklist', (ctx) => {
     functions.setUser(ctx);
+    functions.update_admin(ctx,current_user);
     //if the user who wrote the command is banned from the bot, ignore message
     if(functions.checkBanned(current_user)){
         functions.clearUser();
@@ -656,6 +665,7 @@ bot.command('blacklist', (ctx) => {
 //grant an admin the superior admin permissions
 bot.command(['promote','superior'], (ctx) => {
     functions.setUser(ctx);
+    functions.update_admin(ctx,current_user);
     if(functions.checkBanned(current_user)) return;
     if(functions.checkCreator(current_user)) {
         //only creator of the bot can use the superior command
@@ -717,6 +727,7 @@ bot.command(['promote','superior'], (ctx) => {
 //Clears the admins list and the only admin left is the creator
 bot.command('resetadmins', (ctx) => {
     functions.setUser(ctx);
+    functions.update_admin(ctx,current_user);
     if(functions.checkBanned(current_user)) return;
     //the only admin is the creator, nothing has to be reset
     if(admins.get("Admins Number") == 1){
