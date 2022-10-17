@@ -26,7 +26,7 @@ Do **NOT** delete or manually modify this files unless you know what you're doin
 
 When an user sends any message to the bot, that message will be forwarded to all the current Administrators. That's right! This bot supports multiple admins. Not only that, but there are 3 diffent ranks of Administrators:<br>
 + 👑 Bot's Owner (also mentioned as Creator) is the highest rank and has access to ALL the commands, there can only be 1 Bot Owner;<br>
-+ 💎 Superior Administrator it's the max rank any user *(besides the Bot's Owner)* can aspire to, it has a high amount of available commands;<br>
++ 💎 Superior Administrator it's the max rank any user *(who isn't Bot's Owner)* can aspire to, it has a high amount of available commands;<br>
 + 👮‍♀️ Administrator is a user who has Ban power over normal users.
 
 Administrators can reply to users by simply using the reply function of Telegram. When that happens, said reply will be forwarded to all the other Administrators of the bot also.
