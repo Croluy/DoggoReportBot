@@ -33,7 +33,8 @@ Administrators can reply to users by simply using the reply function of Telegram
 
 If users restrict their forwarding privacy setting, the bot has to use some tricks to get around the problem as some functions might work slightly diffentely than normal. Having this said, at the moment, ALL of the features and commands of this bot are usable even with this category of users.
 
-If any errors occour during the use of the bot, it will log those errors on a log channel you've chosen, which is different from the channel this bot is supposed to be linked with. The Telegram log channel has to be created manually by you and it should only be visible to people you have granted Administrator permission to.
+If any errors occour during the use of the bot, it will log those errors on a log channel you've chosen, which is different from the channel this bot is supposed to be linked with.<br>
+The Telegram log channel has to be created manually by you and it should only be visible to people you have granted Administrator permission to.
 <br>
 
 ## 💡 Commands
