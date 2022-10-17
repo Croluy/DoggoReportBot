@@ -43,30 +43,47 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
 
 👮‍♀️ Ban (OR Terminate) and Unban: ban any user who texts the bot and their messages will be completely ignored until you choose to Unban said user.<br>
 You can Ban only by replying to user's message. You can Unban by either replying to user's message OR by using the user's ID.
+![Ban Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Ban_new.gif)<br>
+***
 
 👮‍♀️ Blacklist: show a list of all users who are Banned from the bot.<br>
 You can run Blacklist command only by typing it in bot's chat as a normal message.
+![Blacklist Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Blacklist_new.gif)<br>
+***
 
 💎 Adminlist: show a list of all Administrators of the bot.<br>
 You can run Adminlist command only by typing it in bot's chat as a normal message.
+![Adminlist Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Adminlist_new.gif)<br>
+***
 
 💎 Admin: promote a normal user to Admininistrator.<br>
 You can run Admin only by replying to user's message.
+![Admin Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Admin_new.gif)<br>
+***
 
 💎 Unadmin OR Demote: demote users of their current Administrator rank to the lower rank. Obviously if you are a Superior Admin you can only demote Admins back to users, but you can't demote other Superior Admins.<br>
 You can Demote by either replying to user's message OR by using the user's ID.
+![Demote Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Demote_new.gif)<br>
+***
 
 💎 Info: gather some infos about a specific user. Those include: ID, Full Name, Username (if any) and Language code.<br>
 You can run Info only by replying to user's message.
+![Info Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Info_new.gif)<br>
+***
 
 💎 SetUsername: set the username of the channel this bot is linked to.<br>
 You can run this command followed by the new username of the linked channel.
+![SetUsername Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/SetUsername_new.gif)<br>
+***
 
 👑 Promote OR Superior: grant an Administrator the Superior Administrator rank.<br>
 You can run this command followed by Admin's ID.
+![Promote Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Promote_new.gif)<br>
+***
 
 👑 ResetAdmins: resets the list of ALL the admins by removing every single one of them except the Bot's Owner.<br>
 You can run Blacklist command only by typing it in bot's chat as a normal message.
+![ResetAdminsExample GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Resetadminlist_new.gif)<br><br>
 
 ## 📄 Credits:
 *:rocket: Created and Maintained by [Croluy](https://www.github.com/croluy)*
