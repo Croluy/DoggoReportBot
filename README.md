@@ -1,36 +1,42 @@
-# DoggoReportBot
+# ⚙️ DoggoReportBot
 
 A Telegram bot coded in NodeJS, which allows admins of a channel to communicate with several users by using the bot as an intermediary.
 <br>
 
-# Dev Infos
+## 💻 Dev Infos
 
-When running the bot be sure to set the variable "bot_test" to "false" in "index.js". That will deny the bot from skipping some initial steps that I've preferred ignoring during development process.<br>
+When running the bot be sure to set the variable `bot_test` to `false` in "*index.js*". That will deny the bot from skipping some initial steps that I've preferred ignoring during development process.<br>
 I have excluded some files when uploading the project to GitHub. Those include data I won't disclose publicly for obvious reasons.<br>
-If you're using this project, then you might need to recreate at least the .env file in your local machine after you clone the repository.
-It includes crucial data: bot token, ID and full name of the bot's owner, bot ID, ID of a log channel, name of the channel this bot is linked to.<br>
-<br>
+You might need to recreate at least the *.env* file in your local machine after you clone the repository.<br>
+It includes crucial data:
+- bot's token;
+- ID and full name of the bot's owner;
+- bot's ID;
+- ID of the log channel;
+- name of the channel this bot is linked to.<br>
+
 When you run the bot for the 1st time, it will create 2 files on your local machine:<br>
-~ blacklist.json --> it saves a list of all users banned from the bot;<br>
-~ admins.json --> this file saves a list of all the admins of the bot.<br>
-Do NOT delete or manually modify this files unless you know what you're doing!
+- blacklist.json --> it saves a list of all users banned from the bot;<br>
+- admins.json --> this file saves a list of all the admins of the bot.<br>
+
+Do **NOT** delete or manually modify this files unless you know what you're doing!
 <br>
 
-# Features
+## 🧬 Features
 
 When an user sends any message to the bot, that message will be forwarded to all the current Administrators. That's right! This bot supports multiple admins. Not only that, but there are 3 diffent ranks of Administrators:<br>
-• 👑 Bot's Owner (also mentioned as Creator) is the highest rank and has access to ALL the commands, there can only be 1 Bot Owner;<br>
-• 💎 Superior Administrator it's the max rank any user besides the Bot's Owner can aspire to, it has a high amount of available commands;<br>
-• 👮‍♀️ Administrator is a user who has Ban power over normal users.
++ 👑 Bot's Owner (also mentioned as Creator) is the highest rank and has access to ALL the commands, there can only be 1 Bot Owner;<br>
++ 💎 Superior Administrator it's the max rank any user *(besides the Bot's Owner)* can aspire to, it has a high amount of available commands;<br>
++ 👮‍♀️ Administrator is a user who has Ban power over normal users.
 
 Administrators can reply to users by simply using the reply function of Telegram. When that happens, said reply will be forwarded to all the other Administrators of the bot also.
 
 If users restrict their forwarding privacy setting, the bot has to use some tricks to get around the problem as some functions might work slightly diffentely than normal. Having this said, at the moment, ALL of the features and commands of this bot are usable even with this category of users.
 
-If any errors occour during the use of the bot, it will log those errors on a log channel you've chosen, which is different from the channel this bot is supposed to be linkes with. The Telegram log channel should only be visible to people you have granted Administrator permission to.
+If any errors occour during the use of the bot, it will log those errors on a log channel you've chosen, which is different from the channel this bot is supposed to be linked with. The Telegram log channel has to be created manually by you and it should only be visible to people you have granted Administrator permission to.
 <br>
 
-# Commands
+## 💡 Commands
 
 I've used emojis to give you a list of commands while also showing what kind of rank is required for that command to work.<br>
 Obviously all lower ranked commands can be executed by higher ranked Administrators too.
@@ -61,3 +67,6 @@ You can run this command followed by Admin's ID.
 
 👑 ResetAdmins: resets the list of ALL the admins by removing every single one of them except the Bot's Owner.<br>
 You can run Blacklist command only by typing it in bot's chat as a normal message.
+
+## 📄 Credits:
+*:rocket: Created and Maintained by [Croluy](https://www.github.com/croluy)*
