@@ -48,7 +48,7 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
     <summary>Click Me for an Example 👇🏻</summary>
     
     ![Ban Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Ban_new.gif)
-  </details><br>
+  </details>
 ***
 
 + 👮‍♀️ Blacklist: show a list of all users who are Banned from the bot.<br>
@@ -57,7 +57,7 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
     <summary>Click Me for an Example 👇🏻</summary>
     
     ![Blacklist Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Blacklist_new.gif)
-  </details><br>
+  </details>
 ***
 
 + 💎 Adminlist: show a list of all Administrators of the bot.<br>
@@ -66,7 +66,7 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
     <summary>Click Me for an Example 👇🏻</summary>
     
     ![Adminlist Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Adminlist_new.gif)
-  </details><br>
+  </details>
 ***
 
 + 💎 Admin: promote a normal user to Admininistrator.<br>
@@ -75,7 +75,7 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
     <summary>Click Me for an Example 👇🏻</summary>
     
     ![Admin Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Admin_new.gif)
-  </details><br>
+  </details>
 ***
 
 + 💎 Unadmin OR Demote: demote users of their current Administrator rank to the lower rank. Obviously if you are a Superior Admin you can only demote Admins back to users, but you can't demote other Superior Admins.<br>
@@ -84,7 +84,7 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
     <summary>Click Me for an Example 👇🏻</summary>
     
     ![Demote Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Demote_new.gif)
-  </details><br>
+  </details>
 ***
 
 + 💎 Info: gather some infos about a specific user. Those include: ID, Full Name, Username (if any) and Language code.<br>
@@ -93,7 +93,7 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
     <summary>Click Me for an Example 👇🏻</summary>
     
     ![Info Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Info_new.gif)
-  </details><br>
+  </details>
 ***
 
 + 💎 SetUsername: set the username of the channel this bot is linked to.<br>
@@ -102,7 +102,7 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
     <summary>Click Me for an Example 👇🏻</summary>
     
     ![SetUsername Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/SetUsername_new.gif)
-  </details><br>
+  </details>
 ***
 
 + 👑 Promote OR Superior: grant an Administrator the Superior Administrator rank.<br>
@@ -111,7 +111,7 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
     <summary>Click Me for an Example 👇🏻</summary>
     
     ![Promote Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Promote_new.gif)
-  </details><br>
+  </details>
 ***
 
 + 👑 ResetAdmins: resets the list of ALL the admins by removing every single one of them except the Bot's Owner.<br>
@@ -120,7 +120,7 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
     <summary>Click Me for an Example 👇🏻</summary>
     
     ![ResetAdminsExample GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Resetadminlist_new.gif)
-  </details><br><br>
+  </details><br>
 
 ## 📄 Credits:
 *:rocket: Created and Maintained by [Croluy](https://www.github.com/croluy)*
