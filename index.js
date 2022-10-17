@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 /**
+ * DoggoReportBot - index.js - main file with all the commands.
  * Copyright (C) 2022   Croluy
  * 
  * This program comes with ABSOLUTELY NO WARRANTY;

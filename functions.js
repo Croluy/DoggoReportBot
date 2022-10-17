@@ -1,4 +1,5 @@
 /**
+ * DoggoReportBot - functions.js - file with all the useful functions.
  * Copyright (C) 2022   Croluy
  * 
  * This program comes with ABSOLUTELY NO WARRANTY;

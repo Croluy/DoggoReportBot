@@ -1,4 +1,5 @@
 /**
+ * DoggoReportBot - User.js - User Class file to create Users objects.
  * Copyright (C) 2022   Croluy
  * 
  * This program comes with ABSOLUTELY NO WARRANTY;
