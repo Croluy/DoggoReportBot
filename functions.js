@@ -558,7 +558,7 @@ function removeFromFile(i,bannedORadmin){
 }
 
 //Demotes superior admins to admins OR admins to normal users given an id
-function demote_AdminToFile(id){
+function demote_AdminToFile(id,is_creator){
     let i=1;    //start check at index 1, because index 0 of List will always be creator and creator can't be demoted
     const a=admins.toObject();
 
@@ -569,11 +569,14 @@ function demote_AdminToFile(id){
     do{
         //if user's ID attribute is equal to id (parameter) and the user has isAdmin set to true, transfom user in normal user and return success
         if(a.List[i].ID==id && a.List[i].isAdmin==true){
-            //if admin is superior, he will be demoted to normal admin
-            if(a.List[i].isSuperior==true) {
+            //if admin is superior and it's the creator who tryies to demote him, he will be demoted to normal admin
+            if(a.List[i].isSuperior==true && is_creator==true){
                 a.List[i].isSuperior=false;
                 admins.save();
                 return -1;
+            }else if(a.List[i].isSuperior==true && is_creator==false){
+                //superior admin is trying to demote another superior admin
+                return -1010;
             }
             removeFromFile(i,"admin");
             return 1;

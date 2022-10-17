@@ -9,7 +9,7 @@ const functions = require('./functions');
 
 const bot_test=true;
 
-global.botID = 5198012118;   //ID: @DoggoReportBot
+global.botID = process.env.BOT_ID;   //ID: @DoggoReportBot
 
 //set environment variables
 global.adminID = process.env.CREATOR_ID;     //ID of the creator
@@ -147,7 +147,6 @@ bot.help((ctx) => {
                  +'~ /ban \t=>\t forbids an user to keep using the bot;\n'
                  +'~ /unban \t=>\t allows a banned user to keep using the bot;\n'
                  +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID.\n'
-                 +'~ /superior [id] OR /promote [id] \t=>\t set an admin as a superior admin of the bot;\n'
                  +'~ /unadmin [id] OR /demote [id] \t=>\t if an user is superior admin, he will become admin and if he\'s admin he will become normal user;\n'
                  +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n'
                  +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
@@ -361,6 +360,10 @@ bot.command(['unadmin','demote'], (ctx) => {
             if(input[0]=="@") input.shift();    //User started username with @, so I remove that
             const UserID=input;
 
+            //check if the user who exectues command is creator
+            let is_creator=false;
+            if(ctx.message.from.id==creator.get_id) is_creator=true;
+
             if(UserID=="") {
                 //There is no text after the command
                 //check if I am actually replying to someone
@@ -372,7 +375,7 @@ bot.command(['unadmin','demote'], (ctx) => {
                         //OR
                         //user has limited privacy and I can only print up a little amount of info
 
-                        switch(functions.demote_AdminToFile(current_user.get_id)){
+                        switch(functions.demote_AdminToFile(current_user.get_id,is_creator)){
                             case -1000:
                                 //ERROR: User is not admin, can't be demoted
                                 ctx.reply('The user is not admin so he can\'t be demoted from the list. 👀');
@@ -381,6 +384,11 @@ bot.command(['unadmin','demote'], (ctx) => {
                             case -1005:
                                 //ERROR: Loop ended without finding a match to demote
                                 ctx.reply('The user is not admin so he can\'t be demoted from the list. 👀');
+                                break;
+
+                            case -1010:
+                                //ERROR: Superior Admin tries to demote another Superior Admin
+                                ctx.reply('The user is Superior Admin, just as you are. So he can\'t be demoted from the list by you. 👀');
                                 break;
 
                             case -1:
@@ -443,7 +451,7 @@ bot.command(['unadmin','demote'], (ctx) => {
                 if(functions.setAdminUser(UserID)) user_set=true;
 
                 //admin has written something after the admin command
-                switch(functions.demote_AdminToFile(UserID)){
+                switch(functions.demote_AdminToFile(UserID,is_creator)){
                     case -1000:
                         //ERROR: User is not admin, can't be demoted
                         ctx.reply('The user is not admin so he can\'t be demoted from the list. 👀');
@@ -452,6 +460,11 @@ bot.command(['unadmin','demote'], (ctx) => {
                     case -1005:
                         //ERROR: Loop ended without finding a match to demote
                         ctx.reply('The user is not admin so he can\'t be demoted from the list. 👀');
+                        break;
+
+                    case -1010:
+                        //ERROR: Superior Admin tries to demote another Superior Admin
+                        ctx.reply('The user is Superior Admin, just as you are. So he can\'t be demoted from the list by you. 👀');
                         break;
 
                     case -1:
