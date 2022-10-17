@@ -5,7 +5,7 @@ A Telegram bot coded in NodeJS, which allows admins of a channel to communicate 
 
 ## 💻 Dev Infos
 
-When running the bot be sure to set the variable `bot_test` to `false` in "*[index.js](https://github.com/Croluy/DoggoReportBot/blob/master/index.js#L10)*". That will deny the bot from skipping some initial steps that I've preferred ignoring during development process.<br>
+When running the bot be sure to set the variable `bot_test` to `false` in "*[index.js](https://github.com/Croluy/DoggoReportBot/blob/master/index.js#L17)*". That will deny the bot from skipping some initial steps that I've preferred ignoring during development process.<br>
 I have excluded some files when uploading the project to GitHub. Those include data I won't disclose publicly for obvious reasons.<br>
 You might need to recreate at least the *.env* file in your local machine after you clone the repository.<br>
 It includes crucial data:
