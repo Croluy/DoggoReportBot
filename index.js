@@ -109,6 +109,7 @@ bot.start((ctx) => {
 bot.help((ctx) => {
     functions.setUser(ctx);
     if(functions.checkBanned(current_user)) return;
+    functions.update_admin(ctx,current_user);
     if(functions.checkCreator(current_user)){
         //creator help
         ctx.reply('❔ Help for @DoggoReportBot:\n\n'
@@ -127,6 +128,8 @@ bot.help((ctx) => {
                  +'~ /unban \t=>\t allows a banned user to keep using the bot;\n'
                  +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID.\n'
                  +'~ /superior [id] OR /promote [id] \t=>\t set an admin as a superior admin of the bot;\n'
+                 +'~ /unadmin [id] OR /demote [id] \t=>\t if an user is superior admin, he will become admin and if he\'s admin he will become normal user;\n'
+                 +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n'
                  +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
     }else if(functions.checkSuperior(current_user)) {
         //superior admin help
@@ -143,6 +146,10 @@ bot.help((ctx) => {
                  +'~ /unadmin OR /demote \t=>\t demote admin to normal user;\n'
                  +'~ /ban \t=>\t forbids an user to keep using the bot;\n'
                  +'~ /unban \t=>\t allows a banned user to keep using the bot;\n'
+                 +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID.\n'
+                 +'~ /superior [id] OR /promote [id] \t=>\t set an admin as a superior admin of the bot;\n'
+                 +'~ /unadmin [id] OR /demote [id] \t=>\t if an user is superior admin, he will become admin and if he\'s admin he will become normal user;\n'
+                 +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n'
                  +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
         functions.update_admin(ctx,current_user);
     }else if(functions.checkAdmin(current_user)) {
@@ -155,6 +162,8 @@ bot.help((ctx) => {
                  +'\nUser-related commands:\nIn order to use this commands reply to user\'s message.\n'
                  +'~ /ban \t=>\t forbids an user to keep using the bot;\n'
                  +'~ /unban \t=>\t allows a banned user to keep using the bot;\n'
+                 +'\nUser\'s ID commands:\nIn order to use this commands type the command followed by user\'s ID.\n'
+                 +'~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n'
                  +'\nDo you want to know how to reply to users?\nJust reply to the user message bro, it\'s that simple. 🤷🏻‍♂️\n');
         functions.update_admin(ctx,current_user);
     }else{
@@ -238,7 +247,9 @@ bot.command(['admin'], (ctx) => {
     //only superior admins can add an admin
     if(functions.checkSuperiorId(ctx.message.chat.id)) {
         functions.setUser(ctx);
-        functions.update_admin(ctx,current_user);
+        //FIXME:current_user is the user you reply to, so I can't update admin with current_user
+        //console.log(JSON.stringify(current_user));
+        //functions.update_admin(ctx,current_user);
         if(functions.checkBanned(current_user)){
             //User can NOT be promoted, he is currently banned.. have to unban first
             if(current_user.get_username != undefined && current_user.get_username != "")  //user has username
@@ -260,7 +271,7 @@ bot.command(['admin'], (ctx) => {
             inputArray.shift();
             input=inputArray.join(' ');
             if(input[0]=="@") input.shift();    //User started username with @, so I remove that
-            const newAdminUsername=input;
+            const UserID=input;
 
             const m='Congrats! 🎉 You are now part of the admins of this bot! 👮‍♂️\n'
                    +'Discover the new commands available to you.\n'
@@ -271,7 +282,7 @@ bot.command(['admin'], (ctx) => {
                    //+'Just type /timezone in chat.\n'
                    //+'NOTICE: You are free to skip this step if you aren\'t interested. ✌🏻';
 
-            if(newAdminUsername=="") {
+            if(UserID=="") {
                 //There is no text after the command
                 //check if I am actually replying to someone
                 if(ctx.message.hasOwnProperty('reply_to_message')){
@@ -285,7 +296,7 @@ bot.command(['admin'], (ctx) => {
                         current_user.set_isAdmin=true;
                         if(functions.add_AdminToFile(current_user,ctx.message.date)){
                             //User can be promoted, he is not banned
-                            //FIXME: bug, user in admins.json isn't "isAdmin" field isn't set to true
+                            //FIXME: bug, user in admins.json "isAdmin" field isn't set to true
                             if(current_user.get_username != undefined && current_user.get_username != "")  //user has username
                                 ctx.reply('User: <b>'+current_user.get_fullName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>]\nhas been added to the admin list! 🎉',{parse_mode: 'HTML'});
                             else  //user doesn't have an username
@@ -335,8 +346,8 @@ bot.command(['admin'], (ctx) => {
 
 //Demote an user from admin
 bot.command(['unadmin','demote'], (ctx) => {
-    //only creator can demote an admin
-    if(ctx.message.chat.id == creator.get_id) {
+    //only superior admins can demote an admin
+    if(functions.checkSuperiorId(ctx.message.chat.id)) {
         functions.setUser(ctx);
         functions.update_admin(ctx,current_user);
         if(functions.checkBanned(current_user)) return;
@@ -348,9 +359,9 @@ bot.command(['unadmin','demote'], (ctx) => {
             inputArray.shift();
             input=inputArray.join(' ');
             if(input[0]=="@") input.shift();    //User started username with @, so I remove that
-            const newAdminUsername=input;
+            const UserID=input;
 
-            if(newAdminUsername=="") {
+            if(UserID=="") {
                 //There is no text after the command
                 //check if I am actually replying to someone
                 if(ctx.message.hasOwnProperty('reply_to_message')){
@@ -369,7 +380,7 @@ bot.command(['unadmin','demote'], (ctx) => {
                             
                             case -1005:
                                 //ERROR: Loop ended without finding a match to demote
-                                ctx.reply('Error processing the demotion command. Please try again!');
+                                ctx.reply('The user is not admin so he can\'t be demoted from the list. 👀');
                                 break;
 
                             case -1:
@@ -427,9 +438,64 @@ bot.command(['unadmin','demote'], (ctx) => {
                              +'Reply to the message of the user you want to demote from admin position.');
                 }
             }else{
+                //set the user before removing it from the admin list
+                let user_set=false;
+                if(functions.setAdminUser(UserID)) user_set=true;
+
                 //admin has written something after the admin command
-                ctx.reply('I\'m sorry, I can\'t demote an user this way yet.\n'
-                         +'Just reply to the message of the user you want to demote from admin position.');
+                switch(functions.demote_AdminToFile(UserID)){
+                    case -1000:
+                        //ERROR: User is not admin, can't be demoted
+                        ctx.reply('The user is not admin so he can\'t be demoted from the list. 👀');
+                        break;
+                    
+                    case -1005:
+                        //ERROR: Loop ended without finding a match to demote
+                        ctx.reply('The user is not admin so he can\'t be demoted from the list. 👀');
+                        break;
+
+                    case -1:
+                        //SUCCESS: User has been successfully demoted back to admin role
+                        if(functions.setAdminUser(UserID)){
+                            //User has been set successfully
+                            if(current_user.get_username != undefined && current_user.get_username != "")
+                                ctx.reply('User: <b>'+current_user.get_fullName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>]\nhas been demoted from Superior Admin to Admin! ✓',{parse_mode: 'HTML'});
+                            else
+                                ctx.reply('User: <b>'+current_user.get_fullName+'</b> [<code>'+current_user.get_id+'</code>]\nhas been demoted from Superior Admin to Admin! ✓',{parse_mode: 'HTML'});
+                            current_user.set_isSuperior=false;
+                        }else{
+                            //User couldn't be set correctly
+                            ctx.reply('User with ID: <code>'+UserID+'</code> has been demoted from Superior Admin to Admin! ✓',{parse_mode: 'HTML'});
+                        }
+
+                        const mm='Sadly you have been demoted from your Superior Admin role. 👮‍♂️\n'
+                                +'Don\'t worry though, you can still use the bot as an Admin.\n'
+                                +'You can get more infos by typing /help in the chat.\n'
+                                +'When you do that, you\'ll see the status set to Admin. 👀';
+                        ctx.telegram.sendMessage(UserID,mm);
+                        break;
+
+                    case 1:
+                        //SUCCESS: User has been successfully demoted back to user role
+                        if(user_set){
+                            //User has been set successfully
+                            if(current_user.get_username != undefined && current_user.get_username != "")
+                                ctx.reply('User: <b>'+current_user.get_fullName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>]\nhas been removed to the admin list! ✓',{parse_mode: 'HTML'});
+                            else
+                                ctx.reply('User: <b>'+current_user.get_fullName+'</b> [<code>'+current_user.get_id+'</code>]\nhas been removed to the admin list! ✓',{parse_mode: 'HTML'});
+                            current_user.set_isAdmin=false;
+                        }else{
+                            //User couldn't be set correctly
+                            ctx.reply('User with ID: <code>'+UserID+'</code> has been removed from the admin list! ✓',{parse_mode: 'HTML'});
+                        }
+
+                        const m='Sadly you have been demoted from your admin role. 👮‍♂️\n'
+                               +'Don\'t worry though, you can still use the bot as a normal user.\n'
+                               +'You can get more infos by typing /help in the chat.\n'
+                               +'When you do that, you\'ll see the status set to User. 👀';
+                        ctx.telegram.sendMessage(UserID,m);
+                        break;
+                }
             }
         }
         else if(current_user.get_id==creator.get_id) ctx.reply('You can\'t demote yourself from admin position! ✌🏻\nBut you already knew that, since you developed me. 💡');
@@ -529,16 +595,16 @@ bot.command('unban', (ctx) => {
         functions.setUser(ctx);
         functions.update_admin(ctx,current_user);
         //check if user is admin and isn't a bot
-        if(functions.checkBanned(current_user)) {
+        //if(functions.checkBanned(current_user)) {
             let input=ctx.message.text;
             let inputArray=input.split(' ');
 
             inputArray.shift();
             input=inputArray.join(' ');
             if(input[0]=="@") input.shift();    //User started username with @, so I remove that
-            const newUnbanUsername=input;
+            const UserID=input;
 
-            if(newUnbanUsername=="") {
+            if(UserID=="") {
                 //There is no text after the command
                 //check if I am actually replying to someone
                 if(ctx.message.hasOwnProperty('reply_to_message')){
@@ -599,15 +665,49 @@ bot.command('unban', (ctx) => {
                 }
             }else{
                 //admin has written something after the admin command
-                ctx.reply('I\'m sorry, I can\'t unban an user this way yet.\n'
-                         +'Just reply to the message of the user you want to demote from admin position, no further text is allowed.');
+                //set the user before removing it from the banned list
+                let user_set=false;
+                if(functions.setBannedUser(UserID)) user_set=true;
+
+                switch(functions.remove_BannedFromFile(UserID)){
+                    case -1000:
+                        //ERROR: User is not banned, can't be unbanned
+                        ctx.reply('The user is not banned so he can\'t be unbanned. 👀');
+                        break;
+                    
+                    case -1005:
+                        //ERROR: Loop ended without finding a match to demote
+                        ctx.reply('The user is not banned so he can\'t be unbanned. 👀');
+                        break;
+
+                    case 1:
+                        //SUCCESS: User has been successfully demoted back to user role
+                        if(user_set){
+                            //User has been set successfully
+                            if(current_user.get_username != undefined && current_user.get_username != "")
+                                ctx.reply('User: <b>'+current_user.get_fullName+'</b>\t-\t@'+current_user.get_username+' [<code>'+current_user.get_id+'</code>]\nhas been removed to the admin list! ✓',{parse_mode: 'HTML'});
+                            else
+                                ctx.reply('User: <b>'+current_user.get_fullName+'</b> [<code>'+current_user.get_id+'</code>]\nhas been removed to the admin list! ✓',{parse_mode: 'HTML'});
+                            current_user.set_isBan=false;
+                        }else{
+                            //User couldn't be set correctly
+                            ctx.reply('User with ID: <code>'+UserID+'</code> has been removed from the admin list! ✓',{parse_mode: 'HTML'});
+                        }
+
+                        const m='Sadly you have been demoted from your admin role. 👮‍♂️\n'
+                               +'Don\'t worry though, you can still use the bot as a normal user.\n'
+                               +'You can get more infos by typing /help in the chat.\n'
+                               +'When you do that, you\'ll see the status set to User. 👀';
+                        ctx.telegram.sendMessage(UserID,m);
+                        break;
+                }
             }
-        }
-        else if(current_user.get_id==creator.get_id) ctx.reply('You can\'t unban yourself! ✌🏻\nBut you already knew that, since you developed me. 💡');
-        else{
-            //User is not banned, he can't be unbanned
-            ctx.reply('The user is not banned so he can\'t be unbanned. 👀');
-        }
+        //}
+        //else if(current_user.get_id==creator.get_id) ctx.reply('You can\'t unban yourself! ✌🏻\nBut you already knew that, since you developed me. 💡');
+        //else{
+        //    //User is not banned, he can't be unbanned
+        //    ctx.reply('The user is not banned so he can\'t be unbanned. 👀');
+        //}
         functions.clearUser();
     }
 });
@@ -654,10 +754,11 @@ bot.command('blacklist', (ctx) => {
             functions.clearUser();
             return;
         }
-        blacklist = editJsonFile('./blacklist.json');
         //only admins can use this command
-        const list=JSON.stringify(blacklist.toObject(),null,'\t\t');
-        ctx.reply(list);
+        functions.bannedToMessage(ctx);
+        /*OLD MODE//blacklist = editJsonFile('./blacklist.json');
+        //const list=JSON.stringify(blacklist.toObject(),null,'\t\t');
+        //ctx.reply(list);*/
     }
     functions.clearUser();
 });
@@ -705,8 +806,15 @@ bot.command(['promote','superior'], (ctx) => {
                         break;
                     case 1:
                         //SUCCESS: User has been promoted to superior admin.. tell the user that he has been promoted
-                        ctx.reply('User has been successfully promoted to superior admin! 🎉');
-                        const m='Congrats! 🎉 You are now part of the Super Admins of this bot! 👮‍♂️\n'
+                        if(functions.setAdminUser(id)){
+                            //User was set successfully
+                            if(current_user.username==null || current_user.username==undefined) ctx.reply('User '+current_user.get_fullName+' ['+id+'] has been successfully promoted to Superior Admin! 🎉');
+                            else ctx.reply('User '+current_user.get_fullName+' - @'+current_user.get_username+' ['+id+'] has been successfully promoted to Superior Admin! 🎉');
+                        }else{
+                            //User couldn't be set
+                            ctx.reply('User ['+id+'] has been successfully promoted to Superior Admin! 🎉');
+                        }
+                        const m='Congrats! 🎉 You are now part of the Superior Admins of this bot! 👮‍♂️\n'
                                +'Discover the new commands available to you.\n'
                                +'You can check them out by typing /help in the chat.\n'
                                +'When you do that, you\'ll see the status set to Superior Admin. 👀';
@@ -842,7 +950,7 @@ bot.on('photo', (ctx) => {
                     //ctx.telegram.sendMessage(ctx.message.reply_to_message.from.id, m);
                 }else{
                     ctx.reply('You can\'t message the bot mate. Who should I forward that to?\n'
-                            +'To yourself? Lmao. 😂');
+                             +'To yourself? Lmao. 😂');
                 }
             }
         }else{

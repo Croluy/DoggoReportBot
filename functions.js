@@ -36,6 +36,8 @@ function UnixTimestamp(b){
         d--;
         h+=24;
     }
+
+    //Special conditions for February
     if(d>28 && m=="February"){
         //last day of February for UTC - user is a day ahead
         m=months[a.getMonth()+1];
@@ -45,6 +47,8 @@ function UnixTimestamp(b){
         m=months[a.getMonth()-1];
         d=28;
     }
+
+    //Special conditions for the end and the start of the year
     if(d>31 && m=="December"){
         //last day of December for UTC - user is a day ahead - year changes
         m=months[0];
@@ -56,6 +60,8 @@ function UnixTimestamp(b){
         d=31;
         y--;
     }
+
+    //Special conditionts for the end and the start of the months with 31 days
     if(d>31 && (m=="January" || m=="March" || m=="May" || m=="July" || m=="August" || m=="October")){
         //last day of months with 31 days for UTC - user is a day ahead
         m=months[a.getMonth()+1];
@@ -65,6 +71,8 @@ function UnixTimestamp(b){
         m=months[a.getMonth()-1];
         d=31;
     }
+
+    //Special conditions for the end and the start of the months with 30 days
     if(d>30 && (m=="April" || m=="June" || m=="September" || m=="November")){
         //last day of months with 30 days for UTC - user is a day ahead
         m=months[a.getMonth()+1];
@@ -84,7 +92,10 @@ function UnixTimestamp(b){
     if(sec<10) sec='0'+sec;
 
     //Format  ->  DD Month YYYY  -  hh:mm:ss
-    return d + ' ' + m + ' ' + y + '  -  ' + h + ':' + min + ':' + sec;
+    if(d==1) return d + 'st ' + m + ' ' + y + '  -  ' + h + ':' + min + ':' + sec;
+    if(d==2) return d + 'nd ' + m + ' ' + y + '  -  ' + h + ':' + min + ':' + sec;
+    if(d==3) return d + 'rd ' + m + ' ' + y + '  -  ' + h + ':' + min + ':' + sec;
+    return d + 'th ' + m + ' ' + y + '  -  ' + h + ':' + min + ':' + sec;
 }
 
 //Set online status on log channel, ask for possible new username of the channel and initializes admin.json file
@@ -115,16 +126,16 @@ function info(a){
     let t="";
     //last name AND username unset
     if(data.surname == undefined && data.username == undefined)
-        t="*************INFO*************\nID: "+data.id+"\nName: "+data.name+"\nLanguage: "+lang+"\n******************************";
+        t="*************INFO*************\nID: <code>"+data.id+"</code>\nName: "+data.name+"\nLanguage: "+lang+"\n******************************";
     //username unset
     else if(data.username==undefined)
-        t="*************INFO*************\nID: "+data.id+"\nName: "+data.name+"\nSurname: "+data.surname+"\nLanguage: "+lang+"\n******************************";
+        t="*************INFO*************\nID: <code>"+data.id+"</code>\nName: "+data.name+"\nSurname: "+data.surname+"\nLanguage: "+lang+"\n******************************";
     //last name unset
     else if(data.surname==undefined)
-        t="*************INFO*************\nID: "+data.id+"\nName: "+data.name+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
+        t="*************INFO*************\nID: <code>"+data.id+"</code>\nName: "+data.name+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
     //last name AND username set
     else
-        t="*************INFO*************\nID: "+data.id+"\nName: "+data.name+"\nSurname: "+data.surname+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
+        t="*************INFO*************\nID: <code>"+data.id+"</code>\nName: "+data.name+"\nSurname: "+data.surname+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
     
     return t;
 }
@@ -379,6 +390,82 @@ function setUser(a){
         current_user.set_username   =   a.message.from.username;
         current_user.set_lang       =   a.message.from.language_code.toUpperCase();
     }
+}
+
+//Using admins.json file set current user
+function setUserFromAdminFile(i){
+    const a=admins.toObject();
+
+    current_user.set_id = a.List[i].ID;
+    current_user.set_fullName = a.List[i]["Full Name"];
+    if(a.List[i].Username != null || a.List[i].Username != undefined) current_user.set_username = a.List[i].Username;
+    current_user.set_lang = a.List[i].Language;
+    current_user.set_isPrivate = a.List[i].isPrivate;
+    current_user.set_isAdmin = a.List[i].isAdmin;
+    current_user.set_isSuperior = a.List[i].isSuperior;
+}
+
+//Using blacklist.json file set current user
+function setUserFromBannedFile(i){
+    const a=banned.toObject();
+
+    current_user.set_id = a.List[i].ID;
+    current_user.set_fullName = a.List[i]["Full Name"];
+    if(a.List[i].Username != null || a.List[i].Username != undefined) current_user.set_username = a.List[i].Username;
+    current_user.set_lang = a.List[i].Language;
+    current_user.set_isPrivate = a.List[i].isPrivate;
+    current_user.set_isBan = a.List[i].isBan;
+}
+
+//Using admin ID, set the user
+function setAdminUser(id){
+    clearUser();
+
+    let i=0;
+    const a=admins.toObject();
+
+    /*/it's the ID of creator or there is only an element in Admin array (creator) - set user as creator
+    if(id==creator.get_id && a.List.length==1){
+        current_user=creator;
+        return true;
+    }*/
+
+    //loop though all the admins except the 1st one
+    do{
+        //if user's ID attribute is equal to id, set user
+        if(a.List[i].ID==id){
+            setUserFromAdminFile(i);
+            return true;
+        }
+        i++;
+    }while(i<adminListIndex);
+
+    //if loop ends without finding a match, user is not admin
+    return false;
+}
+
+//Using banned ID, set the user
+function setBannedUser(id){
+    clearUser();
+
+    let i=0;
+    const a=banned.toObject();
+
+    //if there are no users in the banned list, exit the function
+    if(banned.get("Banned Users") == null || banned.get("Banned Users") == 0) return false;
+
+    //loop though all the banned users
+    do{
+        //if user's ID attribute is equal to id, set user
+        if(a.List[i].ID==id){
+            setUserFromBannedFile(i);
+            return true;
+        }
+        i++;
+    }while(i<bannedListIndex);
+
+    //if loop ends without finding a match, user is not banned
+    return false;
 }
 
 //Initializes admins.json file with admins number and the creator
@@ -704,7 +791,7 @@ function idFromDummy(a){
 //Using ctx parameter returns full_name from dummy message for every user with restricted privacy settings
 function nameFromDummy(a){
     const t = a.message.reply_to_message.text;
-    const start = t.indexOf("by")+4;
+    const start = t.indexOf("by")+5;
     const end = t.indexOf("[")-1;
     var name = "";
     for(let i=start; i<end; i++)
@@ -780,6 +867,36 @@ function adminsToMessage(context){
     }
 }
 
+//Using ctx parameter returns the list of banned users in an ordered way
+function bannedToMessage(context){
+    const a = banned.toObject();
+
+    let priv='';
+    for(let i=0; i<banned.get("Banned Users"); i++){
+
+        if(a.List[i].isPrivate) priv='✅';
+        else priv='🚫';
+
+        if(a.List[i].Username != null || a.List[i].Username != undefined || a.List[i].Username != "")
+            context.reply("******************************\n"
+                        +"<i>~ ID: </i>\t\t<b><code>"+a.List[i].ID+"</code></b>\n"
+                        +"<i>~ Full Name: </i>\t\t<b>"+a.List[i]["Full Name"]+"</b>\n"
+                        +"<i>~ Username: </i>\t\t<b>@"+a.List[i].Username+"</b>\n"
+                        +"<i>~ Language: </i>\t\t<b>"+a.List[i].Language+"</b>\n"
+                        +"<i>~ Has Restricted Privacy Settings: </i>\t\t<b>"+priv+"</b>\n"
+                        +"<i>~ Time of ban (UTC): </i>\t\t<b>"+a.List[i]["Date of Ban"]+"</b>\n"
+                        +"******************************",{parse_mode: 'HTML'});
+        else context.reply("******************************\n"
+                          +"<i>~ ID: </i>\t\t<b><code>"+a.List[i].ID+"</code></b>\n"
+                          +"<i>~ Full Name: </i>\t\t<b>"+a.List[i]["Full Name"]+"</b>\n"
+                          +"<i>~ Username: </i>\t\t<b>NO USERNAME SET</b>\n"
+                          +"<i>~ Language: </i>\t\t<b>"+a.List[i].Language+"</b>\n"
+                          +"<i>~ Has Restricted Privacy Settings: </i>\t\t<b>"+priv+"</b>\n"
+                          +"<i>~ Time of ban (UTC): </i>\t\t<b>"+a.List[i]["Date of Ban"]+"</b>\n"
+                          +"******************************",{parse_mode: 'HTML'});
+    }
+}
+
 //Update info about admin whenever he sends a message to the bot
 function update_admin(ctx,user) {
     //Check if the user is admin
@@ -788,7 +905,7 @@ function update_admin(ctx,user) {
         let pos=null;
         const a = admins.toObject();
         for(let i=0;i<adminListIndex;i++) {
-            if(a.List[i].ID == user.id) {
+            if(a.List[i].ID == ctx.message.from.id) {
                 pos=i;
                 break;
             }
@@ -838,6 +955,10 @@ module.exports = {
     toAllAdmins,
     infoCommand,
     setUser,
+    setUserFromAdminFile,
+    setUserFromBannedFile,
+    setAdminUser,
+    setBannedUser,
     initFiles,
     add_AdminToFile,
     add_BannedToFile,
@@ -859,5 +980,6 @@ module.exports = {
     usernameFromDummy,
     langFromDummy,
     adminsToMessage,
+    bannedToMessage,
     update_admin
 }
