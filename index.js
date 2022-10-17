@@ -1,4 +1,11 @@
 #!/usr/bin/env node
+/**
+ * Copyright (C) 2022   Croluy
+ * 
+ * This program comes with ABSOLUTELY NO WARRANTY;
+ * This is free software, and you are welcome to redistribute it under certain conditions;
+ * See https://www.gnu.org/licenses/ for details.
+ */
 require('dotenv').config();
 const {Telegraf} = require('telegraf');
 const editJsonFile = require("edit-json-file");
