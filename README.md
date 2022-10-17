@@ -44,47 +44,47 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
 
 + 👮‍♀️ Ban (OR Terminate) and Unban: ban any user who texts the bot and their messages will be completely ignored until you choose to Unban said user.<br>
   You can Ban only by replying to user's message. You can Unban by either replying to user's message OR by using the user's ID.<br>
-  ![Ban Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Ban_new.gif)<br>
+  <details><summary>Example</summary>![Ban Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Ban_new.gif)</details><br>
 ***
 
 + 👮‍♀️ Blacklist: show a list of all users who are Banned from the bot.<br>
   You can run Blacklist command only by typing it in bot's chat as a normal message.<br>
-  ![Blacklist Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Blacklist_new.gif)<br>
+  <details><summary>Example</summary>![Blacklist Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Blacklist_new.gif)</details><br>
 ***
 
 + 💎 Adminlist: show a list of all Administrators of the bot.<br>
   You can run Adminlist command only by typing it in bot's chat as a normal message.<br>
-  ![Adminlist Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Adminlist_new.gif)<br>
+  <details><summary>Example</summary>![Adminlist Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Adminlist_new.gif)</details><br>
 ***
 
 + 💎 Admin: promote a normal user to Admininistrator.<br>
   You can run Admin only by replying to user's message.<br>
-  ![Admin Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Admin_new.gif)<br>
+  <details><summary>Example</summary>![Admin Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Admin_new.gif)</details><br>
 ***
 
 + 💎 Unadmin OR Demote: demote users of their current Administrator rank to the lower rank. Obviously if you are a Superior Admin you can only demote Admins back to users, but you can't demote other Superior Admins.<br>
   You can Demote by either replying to user's message OR by using the user's ID.<br>
-  ![Demote Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Demote_new.gif)<br>
+  <details><summary>Example</summary>![Demote Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Demote_new.gif)</details><br>
 ***
 
 + 💎 Info: gather some infos about a specific user. Those include: ID, Full Name, Username (if any) and Language code.<br>
   You can run Info only by replying to user's message.<br>
-  ![Info Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Info_new.gif)<br>
+  <details><summary>Example</summary>![Info Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Info_new.gif)</details><br>
 ***
 
 + 💎 SetUsername: set the username of the channel this bot is linked to.<br>
   You can run this command followed by the new username of the linked channel.<br>
-  ![SetUsername Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/SetUsername_new.gif)<br>
+  <details><summary>Example</summary>![SetUsername Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/SetUsername_new.gif)</details><br>
 ***
 
 + 👑 Promote OR Superior: grant an Administrator the Superior Administrator rank.<br>
   You can run this command followed by Admin's ID.<br>
-  ![Promote Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Promote_new.gif)<br>
+  <details><summary>Example</summary>![Promote Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Promote_new.gif)</details><br>
 ***
 
 + 👑 ResetAdmins: resets the list of ALL the admins by removing every single one of them except the Bot's Owner.<br>
   You can run Blacklist command only by typing it in bot's chat as a normal message.<br>
-  ![ResetAdminsExample GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Resetadminlist_new.gif)<br><br>
+  <details><summary>Example</summary>![ResetAdminsExample GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Resetadminlist_new.gif)</details><br><br>
 
 ## 📄 Credits:
 *:rocket: Created and Maintained by [Croluy](https://www.github.com/croluy)*
