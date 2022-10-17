@@ -1,6 +1,7 @@
 .env
 .npmignore
 /node_modules/
+/Example_Videos/
 admins.json
 blacklist.json
 features.txt
