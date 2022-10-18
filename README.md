@@ -23,7 +23,7 @@ When you run the bot for the 1st time, it will create 2 files on your local mach
 - blacklist.json --> it saves a list of all users banned from the bot;<br>
 - admins.json --> this file saves a list of all the admins of the bot.<br>
 
-Do **NOT** delete or manually modify this files unless you know what you're doing!
+Do **NOT** delete or manually modify these files unless you know what you're doing!
 <br>
 
 ## 🧬 Features
