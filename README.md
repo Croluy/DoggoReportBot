@@ -128,7 +128,7 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
   <details>
     <summary>Click Me for an Example 👇🏻</summary>
     
-    ![ResetAdminsExample GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Resetadminlist_new.gif)
+    ![ResetAdmins Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Resetadminlist_new.gif)
   </details><br>
 
 ## 📄 Credits:
