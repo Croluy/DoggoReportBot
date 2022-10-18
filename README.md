@@ -5,7 +5,7 @@ A Telegram bot coded in NodeJS, which allows admins of a channel to communicate 
 
 ## 💻 Dev Infos
 
-When running the bot be sure to set the variable `bot_test` to `false` in "*[index.js](https://github.com/Croluy/DoggoReportBot/blob/master/index.js#L18)*". That will deny the bot from skipping some initial steps that I've preferred ignoring during development process.<br>
+When running the bot be sure to set the variable `bot_test` to `false` in "*[index.js](https://github.com/Croluy/DoggoReportBot/blob/master/index.js#L20)*". That will deny the bot from skipping some initial steps that I've preferred ignoring during development process.<br>
 I have excluded some files when uploading the project to GitHub. Those include data I won't disclose publicly for obvious reasons.<br>
 You might need to recreate at least the *.env* file in your local machine after you clone the repository.<br>
 It includes crucial data:
@@ -14,6 +14,10 @@ It includes crucial data:
 - bot's ID;
 - ID of the log channel;
 - name of the channel this bot is linked to.<br>
+
+All the messages that the bot sends to users and admins are stored in "*[BotReplies.json](https://github.com/Croluy/DoggoReportBot/blob/master/BotReplies.json)*".<br>
+The JSON is organized following a Tree Structure where the roots are `functions` and `index` and each of them represents a JS file ("*[index.js](https://github.com/Croluy/DoggoReportBot/blob/master/index.js)*" and "*[functions.js](https://github.com/Croluy/DoggoReportBot/blob/master/functions.js)*").<br>
+Both roots have a list of childs named the same as that file's functions where messages are sent from the bot to anyone. This allows the project to be more organized.
 
 When you run the bot for the 1st time, it will create 2 files on your local machine:<br>
 - blacklist.json --> it saves a list of all users banned from the bot;<br>
