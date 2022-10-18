@@ -25,9 +25,9 @@ Do **NOT** delete or manually modify this files unless you know what you're doin
 ## 🧬 Features
 
 When an user sends any message to the bot, that message will be forwarded to all the current Administrators. That's right! This bot supports multiple admins. Not only that, but there are 3 diffent ranks of Administrators:<br>
-+ 👑 Bot's Owner (also mentioned as Creator) is the highest rank and has access to ALL the commands, there can only be 1 Bot Owner;<br>
-+ 💎 Superior Administrator it's the max rank any user *(who isn't Bot's Owner)* can aspire to, it has a high amount of available commands;<br>
-+ 👮‍♀️ Administrator is a user who has Ban power over normal users.
++ 👑 **Bot's Owner** (also mentioned as Creator) is the highest rank and has access to ALL the commands, there can only be 1 Bot Owner;<br>
++ 💎 **Superior Administrator** it's the max rank any user *(who isn't Bot's Owner)* can aspire to, it has a high amount of available commands;<br>
++ 👮‍♀️ **Administrator** is a user who has Ban power over normal users.
 
 Administrators can reply to users by simply using the reply function of Telegram. When that happens, said reply will be forwarded to all the other Administrators of the bot also.
 
@@ -42,8 +42,8 @@ The Telegram log channel has to be created manually by you and it should only be
 I've used emojis to give you a list of commands while also showing what kind of rank is required for that command to work.<br>
 Obviously all lower ranked commands can be executed by higher ranked Administrators too.
 
-+ 👮‍♀️ Ban (OR Terminate) and Unban: ban any user who texts the bot and their messages will be completely ignored until you choose to Unban said user.<br>
-  You can Ban only by replying to user's message. You can Unban by either replying to user's message OR by using the user's ID.<br>
++ 👮‍♀️ **Ban** OR **Terminate**: ban any user who texts the bot and their messages will be completely ignored until you choose to Unban said user.<br>
+  You can Ban only by replying to user's message.<br>
   <details>
     <summary>Click Me for an Example 👇🏻</summary>
     
@@ -51,7 +51,16 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
   </details>
 ***
 
-+ 👮‍♀️ Blacklist: show a list of all users who are Banned from the bot.<br>
++ 👮‍♀️ **Unban**: unban an user that has previously been banned from using the bot. It allows said user to be able to use the bot again.<br>
+  You can Unban by either replying to user's message OR by using the user's ID.<br>
+  <details>
+    <summary>Click Me for an Example 👇🏻</summary>
+    
+    ![Unban Example GIF](https://github.com/Croluy/DoggoReportBot/blob/master/gifs/Unban_new.gif)
+  </details>
+***
+
++ 👮‍♀️ **Blacklist**: show a list of all users who are Banned from the bot.<br>
   You can run Blacklist command only by typing it in bot's chat as a normal message.<br>
   <details>
     <summary>Click Me for an Example 👇🏻</summary>
@@ -60,7 +69,7 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
   </details>
 ***
 
-+ 💎 Adminlist: show a list of all Administrators of the bot.<br>
++ 💎 **Adminlist**: show a list of all Administrators of the bot.<br>
   You can run Adminlist command only by typing it in bot's chat as a normal message.<br>
   <details>
     <summary>Click Me for an Example 👇🏻</summary>
@@ -69,7 +78,7 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
   </details>
 ***
 
-+ 💎 Admin: promote a normal user to Admininistrator.<br>
++ 💎 **Admin**: promote a normal user to Admininistrator.<br>
   You can run Admin only by replying to user's message.<br>
   <details>
     <summary>Click Me for an Example 👇🏻</summary>
@@ -78,7 +87,7 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
   </details>
 ***
 
-+ 💎 Unadmin OR Demote: demote users of their current Administrator rank to the lower rank. Obviously if you are a Superior Admin you can only demote Admins back to users, but you can't demote other Superior Admins.<br>
++ 💎 **Unadmin** OR **Demote**: demote users of their current Administrator rank to the lower rank. Obviously if you are a Superior Admin you can only demote Admins back to users, but you can't demote other Superior Admins.<br>
   You can Demote by either replying to user's message OR by using the user's ID.<br>
   <details>
     <summary>Click Me for an Example 👇🏻</summary>
@@ -87,7 +96,7 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
   </details>
 ***
 
-+ 💎 Info: gather some infos about a specific user. Those include: ID, Full Name, Username (if any) and Language code.<br>
++ 💎 **Info**: gather some infos about a specific user. Those include: ID, Full Name, Username (if any) and Language code.<br>
   You can run Info only by replying to user's message.<br>
   <details>
     <summary>Click Me for an Example 👇🏻</summary>
@@ -96,7 +105,7 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
   </details>
 ***
 
-+ 💎 SetUsername: set the username of the channel this bot is linked to.<br>
++ 💎 **SetUsername**: set the username of the channel this bot is linked to.<br>
   You can run this command followed by the new username of the linked channel.<br>
   <details>
     <summary>Click Me for an Example 👇🏻</summary>
@@ -105,7 +114,7 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
   </details>
 ***
 
-+ 👑 Promote OR Superior: grant an Administrator the Superior Administrator rank.<br>
++ 👑 **Promote** OR **Superior**: grant an Administrator the Superior Administrator rank.<br>
   You can run this command followed by Admin's ID.<br>
   <details>
     <summary>Click Me for an Example 👇🏻</summary>
@@ -114,7 +123,7 @@ Obviously all lower ranked commands can be executed by higher ranked Administrat
   </details>
 ***
 
-+ 👑 ResetAdmins: resets the list of ALL the admins by removing every single one of them except the Bot's Owner.<br>
++ 👑 **ResetAdmins**: resets the list of ALL the admins by removing every single one of them except the Bot's Owner.<br>
   You can run Blacklist command only by typing it in bot's chat as a normal message.<br>
   <details>
     <summary>Click Me for an Example 👇🏻</summary>
