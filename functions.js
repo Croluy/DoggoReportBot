@@ -19,50 +19,52 @@ const path = require("path");
 const res = fs.readFileSync(path.resolve(__dirname, "BotReplies.json"));
 const BotReplies = JSON.parse(res);
 const {
-    startup: {
-        _bot_online_channel,
-        bot_online_creator
-    },
-    info: {
-        no_surname_and_username_info,
-        no_username_info,
-        no_surname_info,
-        complete_info
-    },
-    toAdmin: {
-        no_surname_and_username_usr_err_toAdmin,
-        no_username_usr_err_toAdmin,
-        no_surname_usr_err_toAdmin,
-        complete_usr_err_toAdmin,
+    functions: {
+        startup: {
+            _bot_online_channel,
+            bot_online_creator
+        },
+        info: {
+            no_surname_and_username_info,
+            no_username_info,
+            no_surname_info,
+            complete_info
+        },
+        toAdmin: {
+            no_surname_and_username_usr_err_toAdmin,
+            no_username_usr_err_toAdmin,
+            no_surname_usr_err_toAdmin,
+            complete_usr_err_toAdmin,
 
-        no_surname_and_username_usr_privacy_toAdmin,
-        no_username_privacy_usr_toAdmin,
-        no_surname_privacy_usr_toAdmin,
-        complete_privacy_usr_toAdmin,
+            no_surname_and_username_usr_privacy_toAdmin,
+            no_username_privacy_usr_toAdmin,
+            no_surname_privacy_usr_toAdmin,
+            complete_privacy_usr_toAdmin,
 
-        no_surname_and_username_admin_err_toAdmin,
-        no_username_admin_err_toAdmin,
-        no_surname_admin_err_toAdmin,
-        complete_admin_err_toAdmin,
+            no_surname_and_username_admin_err_toAdmin,
+            no_username_admin_err_toAdmin,
+            no_surname_admin_err_toAdmin,
+            complete_admin_err_toAdmin,
 
-        no_surname_and_username_admin_privacy_toAdmin,
-        no_username_privacy_admin_toAdmin,
-        no_surname_privacy_admin_toAdmin,
-        complete_privacy_admin_toAdmin,
-    },
-    infoCommand: {
-        no_surname_and_username_infoCommand,
-        no_username_infoCommand,
-        no_surname_infoCommand,
-        complete_infoCommand
-    },
-    adminsToMessage: {
-        no_username_adminsToMessage,
-        username_adminsToMessage
-    },
-    bannedToMessage: {
-        no_username_bannedToMessage,
-        username_bannedToMessage
+            no_surname_and_username_admin_privacy_toAdmin,
+            no_username_privacy_admin_toAdmin,
+            no_surname_privacy_admin_toAdmin,
+            complete_privacy_admin_toAdmin,
+        },
+        infoCommand: {
+            no_surname_and_username_infoCommand,
+            no_username_infoCommand,
+            no_surname_infoCommand,
+            complete_infoCommand
+        },
+        adminsToMessage: {
+            no_username_adminsToMessage,
+            username_adminsToMessage
+        },
+        bannedToMessage: {
+            no_username_bannedToMessage,
+            username_bannedToMessage
+        }
     }
 } = BotReplies;
 
@@ -171,8 +173,8 @@ function UnixTimestamp(b){
 //Set online status on log channel, ask for possible new username of the channel and initializes admin.json file
 function startup(b){
     clearUser();
-    b.telegram.sendMessage(LogChannel,BotReplies.startup._bot_online_channel);     //logs on log_channel that bot is online
-    b.telegram.sendMessage(adminID,s(BotReplies.startup.bot_online_creator,{channelname: channelName}));          //asks creator if the channel name is still correct
+    b.telegram.sendMessage(LogChannel,BotReplies.functions.startup._bot_online_channel);     //logs on log_channel that bot is online
+    b.telegram.sendMessage(adminID,s(BotReplies.functions.startup.bot_online_creator,{channelname: channelName}));          //asks creator if the channel name is still correct
     //initialize the files
     initFiles();
 }
@@ -192,16 +194,16 @@ function info(a){
     let t="";
     //last name AND username unset
     if(data.surname == undefined && data.username == undefined)
-        t=s(BotReplies.infos.no_surname_and_username, {id:data.id, name:data.name, language: lang});
+        t=s(BotReplies.functions.infos.no_surname_and_username, {id:data.id, name:data.name, language: lang});
     //username unset
     else if(data.username==undefined)
-        t=s(BotReplies.infos.no_username, {id:data.id, name:data.name, surname:data.surname, language: lang});
+        t=s(BotReplies.functions.infos.no_username, {id:data.id, name:data.name, surname:data.surname, language: lang});
     //last name unset
     else if(data.surname==undefined)
-        t=s(BotReplies.infos.no_surname, {id:data.id, name:data.name, username:data.username, language: lang});
+        t=s(BotReplies.functions.infos.no_surname, {id:data.id, name:data.name, username:data.username, language: lang});
     //last name AND username set
     else
-        t=s(BotReplies.infos.complete, {id:data.id, name:data.name, surname:data.surname, username:data.username, language: lang});
+        t=s(BotReplies.functions.infos.complete, {id:data.id, name:data.name, surname:data.surname, username:data.username, language: lang});
     
     return t;
 }
@@ -216,13 +218,13 @@ async function toAdmin(a){
         if(err){
             let m="";
             if(a.from.last_name == undefined && a.from.username == undefined)
-                m=s(BotReplies.toAdmin.no_surname_and_username_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
+                m=s(BotReplies.functions.toAdmin.no_surname_and_username_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
             else if(a.from.username == undefined)
-                m=s(BotReplies.toAdmin.no_username_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
+                m=s(BotReplies.functions.toAdmin.no_username_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
             else if(a.from.last_name == undefined)
-                m=s(BotReplies.toAdmin.no_surname_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
+                m=s(BotReplies.functions.toAdmin.no_surname_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
             else
-                m=s(BotReplies.toAdmin.complete_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
+                m=s(BotReplies.functions.toAdmin.complete_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
             
             a.telegram.sendMessage(LogChannel,m,{parse_mode: 'HTML'});
         }
@@ -232,13 +234,13 @@ async function toAdmin(a){
             await sleep(500);  //delays the next message for 0,5 sec. This way it's sure it will always be 2nd
             let m="";
             if(a.from.last_name == undefined && a.from.username == undefined)
-                m=s(BotReplies.toAdmin.no_surname_and_username_usr_privacy_toAdmin, {name: a.from.first_name, id: a.from.id, });
+                m=s(BotReplies.functions.toAdmin.no_surname_and_username_usr_privacy_toAdmin, {name: a.from.first_name, id: a.from.id, });
             else if(a.from.username == undefined)
-                m=s(BotReplies.toAdmin.no_username_privacy_usr_toAdmin, {name: a.from.first_name, surname: a.from.last_name, id: a.from.id, });
+                m=s(BotReplies.functions.toAdmin.no_username_privacy_usr_toAdmin, {name: a.from.first_name, surname: a.from.last_name, id: a.from.id, });
             else if(a.from.last_name == undefined)
-                m=s(BotReplies.toAdmin.no_surname_privacy_usr_toAdmin, {name: a.from.first_name, id: a.from.id, username: a.from.username});
+                m=s(BotReplies.functions.toAdmin.no_surname_privacy_usr_toAdmin, {name: a.from.first_name, id: a.from.id, username: a.from.username});
             else
-                m=s(BotReplies.toAdmin.complete_privacy_usr_toAdmin, {name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
+                m=s(BotReplies.functions.toAdmin.complete_privacy_usr_toAdmin, {name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
             const newMessage=m.concat('\n\n',info(a));
 
             //send message to all admins
@@ -247,13 +249,13 @@ async function toAdmin(a){
             if(err){
                 let m="";
                 if(a.from.last_name == undefined && a.from.username == undefined)
-                    m=s(BotReplies.toAdmin.no_surname_and_username_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
+                    m=s(BotReplies.functions.toAdmin.no_surname_and_username_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
                 else if(a.from.username == undefined)
-                    m=s(BotReplies.toAdmin.no_username_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
+                    m=s(BotReplies.functions.toAdmin.no_username_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
                 else if(a.from.last_name == undefined)
-                    m=s(BotReplies.toAdmin.no_surname_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
+                    m=s(BotReplies.functions.toAdmin.no_surname_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
                 else
-                    m=s(BotReplies.toAdmin.complete_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
+                    m=s(BotReplies.functions.toAdmin.complete_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
                 
                 a.telegram.sendMessage(LogChannel,m,{parse_mode: 'HTML'});
             }
@@ -265,13 +267,13 @@ async function toAdmin(a){
         if(err){
             let m="";
             if(a.from.last_name == undefined && a.from.username == undefined)
-                m=s(BotReplies.toAdmin.no_surname_and_username_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
+                m=s(BotReplies.functions.toAdmin.no_surname_and_username_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
             else if(a.from.username == undefined)
-                m=s(BotReplies.toAdmin.no_username_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
+                m=s(BotReplies.functions.toAdmin.no_username_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
             else if(a.from.last_name == undefined)
-                m=s(BotReplies.toAdmin.no_surname_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
+                m=s(BotReplies.functions.toAdmin.no_surname_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
             else
-                m=s(BotReplies.toAdmin.complete_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
+                m=s(BotReplies.functions.toAdmin.complete_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
             
             a.telegram.sendMessage(LogChannel,m,{parse_mode: 'HTML'});
         }
@@ -281,13 +283,13 @@ async function toAdmin(a){
             await sleep(500);  //delays the next message for 0,5 sec. This way it's sure it will always be 2nd
             let m="";
             if(a.from.last_name == undefined && a.from.username == undefined)
-                m=s(BotReplies.toAdmin.no_surname_and_username_admin_privacy_toAdmin, {name: a.from.first_name, id: a.from.id, });
+                m=s(BotReplies.functions.toAdmin.no_surname_and_username_admin_privacy_toAdmin, {name: a.from.first_name, id: a.from.id, });
             else if(a.from.username == undefined)
-                m=s(BotReplies.toAdmin.no_username_privacy_admin_toAdmin, {name: a.from.first_name, surname: a.from.last_name, id: a.from.id, });
+                m=s(BotReplies.functions.toAdmin.no_username_privacy_admin_toAdmin, {name: a.from.first_name, surname: a.from.last_name, id: a.from.id, });
             else if(a.from.last_name == undefined)
-                m=s(BotReplies.toAdmin.no_surname_privacy_admin_toAdmin, {name: a.from.first_name, id: a.from.id, username: a.from.username});
+                m=s(BotReplies.functions.toAdmin.no_surname_privacy_admin_toAdmin, {name: a.from.first_name, id: a.from.id, username: a.from.username});
             else
-                m=s(BotReplies.toAdmin.complete_privacy_admin_toAdmin, {name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
+                m=s(BotReplies.functions.toAdmin.complete_privacy_admin_toAdmin, {name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
             const newMessage=m.concat('\n\n',info(a));
 
             //send message to all admins
@@ -296,13 +298,13 @@ async function toAdmin(a){
             if(err){
                 let m="";
                 if(a.from.last_name == undefined && a.from.username == undefined)
-                    m=s(BotReplies.toAdmin.no_surname_and_username_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
+                    m=s(BotReplies.functions.toAdmin.no_surname_and_username_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
                 else if(a.from.username == undefined)
-                    m=s(BotReplies.toAdmin.no_username_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
+                    m=s(BotReplies.functions.toAdmin.no_username_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
                 else if(a.from.last_name == undefined)
-                    m=s(BotReplies.toAdmin.no_surname_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
+                    m=s(BotReplies.functions.toAdmin.no_surname_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
                 else
-                    m=s(BotReplies.toAdmin.complete_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
+                    m=s(BotReplies.functions.toAdmin.complete_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
                 
                 a.telegram.sendMessage(LogChannel,m,{parse_mode: 'HTML'});
             }
@@ -360,13 +362,13 @@ function infoCommand(a){
     if(data.isBot) bot="✅"; else bot="❌";
     let t="";
     if(data.surname == undefined && data.username == undefined)
-        t=s(BotReplies.infoCommand.no_surname_and_username_infoCommand, {isbot: bot, id:data.id, name:data.name, language: lang});
+        t=s(BotReplies.functions.infoCommand.no_surname_and_username_infoCommand, {isbot: bot, id:data.id, name:data.name, language: lang});
     else if(data.username==undefined)
-        t=s(BotReplies.infoCommand.no_username_infoCommand, {isbot: bot, id:data.id, name:data.name, surname:data.surname, language: lang});
+        t=s(BotReplies.functions.infoCommand.no_username_infoCommand, {isbot: bot, id:data.id, name:data.name, surname:data.surname, language: lang});
     else if(data.surname==undefined)
-        t=s(BotReplies.infoCommand.no_surname_infoCommand, {isbot: bot, id:data.id, name:data.name, username:data.username, language: lang});
+        t=s(BotReplies.functions.infoCommand.no_surname_infoCommand, {isbot: bot, id:data.id, name:data.name, username:data.username, language: lang});
     else
-        t=s(BotReplies.infoCommand.complete_infoCommand, {isbot: bot, id:data.id, name:data.name, surname:data.surname, username:data.username, language: lang});
+        t=s(BotReplies.functions.infoCommand.complete_infoCommand, {isbot: bot, id:data.id, name:data.name, surname:data.surname, username:data.username, language: lang});
     return t;
 }
 
@@ -879,8 +881,8 @@ function adminsToMessage(context){
         else priv='🚫';
 
         if(a.List[i].Username != null || a.List[i].Username != undefined || a.List[i].Username != "")
-            context.reply(s(BotReplies.adminsToMessage.username_adminsToMessage, {id: a.List[i].ID, name: a.List[i]["Full Name"], superior: sup, username: a.List[i].Username, lang: a.List[i].Language, private: priv, promotion: a.List[i]["Date of Promotion"]}),{parse_mode: 'HTML'});
-        else context.reply(s(BotReplies.adminsToMessage.no_username_adminsToMessage, {id: a.List[i].ID, name: a.List[i]["Full Name"], superior: sup, lang: a.List[i].Language, private: priv, promotion: a.List[i]["Date of Promotion"]}),{parse_mode: 'HTML'});
+            context.reply(s(BotReplies.functions.adminsToMessage.username_adminsToMessage, {id: a.List[i].ID, name: a.List[i]["Full Name"], superior: sup, username: a.List[i].Username, lang: a.List[i].Language, private: priv, promotion: a.List[i]["Date of Promotion"]}),{parse_mode: 'HTML'});
+        else context.reply(s(BotReplies.functions.adminsToMessage.no_username_adminsToMessage, {id: a.List[i].ID, name: a.List[i]["Full Name"], superior: sup, lang: a.List[i].Language, private: priv, promotion: a.List[i]["Date of Promotion"]}),{parse_mode: 'HTML'});
     }
 }
 
@@ -895,8 +897,8 @@ function bannedToMessage(context){
         else priv='🚫';
 
         if(a.List[i].Username != null || a.List[i].Username != undefined || a.List[i].Username != "")
-            context.reply(s(BotReplies.adminsToMessage.username_adminsToMessage, {id: a.List[i].ID, name: a.List[i]["Full Name"], username: a.List[i].Username, lang: a.List[i].Language, private: priv, ban: a.List[i]["Date of Ban"]}),{parse_mode: 'HTML'});
-        else context.reply(s(BotReplies.adminsToMessage.no_username_adminsToMessage, {id: a.List[i].ID, name: a.List[i]["Full Name"], lang: a.List[i].Language, private: priv, ban: a.List[i]["Date of Ban"]}),{parse_mode: 'HTML'});
+            context.reply(s(BotReplies.functions.adminsToMessage.username_adminsToMessage, {id: a.List[i].ID, name: a.List[i]["Full Name"], username: a.List[i].Username, lang: a.List[i].Language, private: priv, ban: a.List[i]["Date of Ban"]}),{parse_mode: 'HTML'});
+        else context.reply(s(BotReplies.functions.adminsToMessage.no_username_adminsToMessage, {id: a.List[i].ID, name: a.List[i]["Full Name"], lang: a.List[i].Language, private: priv, ban: a.List[i]["Date of Ban"]}),{parse_mode: 'HTML'});
     }
 }
 

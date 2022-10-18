@@ -1,47 +1,176 @@
 {
-    "startup": {
-        "_bot_online_channel": "---------\n\n@DoggoReportBot: ✅ Online\n\n---------",
-        "bot_online_creator": "Bot is currently online again. ✅\nIs the channel's username still @${channelname}?\n\nIf yes then don't do anything. Otherwise set the new username using the command:\n/setusername your_new_username."
-    },
-    "info": {
-        "no_surname_and_username_info": "*************INFO*************\nID: <code>${id}</code>\nName: ${name}\nLanguage: ${language}\n******************************",
-        "no_username_info": "*************INFO*************\nID: <code>${id}</code>\nName: ${name}\nSurname: ${surname}\nLanguage: ${language}\n******************************",
-        "no_surname_info": "*************INFO*************\nID: <code>${id}</code>\nName: ${name}\nUsername: @${username}\nLanguage: ${language}\n******************************",
-        "complete_info": "*************INFO*************\nID: <code>${id}</code>\nName: ${name}\nSurname: ${surname}\nUsername: @${username}\nLanguage: ${language}\n******************************"
-    },
-    "toAdmin": {
-        "no_surname_and_username_usr_err_toAdmin": "A user has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} [<code>${id}</code>].\n",
-        "no_username_usr_err_toAdmin": "A user has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} ${surname} [<code>${id}</code>].\n",
-        "no_surname_usr_err_toAdmin": "A user has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} [<code>${id}</code>] - @${username}.\n",
-        "complete_usr_err_toAdmin": "A user has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} ${surname} [<code>${id}</code>] - @${username}.\n",
+    "functions": {
+        "startup": {
+            "_bot_online_channel": "---------\n\n@DoggoReportBot: ✅ Online\n\n---------",
+            "bot_online_creator": "Bot is currently online again. ✅\nIs the channel's username still @${channelname}?\n\nIf yes then don't do anything. Otherwise set the new username using the command:\n/setusername your_new_username."
+        },
+        "info": {
+            "no_surname_and_username_info": "*************INFO*************\nID: <code>${id}</code>\nName: ${name}\nLanguage: ${language}\n******************************",
+            "no_username_info": "*************INFO*************\nID: <code>${id}</code>\nName: ${name}\nSurname: ${surname}\nLanguage: ${language}\n******************************",
+            "no_surname_info": "*************INFO*************\nID: <code>${id}</code>\nName: ${name}\nUsername: @${username}\nLanguage: ${language}\n******************************",
+            "complete_info": "*************INFO*************\nID: <code>${id}</code>\nName: ${name}\nSurname: ${surname}\nUsername: @${username}\nLanguage: ${language}\n******************************"
+        },
+        "toAdmin": {
+            "no_surname_and_username_usr_err_toAdmin": "A user has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} [<code>${id}</code>].\n",
+            "no_username_usr_err_toAdmin": "A user has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} ${surname} [<code>${id}</code>].\n",
+            "no_surname_usr_err_toAdmin": "A user has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} [<code>${id}</code>] - @${username}.\n",
+            "complete_usr_err_toAdmin": "A user has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} ${surname} [<code>${id}</code>] - @${username}.\n",
 
-        "no_surname_and_username_usr_privacy_toAdmin": "👆 Message sent by: \n${name} [<code>${id}</code>]\n\n<b><u>Reply to this message instead of the one above.</u></b>",
-        "no_username_privacy_usr_toAdmin": "👆 Message sent by: \n${name} ${surname} [<code>${id}</code>]\n\n<b><u>Reply to this message instead of the one above.</u></b>",
-        "no_surname_privacy_usr_toAdmin": "👆 Message sent by: \n${name} [<code>${id}</code>] - @${username}\n\n<b><u>Reply to this message instead of the one above.</u></b>",
-        "complete_privacy_usr_toAdmin": "👆 Message sent by: \n${name} ${surname} [<code>${id}</code>] - @${username}\n\n<b><u>Reply to this message instead of the one above.</u></b>",
+            "no_surname_and_username_usr_privacy_toAdmin": "👆 Message sent by: \n${name} [<code>${id}</code>]\n\n<b><u>Reply to this message instead of the one above.</u></b>",
+            "no_username_privacy_usr_toAdmin": "👆 Message sent by: \n${name} ${surname} [<code>${id}</code>]\n\n<b><u>Reply to this message instead of the one above.</u></b>",
+            "no_surname_privacy_usr_toAdmin": "👆 Message sent by: \n${name} [<code>${id}</code>] - @${username}\n\n<b><u>Reply to this message instead of the one above.</u></b>",
+            "complete_privacy_usr_toAdmin": "👆 Message sent by: \n${name} ${surname} [<code>${id}</code>] - @${username}\n\n<b><u>Reply to this message instead of the one above.</u></b>",
 
-        "no_surname_and_username_admin_err_toAdmin": "An admin has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} [<code>${id}</code>].\n",
-        "no_username_admin_err_toAdmin": "An admin has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} ${surname} [<code>${id}</code>].\n",
-        "no_surname_admin_err_toAdmin": "An admin has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} [<code>${id}</code>] - @${username}.\n",
-        "complete_admin_err_toAdmin": "An admin has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} ${surname} [<code>${id}</code>] - @${username}.\n",
+            "no_surname_and_username_admin_err_toAdmin": "An admin has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} [<code>${id}</code>].\n",
+            "no_username_admin_err_toAdmin": "An admin has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} ${surname} [<code>${id}</code>].\n",
+            "no_surname_admin_err_toAdmin": "An admin has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} [<code>${id}</code>] - @${username}.\n",
+            "complete_admin_err_toAdmin": "An admin has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} ${surname} [<code>${id}</code>] - @${username}.\n",
 
-        "no_surname_and_username_admin_privacy_toAdmin": "👆 Message sent by Admin: \n${name} [<code>${id}</code>]\n\n<b><u>Reply to this message instead of the one above.</u></b>",
-        "no_username_privacy_admin_toAdmin": "👆 Message sent by Admin: \n${name} ${surname} [<code>${id}</code>]\n\n<b><u>Reply to this message instead of the one above.</u></b>",
-        "no_surname_privacy_admin_toAdmin": "👆 Message sent by Admin: \n${name} [<code>${id}</code>] - @${username}\n\n<b><u>Reply to this message instead of the one above.</u></b>",
-        "complete_privacy_admin_toAdmin": "👆 Message sent by Admin: \n${name} ${surname} [<code>${id}</code>] - @${username}\n\n<b><u>Reply to this message instead of the one above.</u></b>"
+            "no_surname_and_username_admin_privacy_toAdmin": "👆 Message sent by Admin: \n${name} [<code>${id}</code>]\n\n<b><u>Reply to this message instead of the one above.</u></b>",
+            "no_username_privacy_admin_toAdmin": "👆 Message sent by Admin: \n${name} ${surname} [<code>${id}</code>]\n\n<b><u>Reply to this message instead of the one above.</u></b>",
+            "no_surname_privacy_admin_toAdmin": "👆 Message sent by Admin: \n${name} [<code>${id}</code>] - @${username}\n\n<b><u>Reply to this message instead of the one above.</u></b>",
+            "complete_privacy_admin_toAdmin": "👆 Message sent by Admin: \n${name} ${surname} [<code>${id}</code>] - @${username}\n\n<b><u>Reply to this message instead of the one above.</u></b>"
+        },
+        "infoCommand": {
+            "no_surname_and_username_infoCommand": "*************INFO*************\nIs Bot: ${isbot}\nID: <code>${id}</code>\nName: ${name}\nLanguage: ${language}\n******************************",
+            "no_username_infoCommand": "*************INFO*************\nIs Bot: ${isbot}\nID: <code>${id}</code>\nName: ${name}\nSurname: ${surname}\nLanguage: ${language}\n******************************",
+            "no_surname_infoCommand": "*************INFO*************\nIs Bot: ${isbot}\nID: <code>${id}</code>\nName: ${name}\nUsername: @${username}\nLanguage: ${language}\n******************************",
+            "complete_infoCommand": "*************INFO*************\nIs Bot: ${isbot}\nID: <code>${id}</code>\nName: ${name}\nSurname: ${surname}\nUsername: @${username}\nLanguage: ${language}\n******************************"
+        },
+        "adminsToMessage": {
+            "no_username_adminsToMessage": "******************************\n<i>~ ID: </i>\t\t<b><code>${id}</code></b>\n<i>~ Full Name: </i>\t\t<b>${name}</b>\n<i>~ Superior Admin: </i>\t\t<b>${superior}</b>\n<i>~ Username: </i>\t\t<b>NO USERNAME SET</b>\n<i>~ Language: </i>\t\t<b>${lang}</b>\n<i>~ Has Restricted Privacy Settings: </i>\t\t<b>${private}</b>\n<i>~ Time of Promotion (UTC): </i>\t\t<b>${promotion}</b>\n******************************",
+            "username_adminsToMessage": "******************************\n<i>~ ID: </i>\t\t<b><code>${id}</code></b>\n<i>~ Full Name: </i>\t\t<b>${name}</b>\n<i>~ Superior Admin: </i>\t\t<b>${superior}</b>\n<i>~ Username: </i>\t\t<b>@${username}</b>\n<i>~ Language: </i>\t\t<b>${lang}</b>\n<i>~ Has Restricted Privacy Settings: </i>\t\t<b>${private}</b>\n<i>~ Time of Promotion (UTC): </i>\t\t<b>${promotion}</b>\n******************************"
+        },
+        "bannedToMessage": {
+            "no_username_bannedToMessage": "******************************\n<i>~ ID: </i>\t\t<b><code>${id}</code></b>\n<i>~ Full Name: </i>\t\t<b>${name}</b>\n<i>\n<i>~ Username: </i>\t\t<b>NO USERNAME SET</b>\n<i>~ Language: </i>\t\t<b>${lang}</b>\n<i>~ Has Restricted Privacy Settings: </i>\t\t<b>${private}</b>\n<i>~ Time of Ban (UTC): </i>\t\t<b>${ban}</b>\n******************************",
+            "username_bannedToMessage": "******************************\n<i>~ ID: </i>\t\t<b><code>${id}</code></b>\n<i>~ Full Name: </i>\t\t<b>${name}</b>\n<i>\n<i>~ Username: </i>\t\t<b>@${username}</b>\n<i>~ Language: </i>\t\t<b>${lang}</b>\n<i>~ Has Restricted Privacy Settings: </i>\t\t<b>${private}</b>\n<i>~ Time of Ban (UTC): </i>\t\t<b>${ban}</b>\n******************************"
+        }
     },
-    "infoCommand": {
-        "no_surname_and_username_infoCommand": "*************INFO*************\nIs Bot: ${isbot}\nID: <code>${id}</code>\nName: ${name}\nLanguage: ${language}\n******************************",
-        "no_username_infoCommand": "*************INFO*************\nIs Bot: ${isbot}\nID: <code>${id}</code>\nName: ${name}\nSurname: ${surname}\nLanguage: ${language}\n******************************",
-        "no_surname_infoCommand": "*************INFO*************\nIs Bot: ${isbot}\nID: <code>${id}</code>\nName: ${name}\nUsername: @${username}\nLanguage: ${language}\n******************************",
-        "complete_infoCommand": "*************INFO*************\nIs Bot: ${isbot}\nID: <code>${id}</code>\nName: ${name}\nSurname: ${surname}\nUsername: @${username}\nLanguage: ${language}\n******************************"
-    },
-    "adminsToMessage": {
-        "no_username_adminsToMessage": "******************************\n<i>~ ID: </i>\t\t<b><code>${id}</code></b>\n<i>~ Full Name: </i>\t\t<b>${name}</b>\n<i>~ Superior Admin: </i>\t\t<b>${superior}</b>\n<i>~ Username: </i>\t\t<b>NO USERNAME SET</b>\n<i>~ Language: </i>\t\t<b>${lang}</b>\n<i>~ Has Restricted Privacy Settings: </i>\t\t<b>${private}</b>\n<i>~ Time of Promotion (UTC): </i>\t\t<b>${promotion}</b>\n******************************",
-        "username_adminsToMessage": "******************************\n<i>~ ID: </i>\t\t<b><code>${id}</code></b>\n<i>~ Full Name: </i>\t\t<b>${name}</b>\n<i>~ Superior Admin: </i>\t\t<b>${superior}</b>\n<i>~ Username: </i>\t\t<b>@${username}</b>\n<i>~ Language: </i>\t\t<b>${lang}</b>\n<i>~ Has Restricted Privacy Settings: </i>\t\t<b>${private}</b>\n<i>~ Time of Promotion (UTC): </i>\t\t<b>${promotion}</b>\n******************************"
-    },
-    "bannedToMessage": {
-        "no_username_bannedToMessage": "******************************\n<i>~ ID: </i>\t\t<b><code>${id}</code></b>\n<i>~ Full Name: </i>\t\t<b>${name}</b>\n<i>\n<i>~ Username: </i>\t\t<b>NO USERNAME SET</b>\n<i>~ Language: </i>\t\t<b>${lang}</b>\n<i>~ Has Restricted Privacy Settings: </i>\t\t<b>${private}</b>\n<i>~ Time of Ban (UTC): </i>\t\t<b>${ban}</b>\n******************************",
-        "username_bannedToMessage": "******************************\n<i>~ ID: </i>\t\t<b><code>${id}</code></b>\n<i>~ Full Name: </i>\t\t<b>${name}</b>\n<i>\n<i>~ Username: </i>\t\t<b>@${username}</b>\n<i>~ Language: </i>\t\t<b>${lang}</b>\n<i>~ Has Restricted Privacy Settings: </i>\t\t<b>${private}</b>\n<i>~ Time of Ban (UTC): </i>\t\t<b>${ban}</b>\n******************************"
+    "index": {
+        "strict_privacy_messsage": "This user has hidden the link to its account from forwarded messages tweaking privacy settings.\nDon't worry, we'll work around this. 👀\n\nCheck for the bot's message immediately below the one you wish and reply to that one instead. 😉",
+        "__start": {
+            "creator_start": "Welcome My Lord <b>@${username}</b>! 🎉🎉\nI'm going to explain how this whole things works even if you should know already since you literally created me! 👀\nThis bot lets you manage messages from users on behalf of @${channel}.\n\nYou're set as the <b><u>CREATOR</u></b> of this bot! 👑\nJust reply to any message I forward you and I will send your reply to the selected user! 🚀\nYou can check anytime for all your available commands by typing /help in chat! 💡\n",
+            "creator_no_username_start": "Welcome My Lord <b>${name}</b>! 🎉🎉\nI'm going to explain how this whole things works even if you should know already since you literally created me! 👀\nThis bot lets you manage messages from users on behalf of @${channel}.\n\nYou're set as the <b><u>CREATOR</u></b> of this bot! 👑\nJust reply to any message I forward you and I will send your reply to the selected user! 🚀\nYou can check anytime for all your available commands by typing /help in chat! 💡\n",
+
+            "superior_start": "Welcome <b>@${username}</b>! 🎉🎉\nThis bot lets you manage messages from users on behalf of @${channel}.\n\nYou're set as a <b><u>SUPERIOR ADMINISTRATOR</u></b> for this bot! 💎\nJust reply to any message I forward you and I will send your reply to the selected user! 🚀\nYou can check anytime for all your available commands by typing /help in chat! 💡\n",
+            "superior_no_username_start": "Welcome <b>${name}</b>! 🎉🎉\nThis bot lets you manage messages from users on behalf of @${channel}.\n\nYou're set as a <b><u>SUPERIOR ADMINISTRATOR</u></b> for this bot! 💎\nJust reply to any message I forward you and I will send your reply to the selected user! 🚀\nYou can check anytime for all your available commands by typing /help in chat! 💡\n",
+
+            "admin_start": "Welcome <b>@${username}</b>! 🎉🎉\nThis bot lets you manage messages from users on behalf of @${channel}.\n\nYou're set as a <b><u>ADMINISTRATOR</u></b> for this bot! 👮‍♀️\nJust reply to any message I forward you and I will send your reply to the selected user! 🚀\nYou can check anytime for all your available commands by typing /help in chat! 💡\n",
+            "admin_no_username_start": "Welcome <b>${name}</b>! 🎉🎉\nThis bot lets you manage messages from users on behalf of @${channel}.\n\nYou're set as a <b><u>ADMINISTRATOR</u></b> for this bot! 👮‍♀️\nJust reply to any message I forward you and I will send your reply to the selected user! 🚀\nYou can check anytime for all your available commands by typing /help in chat! 💡\n",
+
+            "user_start": "Hey <b>@${username}</b>, thanks for dropping by. 👋🏻\nThis bot lets you contact the admins of @${channel}.\n\nJust write to me anything and admins will see and reply to your message. 👨‍💻\nYou can send me funny images of scammers if you wish. 🤡",
+            "user_no_username_start": "Hey <b>${name}</b>, thanks for dropping by. 👋🏻\nThis bot lets you contact the admins of @${channel}.\n\nJust write to me anything and admins will see and reply to your message. 👨‍💻\nYou can send me funny images of scammers if you wish. 🤡"
+        },
+        "__help": {
+            "creator_help": "❔ Help for @DoggoReportBot:\n\n\t\t# Your status: Creator 👑\n\nBot-related commands:\nIn order to use this commands just type them in chat normally.\n~ /help \t=>\t this command;\n~ /setusername [new_username] \t=>\t lets the bot know the new linked channel username;\n~ /resetadmins \t=>\t demotes all admins and superior admins to normal users except for creator;\n~ /adminlist \t=>\t see a list of all admins of this bot with infos about everyone;\n~ /blacklist \t=>\t see a list of banned users;\n\nUser-related commands:\nIn order to use this commands reply to user's message.\n~ /info \t=>\t reply to a message with this command to get infos about the user;\n~ /admin \t=>\t set an user as an admin of the bot;\n~ /unadmin OR /demote \t=>\t if an user is superior admin, he will become admin and if he's admin he will become normal user;\n~ /ban \t=>\t forbids an user to keep using the bot;\n~ /unban \t=>\t allows a banned user to keep using the bot;\n\nUser's ID commands:\nIn order to use this commands type the command followed by user's ID.\n~ /superior [id] OR /promote [id] \t=>\t set an admin as a superior admin of the bot;\n~ /unadmin [id] OR /demote [id] \t=>\t if an user is superior admin, he will become admin and if he's admin he will become normal user;\n~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\nDo you want to know how to reply to users?\nJust reply to the user message bro, it's that simple. 🤷🏻‍♂️\n",
+            "superior_help": "❔ Help for @DoggoReportBot:\n\n\t\t# Your status: Superior Admin 💎\n\nBot-related commands:\nIn order to use this commands just type them in chat normally.\n~ /help \t=>\t this command;\n~ /setusername [new_username] \t=>\t lets the bot know the new linked channel username;\n~ /adminlist \t=>\t see a list of all admins of this bot with infos about everyone;\n~ /blacklist \t=>\t see a list of banned users;\n\nUser-related commands:\nIn order to use this commands reply to user's message.\n~ /info \t=>\t reply to a message with this command to get infos about the user;\n~ /admin \t=>\t set an user as an admin of the bot;\n~ /unadmin OR /demote \t=>\t demote admin to normal user;\n~ /ban \t=>\t forbids an user to keep using the bot;\n~ /unban \t=>\t allows a banned user to keep using the bot;\n\nUser's ID commands:\nIn order to use this commands type the command followed by user's ID.\n~ /unadmin [id] OR /demote [id] \t=>\t if an user is superior admin, he will become admin and if he's admin he will become normal user;\n~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\nDo you want to know how to reply to users?\nJust reply to the user message bro, it's that simple. 🤷🏻‍♂️\n",
+            "admin_help": "❔ Help for @DoggoReportBot:\n\n\t\t# Your status: Admin 👮‍♀️\n\nBot-related commands:\nIn order to use this commands just type them in chat\n~ /help \t=>\t this command;\n~ /blacklist \t=>\t see a list of banned users;\n\nUser-related commands:\nIn order to use this commands reply to user's message.\n~ /ban \t=>\t forbids an user to keep using the bot;\n~ /unban \t=>\t allows a banned user to keep using the bot;\n\nUser's ID commands:\nIn order to use this commands type the command followed by user's ID.\n~ /unban [id] \t=>\t allows a banned user to keep using the bot;\n\nDo you want to know how to reply to users?\nJust reply to the user message bro, it's that simple. 🤷🏻‍♂️\n",
+            "user_help": "❔ Help for @DoggoReportBot:\n\n\t\t# Your status: User 👤\n\nCommand:\n~ /help \t=>\t this command;\n\n\nThis bot lets you contact the admins of @${channel}.\nJust write to me anything and admins will eventually reply to your message. 👨‍💻\nYou can send me screenshots of funny scammers chat. 🤡"
+        },
+        "__info": {
+            "reply_to_dummy_info": "I am sorry. I can't provide you the info on this user.\nThe user has restricted that info from the Privacy Settings.\n\nYou can still see all the infos of this user in the 2nd message below.",
+            "from_other_message_info": "Unfortunately it is not possible to gather infos about this user.\nBut you can still see all the infos of this user in the 2nd message below.",
+            "on_bot_info": "You can't use this command on the bot. Why would you even need to know that?\nLmao. 😂",
+            "no_message_info": "Please select a message to check the user info! 👍🏻"
+        },
+        "__setusername": {
+            "username_changed_setusername": "Username of the channel changed successfully! 🎉\nPlease remember to set this username to the main channel too.\n\nHave you done it already?\nThen you should be able to enter the channel from @{channel}."
+        },
+        "__admin": {
+            "banned_admin": "User: <b>${name}</b>\t-\t@${username} [<code>${id}</code>]\n can't be added to the admin list! 🎉\nThe probable reason is cause he is currently banned. You have to unban him first by running /unban ${id}",
+            "banned_no_username_admin": "User: <b>${name}</b> [<code>${id}</code>]\n can't be added to the admin list! 🎉\nThe probable reason is cause he is currently banned. You have to unban him first by running /unban ${id}",
+
+            "already_admin": "This user is already Admin! 🙈",
+            "creator_is_admin": "You're already an already Admin! ✌🏻\nBut you already knew that, since you developed me. 💡",
+
+            "become_admin": "Congrats! 🎉 You are now part of the admins of this bot! 👮‍♂️\nDiscover the new commands available to you.\nYou can check them out by typing /help in the chat.\nWhen you do that, you'll see the status set to Admin. 👀",
+
+            "promoted_admin": "User: <b>${name}</b>\t-\t@${username} [<code>${id}</code>]\nhas been added to the admin list! 🎉",
+            "promoted_no_username_admin": "User: <b>${name}</b> [<code>${id}</code>]\nhas been added to the admin list! 🎉",
+
+            "self_admin": "You can't make yourself admin. You already are one.\nLmao. 😂",
+            "bot_admin": "Bruh 😐, I'm delighted but you can't make me an admin. I already have more power than you do.\nThere's nothing you can offer to Doggo that he doesn't already have. Lmao. 😂",
+
+            "no_user_admin": "Who should I make admin? You haven't given me any target.\nReply to the message of the user you want to make admin.",
+            "argument_after_admin": "I'm sorry, I can't make an user admin this way yet.\nJust reply to the message of the user you want to make admin."
+        },
+        "__demote": {
+            "not_admin_demote": "The user is not admin so he can't be demoted from the list. 👀",
+            "sup_and_sup_err_demote": "The user is Superior Admin, just as you are. So he can't be demoted from the list by you. 👀",
+
+            "success_to_admin_demote": "User: <b>${name}</b>\t-\t@${username} [<code>${id}</code>]\nhas been demoted from Superior Admin to Admin! ✓",
+            "success_to_admin_no_username_demote": "User: <b>${name}</b> [<code>${id}</code>]\nhas been demoted from Superior Admin to Admin! ✓",
+            "message_to_admin_demote": "Sadly you have been demoted from your Superior Admin role. 💎\nDon't worry though, you can still use the bot like an Admin.\nYou can get more infos by typing /help in the chat.\nWhen you do that, you'll see the status set to Admin. 👀",
+
+            "success_to_user_demote": "User: <b>${name}</b>\t-\t@${username} [<code>${id}</code>]\nhas been removed to the admin list! ✓",
+            "success_to_user_no_username_demote": "User: <b>${name}</b> [<code>${id}</code>]\nhas been removed to the admin list! ✓",
+            "message_to_user_demote": "Sadly you have been demoted from your admin role. 👮‍♂️\nDon't worry though, you can still use the bot like a normal user.\nYou can get more infos by typing /help in the chat.\nWhen you do that, you'll see the status set to User. 👀",
+            
+            "couldnt_set_to_admin_demote": "User with ID: <code>${id}</code> has been demoted from Superior Admin to Admin! ✓",
+            "couldnt_set_to_user_demote": "User with ID: <code>${id}</code> has been removed from the admin list! ✓",
+
+            "self_demote": "You can't demote yourself. Who will keep company to me?\nLmao. 😂",
+            "bot_demote": "Bruh 😐, I'm not even angry, just disappointed.\nPlease remember I have more power than you do.\nThere's no way you could ever demote me. Lmao. 😂",
+            "no_user_demote": "Who should I remove from the admin list? You haven't given me any target.\nReply to the message of the user you want to demote from admin position.",
+
+            "creator_demote": "You can't demote yourself from admin position! ✌🏻\nBut you already knew that, since you developed me. 💡"
+        },
+        "__ban": {
+            "message_ban": "I'm sad to announce that you've been banned from using this bot! 😅\nYou'll get notified if an admin will eventually unban you. 🤷🏻‍♂️\nUntil then every message you'll send here, won't be delivered to admins. 👀",
+            "success_ban": "User: <b>${name}</b>\t-\t@${username} [<code>${id}</code>] terminated successfully! 🎉\nIt won't be able to disturb you anymore. 😈\n",
+            "success_no_username_ban": "User: <b>${name}</b> [<code>${id}</code>] terminated successfully! 🎉\nIt won't be able to disturb you anymore. 😈\n",
+
+            "is_admin_ban": "User: <b>${name}</b>\t-\t@${username} [<code>${id}</code>]\n can't be banned! 👀\nThe probable reason is cause he is currently set as admin. You have to unadmin him first by running /unadmin in reply to his message.",
+            "is_admin_no_username_ban": "User: <b>${name}</b> [<code>${id}</code>]\n can't be banned! 👀\nThe probable reason is cause he is currently set as admin. You have to unadmin him first by running /unadmin in reply to his message.",
+
+            "self_ban": "You can't ban yourself.\nLmao. 😂",
+            "bot_ban": "Bruh 😐, you can't ban me. I have more power than you do.\nIf you don't behave well, you'll be the one to get banned. Lmao. 😂",
+            "no_user_ban": "Who should I ban? You haven't given me any target.\nReply to the message of the user you want to ban.",
+            "argument_after_ban": "Sorry, this functionality is not available yet.\nBut you can still use this command by replying to the user you want to ban."
+        },
+        "__unban": {
+            "no_banned_users_unban": "There doesn't seem to be any banned user. Therefore I can't unban him. 👀",
+            "not_banned_unban": "The user is not banned so he can't be unbanned.",
+
+            "success_unban": "User: <b>${name}</b>\t-\t@${username} [<code>${id}</code>]\nhas been unbanned! ✓",
+            "success_no_username_unban": "User: <b>${name}</b> [<code>${id}</code>]\nhas been unbanned! ✓",
+            "message_unban": "You have been unbanned from this bot. From now on, you are free to use it normally. 👀\nFor more infos about this bot please execute /help.",
+
+            "self_unban": "You can't unban yourself.\nLmao. 😂",
+            "bot_unban": "Bruh 😐, I'm not even angry, just disappointed.\nPlease remember I have more power than you do.\nThere's no way you could ever ban me, so there's no need for unban. Lmao. 😂",
+            "no_user_unban": "Who should I remove from the banned list? You haven't given me any target.\nReply to the message of the user you want to unban.",
+
+            "couldnt_set_unban": "User with ID: <code>${id}</code> has been unbanned! ✓"
+        },
+        "__adminlist": {
+            "ask_creator_adminlist": "Admin: <b>${name}</b> [<code>${id}</code>]\nhas requested the permission to use the command '/adminlist' in order to list all the admins.\nIf you wish to grant him this permission, use /superior '+current_user.get_id",
+            "unable_adminlist": "I am sorry, you are not allowed to view a list of all admins at this moment. 😬\nBut your request has been sent to the bot's creator. 🤩\nHe will decide if you should be allowed to use this command. 🧐\n\nYou will get notified with a message if he grants you this permission. 😎\nGood luck!"
+        },
+        "__blacklist": {
+            "no_banned_users_blacklist": "There are no banned users. 🎉\nApparently everyone is behaving well!"
+        },
+        "__promote": {
+            "no_user_promote_promote": "You have not specified an ID to promote.\nPlease write the id of the user you wish to promote after the /promote command!",
+            "already_superior_promote": "This user is already a Superior Admin!\nIf you wish to demote the user to simple admin, you can type /demote replying to his message.\nUser ID is: <code>${idd}</code>",
+
+            "not_admin_promote": "Oops. This user is not admin yet.\nBefore using promote command on a user, the user must be admin.\nTo make user to admin, you have to use /admin while replying to his message.",
+            "error_promote": "An error has occurred, possible cause:\nThis user is already a Superior Admin!\nIf you wish to demote the user to simple admin, you can type /demote replying to his message.\nUser ID is: <code>${idd}</code>",
+
+            "success_promote": "User ${name} - @${username} [${idd}] has been successfully promoted to Superior Admin! 🎉",
+            "success_no_username_promote": "User ${name} [${idd}] has been successfully promoted to Superior Admin! 🎉",
+
+            "couldnt_set_promote": "User [${idd}] has been successfully promoted to Superior Admin! 🎉",
+            "message_promote": "Congrats! 🎉 You are now part of the Superior Admins of this bot! 👮‍♂️\nDiscover the new commands available to you.\nYou can check them out by typing /help in the chat.\nWhen you do that, you'll see the status set to Superior Admin. 👀"
+        },
+        "__resetadmins": {
+            "only_one_resetadmins": "There is only 1 admin, and that is you. There's no need to reset the list! 👌🏻",
+            "cleared_resetadmins": "Admin list successfully cleared! 👌🏻"
+        },
+        "__hears": {
+            "not_found_hears": "This command wasn't found. 🤷🏻‍♂️\nPlease consult /help and try again. 👀\n\nIf you were trying to send a message to the user, you can't send him one which starts with the character <code>/</code> .",
+            "self_hears": "You can't message yourself. Who should I forward that to?\nTo yourself? Lmao. 😂",
+            "bot_hears": "You can't message the bot mate. Who should I forward that to?\nTo yourself? Lmao. 😂",
+            "no_message_hears": "Please select a message to reply to! 👍🏻\nOr check out your available commands typing /help in chat."
+        }
     }
 }
