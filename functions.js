@@ -12,7 +12,69 @@ let adminListIndex=admins.get("Admins Number");
 const banned = editJsonFile('./blacklist.json');
 let bannedListIndex=banned.get("Banned Users");
 const User = require('./User');
+const fs = require("fs");
+const path = require("path");
 
+//importing Replies from BotReplies.json
+const res = fs.readFileSync(path.resolve(__dirname, "BotReplies.json"));
+const BotReplies = JSON.parse(res);
+const {
+    startup: {
+        _bot_online_channel,
+        bot_online_creator
+    },
+    info: {
+        no_surname_and_username_info,
+        no_username_info,
+        no_surname_info,
+        complete_info
+    },
+    toAdmin: {
+        no_surname_and_username_usr_err_toAdmin,
+        no_username_usr_err_toAdmin,
+        no_surname_usr_err_toAdmin,
+        complete_usr_err_toAdmin,
+
+        no_surname_and_username_usr_privacy_toAdmin,
+        no_username_privacy_usr_toAdmin,
+        no_surname_privacy_usr_toAdmin,
+        complete_privacy_usr_toAdmin,
+
+        no_surname_and_username_admin_err_toAdmin,
+        no_username_admin_err_toAdmin,
+        no_surname_admin_err_toAdmin,
+        complete_admin_err_toAdmin,
+
+        no_surname_and_username_admin_privacy_toAdmin,
+        no_username_privacy_admin_toAdmin,
+        no_surname_privacy_admin_toAdmin,
+        complete_privacy_admin_toAdmin,
+    },
+    infoCommand: {
+        no_surname_and_username_infoCommand,
+        no_username_infoCommand,
+        no_surname_infoCommand,
+        complete_infoCommand
+    },
+    adminsToMessage: {
+        no_username_adminsToMessage,
+        username_adminsToMessage
+    },
+    bannedToMessage: {
+        no_username_bannedToMessage,
+        username_bannedToMessage
+    }
+} = BotReplies;
+
+//Parse template literal so it can be used in JSON elements
+function s(expression, variablesObj){
+    const regexp = /\${\s?([^{}\s]*)\s?}/g;
+    let t = expression.replace(regexp, (substring, variables, index) => {
+        variables = variablesObj[variables];
+        return variables;
+    });
+    return t;
+}
 
 //Sleep in ms
 function sleep(ms) {
@@ -109,12 +171,8 @@ function UnixTimestamp(b){
 //Set online status on log channel, ask for possible new username of the channel and initializes admin.json file
 function startup(b){
     clearUser();
-    const text="---------\n\n@DoggoReportBot: ✅ Online\n\n---------";
-    b.telegram.sendMessage(LogChannel,text);     //logs on log_channel that bot is online
-    const m="Bot is currently online again. ✅\nIs the channel's username still @"+channelName+"?\n\n"
-           +"If yes then don't do anything. Otherwise set the new username using the command:\n/setusername your_new_username.";
-    b.telegram.sendMessage(adminID,m);          //asks creator if the channel name is still correct
-    console.log("@DoggoReportBot online ✓\n");      //logs on console that bot is online
+    b.telegram.sendMessage(LogChannel,BotReplies.startup._bot_online_channel);     //logs on log_channel that bot is online
+    b.telegram.sendMessage(adminID,s(BotReplies.startup.bot_online_creator,{channelname: channelName}));          //asks creator if the channel name is still correct
     //initialize the files
     initFiles();
 }
@@ -134,16 +192,16 @@ function info(a){
     let t="";
     //last name AND username unset
     if(data.surname == undefined && data.username == undefined)
-        t="*************INFO*************\nID: <code>"+data.id+"</code>\nName: "+data.name+"\nLanguage: "+lang+"\n******************************";
+        t=s(BotReplies.infos.no_surname_and_username, {id:data.id, name:data.name, language: lang});
     //username unset
     else if(data.username==undefined)
-        t="*************INFO*************\nID: <code>"+data.id+"</code>\nName: "+data.name+"\nSurname: "+data.surname+"\nLanguage: "+lang+"\n******************************";
+        t=s(BotReplies.infos.no_username, {id:data.id, name:data.name, surname:data.surname, language: lang});
     //last name unset
     else if(data.surname==undefined)
-        t="*************INFO*************\nID: <code>"+data.id+"</code>\nName: "+data.name+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
+        t=s(BotReplies.infos.no_surname, {id:data.id, name:data.name, username:data.username, language: lang});
     //last name AND username set
     else
-        t="*************INFO*************\nID: <code>"+data.id+"</code>\nName: "+data.name+"\nSurname: "+data.surname+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
+        t=s(BotReplies.infos.complete, {id:data.id, name:data.name, surname:data.surname, username:data.username, language: lang});
     
     return t;
 }
@@ -158,21 +216,13 @@ async function toAdmin(a){
         if(err){
             let m="";
             if(a.from.last_name == undefined && a.from.username == undefined)
-                m='A user has tried to send a message to bot, but it failed.\n'+
-                  'Here\'s the message:\n'+a.message.text+'\n'+
-                  '\n👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>].\n';
+                m=s(BotReplies.toAdmin.no_surname_and_username_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
             else if(a.from.username == undefined)
-                m='A user has tried to send a message to bot, but it failed.\n'+
-                  'Here\'s the message:\n'+a.message.text+'\n'+
-                  '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>].\n'
+                m=s(BotReplies.toAdmin.no_username_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
             else if(a.from.last_name == undefined)
-                m='A user has tried to send a message to bot, but it failed.\n'+
-                  'Here\'s the message:\n'+a.message.text+'\n'+
-                  '\n👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
+                m=s(BotReplies.toAdmin.no_surname_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
             else
-                m='A user has tried to send a message to bot, but it failed.\n'+
-                  'Here\'s the message:\n'+a.message.text+'\n'+
-                  '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
+                m=s(BotReplies.toAdmin.complete_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
             
             a.telegram.sendMessage(LogChannel,m,{parse_mode: 'HTML'});
         }
@@ -182,17 +232,13 @@ async function toAdmin(a){
             await sleep(500);  //delays the next message for 0,5 sec. This way it's sure it will always be 2nd
             let m="";
             if(a.from.last_name == undefined && a.from.username == undefined)
-                m='👆 Message sent by: \n'+a.from.first_name+' [<code>'+a.from.id+'</code>]\n'
-                 +'\n<b><u>Reply to this message instead of the one above.</u></b>';
+                m=s(BotReplies.toAdmin.no_surname_and_username_usr_privacy_toAdmin, {name: a.from.first_name, id: a.from.id, });
             else if(a.from.username == undefined)
-                m='👆 Message sent by: \n'+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>]\n'
-                 +'\n<b><u>Reply to this message instead of the one above.</u></b>';
+                m=s(BotReplies.toAdmin.no_username_privacy_usr_toAdmin, {name: a.from.first_name, surname: a.from.last_name, id: a.from.id, });
             else if(a.from.last_name == undefined)
-                m='👆 Message sent by: \n'+a.from.first_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n'
-                 +'\n<b><u>Reply to this message instead of the one above.</u></b>';
+                m=s(BotReplies.toAdmin.no_surname_privacy_usr_toAdmin, {name: a.from.first_name, id: a.from.id, username: a.from.username});
             else
-                m='👆 Message sent by: \n'+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n'
-                 +'\n<b><u>Reply to this message instead of the one above.</u></b>';
+                m=s(BotReplies.toAdmin.complete_privacy_usr_toAdmin, {name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
             const newMessage=m.concat('\n\n',info(a));
 
             //send message to all admins
@@ -201,21 +247,13 @@ async function toAdmin(a){
             if(err){
                 let m="";
                 if(a.from.last_name == undefined && a.from.username == undefined)
-                    m='A user has tried to send a message to bot, but it failed.\n'+
-                    'Here\'s the message:\n'+a.message.text+'\n'+
-                    '\n👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>].\n';
+                    m=s(BotReplies.toAdmin.no_surname_and_username_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
                 else if(a.from.username == undefined)
-                    m='A user has tried to send a message to bot, but it failed.\n'+
-                    'Here\'s the message:\n'+a.message.text+'\n'+
-                    '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>].\n'
+                    m=s(BotReplies.toAdmin.no_username_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
                 else if(a.from.last_name == undefined)
-                    m='A user has tried to send a message to bot, but it failed.\n'+
-                    'Here\'s the message:\n'+a.message.text+'\n'+
-                    '\n👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
+                    m=s(BotReplies.toAdmin.no_surname_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
                 else
-                    m='A user has tried to send a message to bot, but it failed.\n'+
-                    'Here\'s the message:\n'+a.message.text+'\n'+
-                    '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
+                    m=s(BotReplies.toAdmin.complete_usr_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
                 
                 a.telegram.sendMessage(LogChannel,m,{parse_mode: 'HTML'});
             }
@@ -227,21 +265,13 @@ async function toAdmin(a){
         if(err){
             let m="";
             if(a.from.last_name == undefined && a.from.username == undefined)
-                m='An admin has tried to send a message to bot, but it failed.\n'+
-                  'Here\'s the message:\n'+a.message.text+'\n'+
-                  '\n👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>].\n';
+                m=s(BotReplies.toAdmin.no_surname_and_username_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
             else if(a.from.username == undefined)
-                m='An admin has tried to send a message to bot, but it failed.\n'+
-                  'Here\'s the message:\n'+a.message.text+'\n'+
-                  '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>].\n'
+                m=s(BotReplies.toAdmin.no_username_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
             else if(a.from.last_name == undefined)
-                m='An admin has tried to send a message to bot, but it failed.\n'+
-                  'Here\'s the message:\n'+a.message.text+'\n'+
-                  '\n👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
+                m=s(BotReplies.toAdmin.no_surname_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
             else
-                m='An admin has tried to send a message to bot, but it failed.\n'+
-                  'Here\'s the message:\n'+a.message.text+'\n'+
-                  '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
+                m=s(BotReplies.toAdmin.complete_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
             
             a.telegram.sendMessage(LogChannel,m,{parse_mode: 'HTML'});
         }
@@ -251,13 +281,13 @@ async function toAdmin(a){
             await sleep(500);  //delays the next message for 0,5 sec. This way it's sure it will always be 2nd
             let m="";
             if(a.from.last_name == undefined && a.from.username == undefined)
-                m='👆 Message sent by Admin: \n'+a.from.first_name+' [<code>'+a.from.id+'</code>]\n';
+                m=s(BotReplies.toAdmin.no_surname_and_username_admin_privacy_toAdmin, {name: a.from.first_name, id: a.from.id, });
             else if(a.from.username == undefined)
-                m='👆 Message sent by Admin: \n'+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>]\n';
+                m=s(BotReplies.toAdmin.no_username_privacy_admin_toAdmin, {name: a.from.first_name, surname: a.from.last_name, id: a.from.id, });
             else if(a.from.last_name == undefined)
-                m='👆 Message sent by Admin: \n'+a.from.first_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n';
+                m=s(BotReplies.toAdmin.no_surname_privacy_admin_toAdmin, {name: a.from.first_name, id: a.from.id, username: a.from.username});
             else
-                m='👆 Message sent by Admin: \n'+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'\n';
+                m=s(BotReplies.toAdmin.complete_privacy_admin_toAdmin, {name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
             const newMessage=m.concat('\n\n',info(a));
 
             //send message to all admins
@@ -266,21 +296,13 @@ async function toAdmin(a){
             if(err){
                 let m="";
                 if(a.from.last_name == undefined && a.from.username == undefined)
-                    m='An admin has tried to send a message to bot, but it failed.\n'+
-                    'Here\'s the message:\n'+a.message.text+'\n'+
-                    '\n👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>].\n';
+                    m=s(BotReplies.toAdmin.no_surname_and_username_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
                 else if(a.from.username == undefined)
-                    m='An admin has tried to send a message to bot, but it failed.\n'+
-                    'Here\'s the message:\n'+a.message.text+'\n'+
-                    '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>].\n'
+                    m=s(BotReplies.toAdmin.no_username_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
                 else if(a.from.last_name == undefined)
-                    m='An admin has tried to send a message to bot, but it failed.\n'+
-                    'Here\'s the message:\n'+a.message.text+'\n'+
-                    '\n👆 Message sent by: '+a.from.first_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
+                    m=s(BotReplies.toAdmin.no_surname_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, id: a.from.id});
                 else
-                    m='An admin has tried to send a message to bot, but it failed.\n'+
-                    'Here\'s the message:\n'+a.message.text+'\n'+
-                    '\n👆 Message sent by: '+a.from.first_name+' '+a.from.last_name+' [<code>'+a.from.id+'</code>] - @'+a.from.username+'.\n'
+                    m=s(BotReplies.toAdmin.complete_admin_err_toAdmin, {message: a.message.text, name: a.from.first_name, surname: a.from.last_name, id: a.from.id, username: a.from.username});
                 
                 a.telegram.sendMessage(LogChannel,m,{parse_mode: 'HTML'});
             }
@@ -338,13 +360,13 @@ function infoCommand(a){
     if(data.isBot) bot="✅"; else bot="❌";
     let t="";
     if(data.surname == undefined && data.username == undefined)
-        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.name+"\nLanguage: "+lang+"\n******************************";
+        t=s(BotReplies.infoCommand.no_surname_and_username_infoCommand, {isbot: bot, id:data.id, name:data.name, language: lang});
     else if(data.username==undefined)
-        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.name+"\nSurname: "+data.surname+"\nLanguage: "+lang+"\n******************************";
+        t=s(BotReplies.infoCommand.no_username_infoCommand, {isbot: bot, id:data.id, name:data.name, surname:data.surname, language: lang});
     else if(data.surname==undefined)
-        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.name+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
+        t=s(BotReplies.infoCommand.no_surname_infoCommand, {isbot: bot, id:data.id, name:data.name, username:data.username, language: lang});
     else
-        t="*************INFO*************\nIs Bot: "+bot+"\nID: "+data.id+"\nName: "+data.name+"\nSurname: "+data.surname+"\nUsername: @"+data.username+"\nLanguage: "+lang+"\n******************************";
+        t=s(BotReplies.infoCommand.complete_infoCommand, {isbot: bot, id:data.id, name:data.name, surname:data.surname, username:data.username, language: lang});
     return t;
 }
 
@@ -857,24 +879,8 @@ function adminsToMessage(context){
         else priv='🚫';
 
         if(a.List[i].Username != null || a.List[i].Username != undefined || a.List[i].Username != "")
-            context.reply("******************************\n"
-                        +"<i>~ ID: </i>\t\t<b><code>"+a.List[i].ID+"</code></b>\n"
-                        +"<i>~ Full Name: </i>\t\t<b>"+a.List[i]["Full Name"]+"</b>\n"
-                        +"<i>~ Superior Admin: </i>\t\t<b>"+sup+"</b>\n"
-                        +"<i>~ Username: </i>\t\t<b>@"+a.List[i].Username+"</b>\n"
-                        +"<i>~ Language: </i>\t\t<b>"+a.List[i].Language+"</b>\n"
-                        +"<i>~ Has Restricted Privacy Settings: </i>\t\t<b>"+priv+"</b>\n"
-                        +"<i>~ Time of Promotion (UTC): </i>\t\t<b>"+a.List[i]["Date of Promotion"]+"</b>\n"
-                        +"******************************",{parse_mode: 'HTML'});
-        else context.reply("******************************\n"
-                          +"<i>~ ID: </i>\t\t<b><code>"+a.List[i].ID+"</code></b>\n"
-                          +"<i>~ Full Name: </i>\t\t<b>"+a.List[i]["Full Name"]+"</b>\n"
-                          +"<i>~ Superior Admin: </i>\t\t<b>"+sup+"</b>\n"
-                          +"<i>~ Username: </i>\t\t<b>NO USERNAME SET</b>\n"
-                          +"<i>~ Language: </i>\t\t<b>"+a.List[i].Language+"</b>\n"
-                          +"<i>~ Has Restricted Privacy Settings: </i>\t\t<b>"+priv+"</b>\n"
-                          +"<i>~ Time of Promotion (UTC): </i>\t\t<b>"+a.List[i]["Date of Promotion"]+"</b>\n"
-                          +"******************************",{parse_mode: 'HTML'});
+            context.reply(s(BotReplies.adminsToMessage.username_adminsToMessage, {id: a.List[i].ID, name: a.List[i]["Full Name"], superior: sup, username: a.List[i].Username, lang: a.List[i].Language, private: priv, promotion: a.List[i]["Date of Promotion"]}),{parse_mode: 'HTML'});
+        else context.reply(s(BotReplies.adminsToMessage.no_username_adminsToMessage, {id: a.List[i].ID, name: a.List[i]["Full Name"], superior: sup, lang: a.List[i].Language, private: priv, promotion: a.List[i]["Date of Promotion"]}),{parse_mode: 'HTML'});
     }
 }
 
@@ -889,22 +895,8 @@ function bannedToMessage(context){
         else priv='🚫';
 
         if(a.List[i].Username != null || a.List[i].Username != undefined || a.List[i].Username != "")
-            context.reply("******************************\n"
-                        +"<i>~ ID: </i>\t\t<b><code>"+a.List[i].ID+"</code></b>\n"
-                        +"<i>~ Full Name: </i>\t\t<b>"+a.List[i]["Full Name"]+"</b>\n"
-                        +"<i>~ Username: </i>\t\t<b>@"+a.List[i].Username+"</b>\n"
-                        +"<i>~ Language: </i>\t\t<b>"+a.List[i].Language+"</b>\n"
-                        +"<i>~ Has Restricted Privacy Settings: </i>\t\t<b>"+priv+"</b>\n"
-                        +"<i>~ Time of ban (UTC): </i>\t\t<b>"+a.List[i]["Date of Ban"]+"</b>\n"
-                        +"******************************",{parse_mode: 'HTML'});
-        else context.reply("******************************\n"
-                          +"<i>~ ID: </i>\t\t<b><code>"+a.List[i].ID+"</code></b>\n"
-                          +"<i>~ Full Name: </i>\t\t<b>"+a.List[i]["Full Name"]+"</b>\n"
-                          +"<i>~ Username: </i>\t\t<b>NO USERNAME SET</b>\n"
-                          +"<i>~ Language: </i>\t\t<b>"+a.List[i].Language+"</b>\n"
-                          +"<i>~ Has Restricted Privacy Settings: </i>\t\t<b>"+priv+"</b>\n"
-                          +"<i>~ Time of ban (UTC): </i>\t\t<b>"+a.List[i]["Date of Ban"]+"</b>\n"
-                          +"******************************",{parse_mode: 'HTML'});
+            context.reply(s(BotReplies.adminsToMessage.username_adminsToMessage, {id: a.List[i].ID, name: a.List[i]["Full Name"], username: a.List[i].Username, lang: a.List[i].Language, private: priv, ban: a.List[i]["Date of Ban"]}),{parse_mode: 'HTML'});
+        else context.reply(s(BotReplies.adminsToMessage.no_username_adminsToMessage, {id: a.List[i].ID, name: a.List[i]["Full Name"], lang: a.List[i].Language, private: priv, ban: a.List[i]["Date of Ban"]}),{parse_mode: 'HTML'});
     }
 }
 
@@ -957,6 +949,7 @@ function update_admin_private(pos,user){
 
 //Export functions
 module.exports = {
+    s,
     sleep,
     clearUser,
     UnixTimestamp,

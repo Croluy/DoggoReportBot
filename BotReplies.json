@@ -1,0 +1,47 @@
+{
+    "startup": {
+        "_bot_online_channel": "---------\n\n@DoggoReportBot: ✅ Online\n\n---------",
+        "bot_online_creator": "Bot is currently online again. ✅\nIs the channel's username still @${channelname}?\n\nIf yes then don't do anything. Otherwise set the new username using the command:\n/setusername your_new_username."
+    },
+    "info": {
+        "no_surname_and_username_info": "*************INFO*************\nID: <code>${id}</code>\nName: ${name}\nLanguage: ${language}\n******************************",
+        "no_username_info": "*************INFO*************\nID: <code>${id}</code>\nName: ${name}\nSurname: ${surname}\nLanguage: ${language}\n******************************",
+        "no_surname_info": "*************INFO*************\nID: <code>${id}</code>\nName: ${name}\nUsername: @${username}\nLanguage: ${language}\n******************************",
+        "complete_info": "*************INFO*************\nID: <code>${id}</code>\nName: ${name}\nSurname: ${surname}\nUsername: @${username}\nLanguage: ${language}\n******************************"
+    },
+    "toAdmin": {
+        "no_surname_and_username_usr_err_toAdmin": "A user has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} [<code>${id}</code>].\n",
+        "no_username_usr_err_toAdmin": "A user has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} ${surname} [<code>${id}</code>].\n",
+        "no_surname_usr_err_toAdmin": "A user has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} [<code>${id}</code>] - @${username}.\n",
+        "complete_usr_err_toAdmin": "A user has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} ${surname} [<code>${id}</code>] - @${username}.\n",
+
+        "no_surname_and_username_usr_privacy_toAdmin": "👆 Message sent by: \n${name} [<code>${id}</code>]\n\n<b><u>Reply to this message instead of the one above.</u></b>",
+        "no_username_privacy_usr_toAdmin": "👆 Message sent by: \n${name} ${surname} [<code>${id}</code>]\n\n<b><u>Reply to this message instead of the one above.</u></b>",
+        "no_surname_privacy_usr_toAdmin": "👆 Message sent by: \n${name} [<code>${id}</code>] - @${username}\n\n<b><u>Reply to this message instead of the one above.</u></b>",
+        "complete_privacy_usr_toAdmin": "👆 Message sent by: \n${name} ${surname} [<code>${id}</code>] - @${username}\n\n<b><u>Reply to this message instead of the one above.</u></b>",
+
+        "no_surname_and_username_admin_err_toAdmin": "An admin has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} [<code>${id}</code>].\n",
+        "no_username_admin_err_toAdmin": "An admin has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} ${surname} [<code>${id}</code>].\n",
+        "no_surname_admin_err_toAdmin": "An admin has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} [<code>${id}</code>] - @${username}.\n",
+        "complete_admin_err_toAdmin": "An admin has tried to send a message to bot, but it failed.\nHere's the message:\n${message}'\n\n👆 Message sent by: ${name} ${surname} [<code>${id}</code>] - @${username}.\n",
+
+        "no_surname_and_username_admin_privacy_toAdmin": "👆 Message sent by Admin: \n${name} [<code>${id}</code>]\n\n<b><u>Reply to this message instead of the one above.</u></b>",
+        "no_username_privacy_admin_toAdmin": "👆 Message sent by Admin: \n${name} ${surname} [<code>${id}</code>]\n\n<b><u>Reply to this message instead of the one above.</u></b>",
+        "no_surname_privacy_admin_toAdmin": "👆 Message sent by Admin: \n${name} [<code>${id}</code>] - @${username}\n\n<b><u>Reply to this message instead of the one above.</u></b>",
+        "complete_privacy_admin_toAdmin": "👆 Message sent by Admin: \n${name} ${surname} [<code>${id}</code>] - @${username}\n\n<b><u>Reply to this message instead of the one above.</u></b>"
+    },
+    "infoCommand": {
+        "no_surname_and_username_infoCommand": "*************INFO*************\nIs Bot: ${isbot}\nID: <code>${id}</code>\nName: ${name}\nLanguage: ${language}\n******************************",
+        "no_username_infoCommand": "*************INFO*************\nIs Bot: ${isbot}\nID: <code>${id}</code>\nName: ${name}\nSurname: ${surname}\nLanguage: ${language}\n******************************",
+        "no_surname_infoCommand": "*************INFO*************\nIs Bot: ${isbot}\nID: <code>${id}</code>\nName: ${name}\nUsername: @${username}\nLanguage: ${language}\n******************************",
+        "complete_infoCommand": "*************INFO*************\nIs Bot: ${isbot}\nID: <code>${id}</code>\nName: ${name}\nSurname: ${surname}\nUsername: @${username}\nLanguage: ${language}\n******************************"
+    },
+    "adminsToMessage": {
+        "no_username_adminsToMessage": "******************************\n<i>~ ID: </i>\t\t<b><code>${id}</code></b>\n<i>~ Full Name: </i>\t\t<b>${name}</b>\n<i>~ Superior Admin: </i>\t\t<b>${superior}</b>\n<i>~ Username: </i>\t\t<b>NO USERNAME SET</b>\n<i>~ Language: </i>\t\t<b>${lang}</b>\n<i>~ Has Restricted Privacy Settings: </i>\t\t<b>${private}</b>\n<i>~ Time of Promotion (UTC): </i>\t\t<b>${promotion}</b>\n******************************",
+        "username_adminsToMessage": "******************************\n<i>~ ID: </i>\t\t<b><code>${id}</code></b>\n<i>~ Full Name: </i>\t\t<b>${name}</b>\n<i>~ Superior Admin: </i>\t\t<b>${superior}</b>\n<i>~ Username: </i>\t\t<b>@${username}</b>\n<i>~ Language: </i>\t\t<b>${lang}</b>\n<i>~ Has Restricted Privacy Settings: </i>\t\t<b>${private}</b>\n<i>~ Time of Promotion (UTC): </i>\t\t<b>${promotion}</b>\n******************************"
+    },
+    "bannedToMessage": {
+        "no_username_bannedToMessage": "******************************\n<i>~ ID: </i>\t\t<b><code>${id}</code></b>\n<i>~ Full Name: </i>\t\t<b>${name}</b>\n<i>\n<i>~ Username: </i>\t\t<b>NO USERNAME SET</b>\n<i>~ Language: </i>\t\t<b>${lang}</b>\n<i>~ Has Restricted Privacy Settings: </i>\t\t<b>${private}</b>\n<i>~ Time of Ban (UTC): </i>\t\t<b>${ban}</b>\n******************************",
+        "username_bannedToMessage": "******************************\n<i>~ ID: </i>\t\t<b><code>${id}</code></b>\n<i>~ Full Name: </i>\t\t<b>${name}</b>\n<i>\n<i>~ Username: </i>\t\t<b>@${username}</b>\n<i>~ Language: </i>\t\t<b>${lang}</b>\n<i>~ Has Restricted Privacy Settings: </i>\t\t<b>${private}</b>\n<i>~ Time of Ban (UTC): </i>\t\t<b>${ban}</b>\n******************************"
+    }
+}

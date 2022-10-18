@@ -15,7 +15,7 @@ let admins = editJsonFile('./admins.json');
 const User = require('./User');
 const functions = require('./functions');
 
-const bot_test=true;
+const bot_test=false;
 
 global.botID = process.env.BOT_ID;   //ID: @DoggoReportBot
 
@@ -197,7 +197,7 @@ bot.command('info', (ctx) => {
         if(ctx.message.hasOwnProperty('reply_to_message')){
             if(ctx.message.reply_to_message.hasOwnProperty('forward_from')){
                 //user has not limited privacy setting of forwarding, bot can know the original id of the forwarded message
-                ctx.telegram.sendMessage(ctx.message.chat.id, functions.infoCommand(ctx));
+                ctx.telegram.sendMessage(ctx.message.chat.id, functions.infoCommand(ctx),{parse_mode: 'HTML'});
             }else{
                 if(ctx.message.reply_to_message.forward_sender_name !== undefined){
                     //user has blocked the bot from sending his ID alongside forwarded messages
