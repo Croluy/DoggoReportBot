@@ -17,7 +17,7 @@ It includes crucial data:
 
 All the messages that the bot sends to users and admins are stored in "*[BotReplies.json](https://github.com/Croluy/DoggoReportBot/blob/master/BotReplies.json)*".<br>
 The JSON is organized following a Tree Structure where the roots are `functions` and `index` and each of them represents a JS file ("*[index.js](https://github.com/Croluy/DoggoReportBot/blob/master/index.js)*" and "*[functions.js](https://github.com/Croluy/DoggoReportBot/blob/master/functions.js)*").<br>
-Both roots have a list of childs named the same as that file's functions where messages are sent from the bot to anyone. This allows the project to be more organized.
+Both roots have a list of children named the same as that file's functions where messages are sent from the bot to anyone. This allows the project to be more organized.
 
 When you run the bot for the 1st time, it will create 2 files on your local machine:<br>
 - blacklist.json --> it saves a list of all users banned from the bot;<br>
