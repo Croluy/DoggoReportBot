@@ -10,8 +10,8 @@
 require('dotenv').config();
 const {Telegraf} = require('telegraf');
 const editJsonFile = require("edit-json-file");
-let blacklist = editJsonFile('./blacklist.json');
-let admins = editJsonFile('./admins.json');
+let blacklist = editJsonFile('./blacklist.json', {autosave: true});
+let admins = editJsonFile('./admins.json', {autosave: true});
 const User = require('./User');
 const functions = require('./functions');
 const fs = require("fs");
@@ -55,6 +55,13 @@ const {
             admin_help,
             user_help
         },
+        __commands: {
+            creator_commands,
+            superior_commands,
+            admin_commands,
+            user_commands
+        },
+        __credits,
         __info: {
             reply_to_dummy_info,
             from_other_message_info,
@@ -217,6 +224,40 @@ bot.help((ctx) => {
     functions.clearUser();
 });
 
+//commands
+bot.command('commands', (ctx) => {
+    functions.setUser(ctx);
+    if(functions.checkBanned(current_user)) return;
+    functions.update_admin(ctx,current_user);
+    if(functions.checkCreator(current_user)){
+        //creator commands
+        ctx.reply(BotReplies.index.__commands.creator_commands,{parse_mode: 'HTML'});
+    }else if(functions.checkSuperior(current_user)) {
+        //superior admin commands
+        ctx.reply(BotReplies.index.__commands.superior_commands,{parse_mode: 'HTML'});
+        functions.update_admin(ctx,current_user);
+    }else if(functions.checkAdmin(current_user)) {
+        //admin commands
+        ctx.reply(BotReplies.index.__commands.admin_commands,{parse_mode: 'HTML'});
+        functions.update_admin(ctx,current_user);
+    }else{
+        //user commands
+        ctx.reply(functions.s(BotReplies.index.__commands.user_commands, {channel: channelName}),{parse_mode: 'HTML'});
+    }
+    functions.clearUser();
+});
+
+//credits
+bot.command('credits', (ctx) => {
+    functions.setUser(ctx);
+    if(functions.checkBanned(current_user)) return;
+    functions.update_admin(ctx,current_user);
+
+    ctx.reply(BotReplies.index.__credits,{parse_mode: 'HTML'});
+
+    functions.clearUser();
+});
+
 //Get info about user
 bot.command('info', (ctx) => {
     functions.setUser(ctx);
@@ -276,6 +317,8 @@ bot.command('setusername', (ctx) => {
 
 //Make user into admin
 bot.command(['admin'], (ctx) => {
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
     //only superior admins can add an admin
     if(functions.checkSuperiorId(ctx.message.chat.id)) {
         functions.setUser(ctx);
@@ -288,6 +331,7 @@ bot.command(['admin'], (ctx) => {
                 ctx.reply(functions.s(BotReplies.index.__admin.banned_admin, {name: current_user.get_fullName, username: current_user.get_username, id: current_user.get_id, id: current_user.get_id}),{parse_mode: 'HTML'});
             else  //user doesn't have an username
                 ctx.reply(functions.s(BotReplies.index.__admin.banned_no_username_admin, {name: current_user.get_fullName, id: current_user.get_id, id: current_user.get_id}),{parse_mode: 'HTML'});
+            return;
         }
         //check if username with userId is an admin and has replied to someone and isn't a bot
         if(functions.checkAdmin(current_user) && !current_user.get_isBot && current_user.get_id!=creator.get_id) ctx.reply(BotReplies.index.__admin.already_admin);
@@ -328,7 +372,7 @@ bot.command(['admin'], (ctx) => {
                                 ctx.reply(functions.s(BotReplies.index.__admin.promoted_admin, {name: current_user.get_fullName, username: current_user.get_username, id: current_user.get_id}),{parse_mode: 'HTML'});
                             else  //user doesn't have an username
                                 ctx.reply(functions.s(BotReplies.index.__admin.promoted_no_username_admin, {name: current_user.get_fullName, id: current_user.get_id}),{parse_mode: 'HTML'});
-                            ctx.telegram.sendMessage(current_user.get_id,m);
+                            ctx.telegram.sendMessage(current_user.get_id,m);    //tell user of the admin privileges
                         }else if(functions.add_AdminToFile(current_user,ctx.message.date) == -1){
                             //User can NOT be promoted, he is currently banned.. have to unban first
                             if(current_user.get_username != undefined && current_user.get_username != "")  //user has username
@@ -365,6 +409,8 @@ bot.command(['admin'], (ctx) => {
 
 //Demote an user from admin
 bot.command(['unadmin','demote'], (ctx) => {
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
     //only superior admins can demote an admin
     if(functions.checkSuperiorId(ctx.message.chat.id)) {
         functions.setUser(ctx);
@@ -524,6 +570,8 @@ bot.command(['unadmin','demote'], (ctx) => {
 
 //ban user from the bot, impeding him to write to admins
 bot.command(['ban','terminate'], (ctx) => {
+    // Reload file from the disk
+    banned = editJsonFile(`./blacklist.json`, {autosave: true});
     //check if the person who sent the command is admin
     if(functions.checkAdminId(ctx.message.chat.id)) {
         functions.setUser(ctx);
@@ -550,7 +598,7 @@ bot.command(['ban','terminate'], (ctx) => {
                     //OR
                     //user has limited privacy and I can only print up a little amount of info
 
-                    if(functions.add_BannedToFile(current_user,ctx.message.date)){
+                    if(functions.add_BannedToFile(current_user,ctx.message.date) == 1){
                         //User can be banned, he is not admin
                         current_user.set_isBan=true;
 
@@ -593,6 +641,8 @@ bot.command(['ban','terminate'], (ctx) => {
 
 //Unban user
 bot.command('unban', (ctx) => {
+    // Reload file from the disk
+    banned = editJsonFile(`./blacklist.json`, {autosave: true});
     //only admin can unban users
     if(functions.checkAdminId(ctx.message.chat.id)) {
         functions.setUser(ctx);
@@ -707,6 +757,8 @@ bot.command('unban', (ctx) => {
 
 //list admin users
 bot.command('adminlist', (ctx) => {
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
     functions.setUser(ctx);
     functions.update_admin(ctx,current_user);
     if(functions.checkBanned(current_user)) return;
@@ -729,6 +781,8 @@ bot.command('adminlist', (ctx) => {
 
 //list banned users
 bot.command('blacklist', (ctx) => {
+    // Reload file from the disk
+    banned = editJsonFile(`./blacklist.json`, {autosave: true});
     functions.setUser(ctx);
     functions.update_admin(ctx,current_user);
     //if the user who wrote the command is banned from the bot, ignore message
@@ -753,6 +807,8 @@ bot.command('blacklist', (ctx) => {
 
 //grant an admin the superior admin permissions
 bot.command(['promote','superior'], (ctx) => {
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
     functions.setUser(ctx);
     functions.update_admin(ctx,current_user);
     if(functions.checkBanned(current_user)) return;
@@ -808,32 +864,52 @@ bot.command(['promote','superior'], (ctx) => {
 });
 
 //Clears the admins list and the only admin left is the creator
-bot.command('resetadmins', (ctx) => {
+bot.command('resetadmins', async (ctx) => {
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
+
+    let a=admins.toObject();
     functions.setUser(ctx);
     functions.update_admin(ctx,current_user);
-    if(functions.checkBanned(current_user)) return;
+    console.log("\nNumber of active admins: " + admins.get("Admins Number"));
     //the only admin is the creator, nothing has to be reset
-    if(admins.get("Admins Number") == 1){
+    //if(admins.get("Admins Number") == 1){
+    if(a["Admins Number"] == 1){
+        console.log("There is only 1 admin, no reset possible.");
         ctx.reply(BotReplies.index.__resetadmins.only_one_resetadmins);
         functions.clearUser();
         return;
     }
     if(functions.checkCreator(current_user)) {
         //Creator of the bot
-        const a=admins.toObject();
+        //let a=admins.toObject();
         let n=admins.get("Admins Number")-1;
+        console.log("Number of admins to delete: "+n);
         //send communication to all former admins that they have been demoted
-        for(let i=1;i<=n;i++){
-            const m=BotReplies.index.__demote.message_to_user_demote;
-            ctx.telegram.sendMessage(a.List[i].ID,m);
+        for(let i=n;i>=1;i--,n--){
+            console.log("Admin #"+i+" is being removed from admin list.");
+            //FIXME: can't find element 'i' in the array, so can't send message to user
+            ctx.telegram.sendMessage(a.List[i].ID, BotReplies.index.__demote.message_to_user_demote);
+            admins.pop("List");
+            console.log("Last element removed from admin list.");
+            admins.save();
         }
         a.List.splice(1,n);
+        admins.save();
+        await functions.resetadmins();
+        /*
+        console.log("Loop ended now removing admins and saving the file.");
+        a.List.splice(1,n);
+        console.log("Admins removed successfully, now setting the Admin Number "+admins.get("Admins Number")+" to 1.");
         admins.set("Admins Number",1);  //only creator is there
         admins.save();
+        console.log("Admins list updated successfully and saved.");
         functions.initFiles();
+        */
         ctx.reply(BotReplies.index.__resetadmins.cleared_resetadmins);
     }
     functions.clearUser();
+    console.log("User cleared, ending the function.");
 });
 
 //sender_chat
