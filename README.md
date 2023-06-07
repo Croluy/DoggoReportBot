@@ -9,10 +9,11 @@ A Telegram bot coded in NodeJS, which allows admins of a channel to communicate 
 1. Read [Dev Infos](https://github.com/Croluy/DoggoReportBot/edit/master/README.md#-dev-infos) below (**do not skip this step**)
 2. If you don't have git, [install it](https://github.com/git-guides/install-git)
 3. Clone the repo executing: `git clone https://github.com/Croluy/DoggoReportBot` (check [this](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) for troubleshooting)
-4. Insert your infos in your local `.env` file
-5. Set `bot_test` to `false` in your local `index.js` file
-6. In your terminal, navigate to the root directory of the bot
-7. Execute `npm start`
+4. Create a `.env` file inside the root directory
+5. Insert your infos in your local `.env` file
+6. Set `bot_test` to `false` in your local `index.js` file
+7. In your terminal, navigate to the root directory of the bot
+8. Execute `npm start`
 
 If you have set up the bot correctly you should get a message from it asking you if the channel name is correct. You should also see that the bot sent a message to the log channel informing you it is online.
 <br>
@@ -21,7 +22,8 @@ If you have set up the bot correctly you should get a message from it asking you
 
 ⚠️ **IMPORTANT**<br>
 I have excluded some files when uploading the project to GitHub. Those include data I won't disclose publicly for obvious reasons.<br>
-You will have to manually insert that data inside the "*[.env](https://github.com/Croluy/DoggoReportBot/blob/master/.env)*" file.<br>
+You will have to manually create and insert that data inside the "*.env*" file.<br>
+I have prepared a [template file](https://gist.github.com/Croluy/8d3463130ad13b135ca28e5071780991) that you can copy-paste inside your .env file and down below you have a description of each line so you know how it has to be edited.<br>
 - Bot Token: It is the token of the bot provided to you by BotFather on Telegram. It is a secret code that gives full access to the bot. Has to be in quotes (or double quotes): `"`.
 - Creator ID: Your Telegram ID. You can get your ID with *[this tutorial](https://www.alphr.com/find-chat-id-telegram/)* or just Google "get personal telegram id".
 - Creator Name: It is your Telegram name/username. Has to be in quotes (or double quotes): `"`.
