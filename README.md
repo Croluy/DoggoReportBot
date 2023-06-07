@@ -5,6 +5,16 @@ A Telegram bot coded in NodeJS, which allows admins of a channel to communicate 
 
 ## 💻 Dev Infos
 
+⚠️ **IMPORTANT**<br>
+I have excluded some files when uploading the project to GitHub. Those include data I won't disclose publicly for obvious reasons.<br>
+You will have to manually insert that data inside the "*[.env](https://github.com/Croluy/DoggoReportBot/blob/master/.env)*" file.<br>
+- Bot Token: It is the token of the bot provided to you by BotFather on Telegram. It is a secret code that gives full access to the bot. Has to be in quotes (or double quotes): `"`.
+- Creator ID: Your Telegram ID. You can get your ID with *[this tutorial](https://www.alphr.com/find-chat-id-telegram/)* or just Google "get personal telegram id".
+- Creator Name: It is your Telegram name/username. Has to be in quotes (or double quotes): `"`.
+- Log Channel: ID of the channel where the bot will log its more important actions. You have to be creator of this channel and to get its ID you can use *[this tutorial](https://neliosoftware.com/content/help/how-do-i-get-the-channel-id-in-telegram/)* or just Google "get telegram channel id".
+- Channel Name: It is the name of the channel linked to your bot. *NOT* the log channel but the channel this bot is linked. Has to be in quotes (or double quotes): `"`.
+
+---
 When running the bot be sure to set the variable `bot_test` to `false` in "*[index.js](https://github.com/Croluy/DoggoReportBot/blob/master/index.js#L20)*". That will deny the bot from skipping some initial steps that I've preferred ignoring during development process.<br>
 I have excluded some files when uploading the project to GitHub. Those include data I won't disclose publicly for obvious reasons.<br>
 You might need to recreate at least the *.env* file in your local machine after you clone the repository.<br>

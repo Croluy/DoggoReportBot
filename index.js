@@ -19,7 +19,8 @@ const path = require("path");
 
 const bot_test=true;
 
-global.botID = process.env.BOT_ID;   //ID: @DoggoReportBot
+//get the id of the bot from its token
+global.botID = process.env.BOT_TOKEN.toString().split(':')[0];
 
 //set environment variables
 global.adminID = process.env.CREATOR_ID;     //ID of the creator
