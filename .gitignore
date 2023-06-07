@@ -7,4 +7,3 @@ blacklist.json
 features.txt
 .DS_Store
 git
-.env
