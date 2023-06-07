@@ -7,9 +7,9 @@
  * See https://www.gnu.org/licenses/ for details.
  */
 const editJsonFile = require("edit-json-file");
-const admins = editJsonFile('./admins.json');
+let admins = editJsonFile('./admins.json', {autosave: true});
 let adminListIndex=admins.get("Admins Number");
-const banned = editJsonFile('./blacklist.json');
+const banned = editJsonFile('./blacklist.json', {autosave: true});
 let bannedListIndex=banned.get("Banned Users");
 const User = require('./User');
 const fs = require("fs");
@@ -68,7 +68,13 @@ const {
     }
 } = BotReplies;
 
-//Parse template literal so it can be used in JSON elements
+/**
+ * Parse template literal so it can be used in JSON elements.
+ * 
+ * @param {string} expression - string to interpret
+ * @param {obj} variablesObj - object with variables to replace
+ * @returns final string with replaced variables
+ */
 function s(expression, variablesObj){
     const regexp = /\${\s?([^{}\s]*)\s?}/g;
     let t = expression.replace(regexp, (substring, variables, index) => {
@@ -78,17 +84,30 @@ function s(expression, variablesObj){
     return t;
 }
 
-//Sleep in ms
+/**
+ * Sleep function.
+ * 
+ * @param {int} ms - milliseconds to sleep 
+ * @returns {Promise} promise
+ */
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-//Reset all current_user parameters to default values
+/**
+ * Resets all current_user parameters to default values.
+ */
 function clearUser(){
     current_user = new User(undefined,undefined,false,undefined,undefined,undefined,undefined,0,false,false,false,false,true);
 }
 
-//Trasform unix time in readable time
+/**
+ * Transforms unix time in human readable time.
+ * Only works with time zones where difference from UTC is measured in hours, not minutes.
+ * 
+ * @param {obj} b - telegraf context
+ * @returns {string} date and time
+ */
 function UnixTimestamp(b){
     const a = new Date(b * 1000);
     const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -164,13 +183,17 @@ function UnixTimestamp(b){
     if(sec<10) sec='0'+sec;
 
     //Format  ->  DD Month YYYY  -  hh:mm:ss
-    if(d==1) return d + 'st ' + m + ' ' + y + '  -  ' + h + ':' + min + ':' + sec;
-    if(d==2) return d + 'nd ' + m + ' ' + y + '  -  ' + h + ':' + min + ':' + sec;
-    if(d==3) return d + 'rd ' + m + ' ' + y + '  -  ' + h + ':' + min + ':' + sec;
+    if(d==1 || d==21 || d==31) return d + 'st ' + m + ' ' + y + '  -  ' + h + ':' + min + ':' + sec;
+    if(d==2 || d==22) return d + 'nd ' + m + ' ' + y + '  -  ' + h + ':' + min + ':' + sec;
+    if(d==3 || d==23) return d + 'rd ' + m + ' ' + y + '  -  ' + h + ':' + min + ':' + sec;
     return d + 'th ' + m + ' ' + y + '  -  ' + h + ':' + min + ':' + sec;
 }
 
-//Set online status on log channel, ask for possible new username of the channel and initializes admin.json file
+/**
+ * Sets online status on log channel, asks for possible new username of the channel and initializes admin.json and blacklist.json files.
+ * 
+ * @param {obj} b - telegraf context 
+ */
 function startup(b){
     clearUser();
     b.telegram.sendMessage(LogChannel,BotReplies.functions.startup._bot_online_channel);     //logs on log_channel that bot is online
@@ -179,7 +202,12 @@ function startup(b){
     initFiles();
 }
 
-//Gets user info from a message
+/**
+ * Gets user info from a message.
+ * 
+ * @param {obj} a - telegraf context
+ * @returns {string} - formatted string with user info
+ */
 function info(a){
     const data = {
         "id": a.message.chat.id,
@@ -194,22 +222,29 @@ function info(a){
     let t="";
     //last name AND username unset
     if(data.surname == undefined && data.username == undefined)
-        t=s(BotReplies.functions.infos.no_surname_and_username, {id:data.id, name:data.name, language: lang});
+        t=s(BotReplies.functions.info.no_surname_and_username_info, {id:data.id, name:data.name, language: lang});
     //username unset
     else if(data.username==undefined)
-        t=s(BotReplies.functions.infos.no_username, {id:data.id, name:data.name, surname:data.surname, language: lang});
+        t=s(BotReplies.functions.info.no_username_info, {id:data.id, name:data.name, surname:data.surname, language: lang});
     //last name unset
     else if(data.surname==undefined)
-        t=s(BotReplies.functions.infos.no_surname, {id:data.id, name:data.name, username:data.username, language: lang});
+        t=s(BotReplies.functions.info.no_surname_info, {id:data.id, name:data.name, username:data.username, language: lang});
     //last name AND username set
     else
-        t=s(BotReplies.functions.infos.complete, {id:data.id, name:data.name, surname:data.surname, username:data.username, language: lang});
+        t=s(BotReplies.functions.info.complete_info, {id:data.id, name:data.name, surname:data.surname, username:data.username, language: lang});
     
     return t;
 }
 
-//Sends message from user to admin
+/**
+ * Sends message from user to all admins && from admin to all the other admins.
+ * If there are any errors, it sends the message to the log channel.
+ * 
+ * @param {obj} a - telegraf context
+ */
 async function toAdmin(a){
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
     //if it was not ad admin to reply, send the message to all admins
     if(!checkAdminId(a.message.from.id)){
         //send message to all admins
@@ -312,16 +347,26 @@ async function toAdmin(a){
     }
 }
 
-//Sends a specific message to all admins
-function toAllAdmins(ctx,m,forward=true,adminsender=null){
+/**
+ * Sends a specific message to all admins.
+ * 
+ * @param {obj} ctx - telegraf context
+ * @param {string} m - message to be sent
+ * @param {bool} forward - DEFAULT true - true: forwarded message; false: regular message
+ * @param {int} adminsenderId - DEFAULT null - id of the admin who sent the message. If null will send to all admins. If set, will send to all admins except that admin.
+ * @returns {int} 0: success; 1: ERR: no admins found
+ */
+function toAllAdmins(ctx,m,forward=true,adminsenderId=null){
     if(adminListIndex==0 || adminListIndex==null){
         return 1;  //ERROR: no admins found
     }
+    // Reload admins file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
     const a = admins.toObject();
 
     let aID=null;
 
-    if(adminsender==null){
+    if(adminsenderId==null){
         //Loop through the admins and send them message
         for(let i=0;i<adminListIndex;i++){
             //update the admin id
@@ -335,7 +380,7 @@ function toAllAdmins(ctx,m,forward=true,adminsender=null){
         for(let i=0;i<adminListIndex;i++){
             //update the admin id
             aID=a.List[i].ID;
-            if(aID!=adminsender){
+            if(aID!=adminsenderId){
                 //the message is being forwarded by default, if the 3rd parameter is set to false, it will be sent as a regular message
                 if(forward==false) ctx.telegram.sendMessage(aID,m,{parse_mode: 'HTML'});
                 else if(forward==true) ctx.forwardMessage(aID,m);
@@ -345,7 +390,12 @@ function toAllAdmins(ctx,m,forward=true,adminsender=null){
     return 0;
 }
 
-//Sends user's info to admin when /info command is run
+/**
+ * Sends user's info to admin when /info command is run.
+ * 
+ * @param {obj} a - telegraf context 
+ * @returns {string} user's info
+ */
 function infoCommand(a){
     const data={
         "id":a.message.reply_to_message.forward_from.id,
@@ -372,7 +422,11 @@ function infoCommand(a){
     return t;
 }
 
-//Using ctx parameter and sets an User object from that (current_user)
+/**
+ * Sets an User object from context (current_user).
+ * 
+ * @param {obj} a - telegraf context 
+ */
 function setUser(a){
     clearUser();
     if(a.message.from.id == creator.get_id && a.message.hasOwnProperty('reply_to_message')==false){
@@ -424,8 +478,14 @@ function setUser(a){
     }
 }
 
-//Using admins.json file set current user
+/**
+ * Using admins.json file sets current user.
+ * 
+ * @param {int} i - index of the user to set in the admins.json file 
+ */
 function setUserFromAdminFile(i){
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
     const a=admins.toObject();
 
     current_user.set_id = a.List[i].ID;
@@ -437,8 +497,14 @@ function setUserFromAdminFile(i){
     current_user.set_isSuperior = a.List[i].isSuperior;
 }
 
-//Using blacklist.json file set current user
+/**
+ * Using blacklist.json file sets current user.
+ * 
+ * @param {int} i - index of the user to set in the blacklist.json file 
+ */
 function setUserFromBannedFile(i){
+    // Reload file from the disk
+    banned = editJsonFile(`./blacklist.json`, {autosave: true});
     const a=banned.toObject();
 
     current_user.set_id = a.List[i].ID;
@@ -449,9 +515,17 @@ function setUserFromBannedFile(i){
     current_user.set_isBan = a.List[i].isBan;
 }
 
-//Using admin ID, set the user
+/**
+ * Sets current user if it's admin.
+ * 
+ * @param {int} id - ID of the user to set if admin 
+ * @returns true if user is admin and set; false if not admin nor set
+ */
 function setAdminUser(id){
     clearUser();
+
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
 
     let i=0;
     const a=admins.toObject();
@@ -476,9 +550,17 @@ function setAdminUser(id){
     return false;
 }
 
-//Using banned ID, set the user
+/**
+ * Sets current user if it's banned.
+ * 
+ * @param {int} id - ID of the user to set if banned
+ * @returns true if user is banned and set; false if not banned nor set
+ */
 function setBannedUser(id){
     clearUser();
+
+    // Reload file from the disk
+    banned = editJsonFile(`./blacklist.json`, {autosave: true});
 
     let i=0;
     const a=banned.toObject();
@@ -500,12 +582,21 @@ function setBannedUser(id){
     return false;
 }
 
-//Initializes admins.json file with admins number and the creator
+/**
+ * Initializes admins.json and blacklist.json files.
+ */
 function initFiles(){
     /**ADMIN FILE */
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
     //if the file is empty (admin number doesn't exist), set admins number to 0
-    if(admins.get("Admins Number") == null || admins.get("Admins Number") == undefined) adminListIndex=0;
+    if(admins.get("Admins Number") == null || admins.get("Admins Number") == undefined){
+        adminListIndex=0;
+        admins.set("Admins Number",adminListIndex);  //write the number of admins at the beginning of the file
+        admins.set("List",[]);  //clear the list of admins
+    }
     admins.set("Admins Number",adminListIndex);  //write the number of admins at the beginning of the file
+    admins.save();
     //if there is no admin
     if(admins.get("Admins Number") == 0){
         //write creator as 1st admin
@@ -520,16 +611,40 @@ function initFiles(){
     }
 
     /**BAN FILE */
+    // Reload file from the disk
+    banned = editJsonFile(`./blacklist.json`, {autosave: true});
     //if the file is empty (banned users number doesn't exist), set banned users to 0
     if(banned.get("Banned Users") == null || banned.get("Banned Users") == undefined) bannedListIndex=0;
     banned.set("Banned Users",bannedListIndex);    //write the number of banned users at the beginning of the file
     banned.save();      //save file
 }
 
-//Adds user to admins.json file
+/**
+ * Resets admins.json file with only the creator infos.
+ */
+function resetadmins(){
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
+    admins.empty(); //clear the list of admins
+    console.log("Clearing the file");
+    admins.save(); //save file
+    console.log("Admins cleared.");
+    admins.set("Admins Number",null);
+    initFiles(); //set the creator as admin again
+}
+
+/**
+ * Adds user to admins.json file.
+ * 
+ * @param {obj} u - user to add to the file 
+ * @param {obj} d - date of promotion
+ * @returns 1: if user is added to admin file; -1: if user is banned
+ */
 function add_AdminToFile(u,d){
     //user is banned, can't promote banned user. You have to unban first
     if(checkBanned(u)) return -1;
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
 
     admins.append("List", {"Admin #":adminListIndex, "ID":u.get_id,
                            "Full Name":u.get_fullName, "isAdmin":u.get_isAdmin, "isSuperior":u.get_isSuperior,
@@ -542,10 +657,18 @@ function add_AdminToFile(u,d){
     return 1;
 }
 
-//Adds user to blacklist.json
+/**
+ * Adds user to blacklist.json file.
+ * 
+ * @param {obj} u - user to add to the file
+ * @param {obj} d - date of ban
+ * @returns 1: if user is added to banned file; -1: if user is admin
+ */
 function add_BannedToFile(u,d){
     //user is admin, can't ban admin. He has to get demoted first
     if(checkAdmin(u)) return -1;
+    // Reload file from the disk
+    banned = editJsonFile(`./blacklist.json`, {autosave: true});
 
     banned.append("List", {"Banned User #":bannedListIndex, "ID":u.get_id,
                            "Full Name":u.get_fullName,
@@ -558,9 +681,22 @@ function add_BannedToFile(u,d){
     return 1;
 }
 
-//Remove admin at index i from admins.json List array
+/**
+ * Removes admin user at index i from admins.json.
+ * OR
+ * Removes banned user at index i from banned.json.
+ * 
+ * @param {int} i - index of the user to remove
+ * @param {string} bannedORadmin - "admin" or "banned" to determine which file to remove from
+ * @returns 1: if user is removed from file; -1: if input is invalid
+ */
 function removeFromFile(i,bannedORadmin){
     let a=null;
+    // Reload file from the disk
+    banned = editJsonFile(`./blacklist.json`, {autosave: true});
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
+    if(bannedORadmin!="admin" && bannedORadmin!="banned") return -1;
     if(bannedORadmin=="admin") a=admins.toObject();
     else if(bannedORadmin=="banned") a=banned.toObject();
     let k=i;
@@ -587,10 +723,19 @@ function removeFromFile(i,bannedORadmin){
         banned.set("Banned Users",bannedListIndex);
         banned.save();
     }
+    return 1;
 }
 
-//Demotes superior admins to admins OR admins to normal users given an id
+/**
+ * If creator runs the command and user is superior admin, demotes him to normal admin. If superior admins run command, demotes admin to normal user.
+ * 
+ * @param {int} id - id of the user to demote
+ * @param {bool} is_creator - true if creator runs the command, false if superior admin runs the command
+ * @returns 1: admin demoted to user; -1: superior admin demoted to admin; -1000: no admin users; -1010: superior admin can't demote another superior admin; -1005: user is not admin
+ */
 function demote_AdminToFile(id,is_creator){
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
     let i=1;    //start check at index 1, because index 0 of List will always be creator and creator can't be demoted
     const a=admins.toObject();
 
@@ -610,8 +755,7 @@ function demote_AdminToFile(id,is_creator){
                 //superior admin is trying to demote another superior admin
                 return -1010;
             }
-            removeFromFile(i,"admin");
-            return 1;
+            if(removeFromFile(i,"admin")==1) return 1;
         }
         i++;
     }while(i<adminListIndex);
@@ -620,8 +764,15 @@ function demote_AdminToFile(id,is_creator){
     return -1005;
 }
 
-//Removes banned user given an id
+/**
+ * Unbans user from id.
+ * 
+ * @param {int} id - id of the user to unban
+ * @returns 1: user is unbanned; -1000: no banned users; -1005: user is not banned
+ */
 function remove_BannedFromFile(id){
+    // Reload file from the disk
+    banned = editJsonFile(`./blacklist.json`, {autosave: true});
     let i=0;    //start check at index 0 of List
     const a=banned.toObject();
 
@@ -642,8 +793,15 @@ function remove_BannedFromFile(id){
     return -1005;
 }
 
-//Sets an admin as superior admin
+/**
+ * Promotes admin to superior admin given his id.
+ * 
+ * @param {int} id - id of the user to promote.
+ * @returns 1: promoted to superior; -1000: no admin users; -1005: user is not admin or already superior
+ */
 function setSuperiorId(id){
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
     let i=1;    //start check at index 1, because index 0 of List will always be creator
     const a=admins.toObject();
 
@@ -661,15 +819,23 @@ function setSuperiorId(id){
         i++;
     }while(i<adminListIndex);
 
-    //if loop ends without finding a match, error has occoured, possible cause: user is already superior
+    //if loop ends without finding a match, error has occoured, possible cause: user is not admin or already superior
     return -1005;
 }
 
-//Checks if parameter user is banned by running through blacklist.json file
+/**
+ * Check if user is banned.
+ * 
+ * @param {obj} u - user object to check 
+ * @returns {bool} true: user is banned; false: user is not banned
+ */
 function checkBanned(u){
     const id=u.get_id;
     //creator is never banned
     if(id==creator.get_id) return false;
+
+    // Reload file from the disk
+    banned = editJsonFile(`./blacklist.json`, {autosave: true});
 
     let i=0;
     const b=banned.toObject();
@@ -688,17 +854,25 @@ function checkBanned(u){
     return false;
 }
 
-//Checks if parameter user is admin by running through admins.json file
+/**
+ * Check if user is admin.
+ * 
+ * @param {obj} u - user object to check 
+ * @returns {bool} true: user is admin; false: user is not admin
+ */
 function checkAdmin(u){
     const id=u.get_id;
     //creator is always admin
     if(id==creator.get_id) return true;
 
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
+
     let i=1;    //start check at index 1, cause index 0 will always be creator
     const a=admins.toObject();
 
     //there is only an element in Admin array (creator) - user can't be admin
-    if(a.List.length==1) return false;
+    if(adminListIndex==1) return false;
 
     //loop though all the admins except the 1st one
     do{
@@ -711,7 +885,12 @@ function checkAdmin(u){
     return false;
 }
 
-//Checks if parameter user OR parameter user_id is creator comparing to "creator" User
+/**
+ * Check if user is creator.
+ * 
+ * @param {obj} u - user to check
+ * @returns {bool} true: user is creator; false: user is not creator
+ */
 function checkCreator(u){
     //u can be either User object or an ID to check
     //check if u is Object or an ID of the creator - otherwise return false
@@ -719,11 +898,19 @@ function checkCreator(u){
     else return false;
 }
 
-//Checks if parameter user is superior admin by running through admins.json file
+/**
+ * Check if user is superior admin.
+ * 
+ * @param {obj} u - user to check 
+ * @returns {bool} true: user is superior; false: user is not superior
+ */
 function checkSuperior(u){
     const id=u.get_id;
     //creator is always superior
     if(id==creator.get_id) return true;
+
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
 
     let i=1;    //start check at index 1, cause index 0 will always be creator
     const a=admins.toObject();
@@ -742,10 +929,18 @@ function checkSuperior(u){
     return false;
 }
 
-//Checks if parameter user_id is admin by running through admins.json file
+/**
+ * Check if user is banned by ID.
+ * 
+ * @param {int} id - id of the user to check
+ * @returns {bool} true: user is banned; false: user is not banned
+ */
 function checkBannedId(id){
     //creator is never banned
     if(id==creator.get_id) return false;
+
+    // Reload file from the disk
+    banned = editJsonFile(`./blacklist.json`, {autosave: true});
 
     let i=0;
     const b=banned.toObject();
@@ -761,10 +956,18 @@ function checkBannedId(id){
     return false;
 }
 
-//Checks if parameter user_id is admin by running through admins.json file
+/**
+ * Check if user is admin by ID.
+ * 
+ * @param {int} id - id of the user to check
+ * @returns {bool} true: user is admin; false: user is not admin
+ */
 function checkAdminId(id){
     //creator is always admin
     if(id==creator.get_id) return true;
+
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
 
     let i=1;    //start check at index 1, cause index 0 will always be creator
     const a=admins.toObject();
@@ -783,10 +986,18 @@ function checkAdminId(id){
     return false;
 }
 
-//Checks if parameter user_id is superior admin by running through admins.json file
+/**
+ * Check if user is superior admin by ID.
+ * 
+ * @param {int} id - id of the user to check
+ * @returns {bool} true: user is superior; false: user is not superior
+ */
 function checkSuperiorId(id){
     //creator is always superior
     if(id==creator.get_id) return true;
+
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
 
     let i=1;    //start check at index 1, cause index 0 will always be creator
     const a=admins.toObject();
@@ -805,14 +1016,25 @@ function checkSuperiorId(id){
     return false;
 }
 
-//Check if there are banned users
+/**
+ * Check if there are banned users.
+ * 
+ * @returns {bool} true: there are banned users; false: there are no banned users
+ */
 function existsBannedUsers(){
+    // Reload file from the disk
+    banned = editJsonFile(`./blacklist.json`, {autosave: true});
     //if the number of banned users is 0 or null, there are no banned users
-    if(banned.get("Banned Users")== null || banned.get("Banned Users")== 0) return true;
-    else return false;
+    if(banned.get("Banned Users")== null || banned.get("Banned Users")== 0) return false;
+    else return true;
 }
 
-//Using ctx parameter returns id from dummy message for every user with restricted privacy settings
+/**
+ * Gets the id from dummy message of users with restricted privacy.
+ * 
+ * @param {obj} a - telegram context
+ * @returns {int} id of the user
+ */
 function idFromDummy(a){
     const t = a.message.reply_to_message.text;
     const start = t.indexOf("[")+1;
@@ -823,7 +1045,12 @@ function idFromDummy(a){
     return newId;
 }
 
-//Using ctx parameter returns full_name from dummy message for every user with restricted privacy settings
+/**
+ * Gets the full_name from dummy message of users with restricted privacy.
+ * 
+ * @param {obj} a - telegram context
+ * @returns {string} full_name of the user
+ */
 function nameFromDummy(a){
     const t = a.message.reply_to_message.text;
     const start = t.indexOf("by")+5;
@@ -834,7 +1061,12 @@ function nameFromDummy(a){
     return name;
 }
 
-//Using ctx parameter returns full_name from admin dummy message for every admin with restricted privacy settings
+/**
+ * Gets the admin full_name from dummy message of admins with restricted privacy.
+ * 
+ * @param {obj} a - telegram context
+ * @returns {string} full_name of the admin
+ */
 function adminNameFromDummy(a){
     const t = a.message.reply_to_message.text;
     const start = t.indexOf("Admin:")+8;
@@ -845,7 +1077,12 @@ function adminNameFromDummy(a){
     return name;
 }
 
-//Using ctx parameter returns username from dummy message for every user with restricted privacy settings
+/**
+ * Gets username from dummy message of users with restricted privacy.
+ * 
+ * @param {obj} a - telegram context
+ * @returns {string} username of the user
+ */
 function usernameFromDummy(a){
     const t = a.message.reply_to_message.text;
     const start = t.indexOf("@")+1;
@@ -856,7 +1093,12 @@ function usernameFromDummy(a){
     return username;
 }
 
-//Using ctx parameter returns sys language from dummy message for every user with restricted privacy settings
+/**
+ * Gets the language from dummy message of users with restricted privacy.
+ * 
+ * @param {obj} a - telegram context
+ * @returns {string} language of the user
+ */
 function langFromDummy(a){
     const t = a.message.reply_to_message.text;
     const start = t.indexOf("\nLanguage:")+11;
@@ -867,8 +1109,14 @@ function langFromDummy(a){
     return lang;
 }
 
-//Using ctx parameter returns the list of admins in an ordered way
+/**
+ * Replies with the list of admins in an ordered way.
+ * 
+ * @param {obj} context - telegram context
+ */
 function adminsToMessage(context){
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
     const a = admins.toObject();
 
     let sup='';
@@ -886,24 +1134,39 @@ function adminsToMessage(context){
     }
 }
 
-//Using ctx parameter returns the list of banned users in an ordered way
+/**
+ * Replies with the list of banned users in an ordered way.
+ * 
+ * @param {obj} context - telegram context
+ */
 function bannedToMessage(context){
+    // Reload file from the disk
+    banned = editJsonFile(`./blacklist.json`, {autosave: true});
     const a = banned.toObject();
 
     let priv='';
     for(let i=0; i<banned.get("Banned Users"); i++){
-
+        //check and set private status
         if(a.List[i].isPrivate) priv='✅';
         else priv='🚫';
 
+        //check if username is set
         if(a.List[i].Username != null || a.List[i].Username != undefined || a.List[i].Username != "")
-            context.reply(s(BotReplies.functions.adminsToMessage.username_adminsToMessage, {id: a.List[i].ID, name: a.List[i]["Full Name"], username: a.List[i].Username, lang: a.List[i].Language, private: priv, ban: a.List[i]["Date of Ban"]}),{parse_mode: 'HTML'});
-        else context.reply(s(BotReplies.functions.adminsToMessage.no_username_adminsToMessage, {id: a.List[i].ID, name: a.List[i]["Full Name"], lang: a.List[i].Language, private: priv, ban: a.List[i]["Date of Ban"]}),{parse_mode: 'HTML'});
+            context.reply(s(BotReplies.functions.bannedToMessage.username_bannedToMessage, {id: a.List[i].ID, name: a.List[i]["Full Name"], username: a.List[i].Username, lang: a.List[i].Language, private: priv, ban: a.List[i]["Date of Ban"]}),{parse_mode: 'HTML'});
+        else
+            context.reply(s(BotReplies.functions.bannedToMessage.no_username_bannedToMessage, {id: a.List[i].ID, name: a.List[i]["Full Name"], lang: a.List[i].Language, private: priv, ban: a.List[i]["Date of Ban"]}),{parse_mode: 'HTML'});
     }
 }
 
-//Update info about admin whenever he sends a message to the bot
+/**
+ * Update infos about admin whenever he sends a message to the bot.
+ * 
+ * @param {obj} ctx - telegram context
+ * @param {obj} user - user to update
+ */
 function update_admin(ctx,user) {
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
     //Check if the user is admin
     if(checkAdminId(ctx.message.from.id)){
         //Gets the position of that admin user
@@ -922,8 +1185,15 @@ function update_admin(ctx,user) {
     }
 }
 
-//Update admin full name
+/**
+ * Update admin full name.
+ * 
+ * @param {int} pos - position of the admin in the list
+ * @param {obj} user - updated user
+ */
 function update_admin_fullname(pos,user){
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
     const a = admins.toObject();
     if(a.List[pos]["Full Name"] != user.fullname){
         a.List[pos]["Full Name"] = user.fullName;
@@ -931,8 +1201,15 @@ function update_admin_fullname(pos,user){
     }
 }
 
-//Update admin username
+/**
+ * Update admin username.
+ * 
+ * @param {int} pos - position of the admin in the list
+ * @param {obj} user - updated user
+ */
 function update_admin_username(pos,user){
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
     const a = admins.toObject();
     if(a.List[pos].Username != user.username){
         a.List[pos].Username = user.username;
@@ -940,8 +1217,15 @@ function update_admin_username(pos,user){
     }
 }
 
-//Update admin private state
+/**
+ * Update admin forwarding messages privacy state.
+ * 
+ * @param {int} pos - position of the admin in the list
+ * @param {obj} user - updated user
+ */
 function update_admin_private(pos,user){
+    // Reload file from the disk
+    admins = editJsonFile(`./admins.json`, {autosave: true});
     const a = admins.toObject();
     if(a.List[pos].isPrivate != user.isPrivate){
         a.List[pos].isPrivate = user.isPrivate;
@@ -966,6 +1250,7 @@ module.exports = {
     setAdminUser,
     setBannedUser,
     initFiles,
+    resetadmins,
     add_AdminToFile,
     add_BannedToFile,
     removeFromFile,
