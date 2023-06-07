@@ -3,7 +3,7 @@
 A Telegram bot coded in NodeJS, which allows admins of a channel to communicate with several users by using the bot as an intermediary.
 <br>
 
-## ⚙️ How to run
+## ⚙️ How to run the bot
 
 **Requirements to run the bot:** *[NodeJS](https://nodejs.org)*. If you are unsure which version to choose, you should probably stick with the LTS version.<br>
 1. Read [Dev Infos](https://github.com/Croluy/DoggoReportBot/edit/master/README.md#-dev-infos) below (**do not skip this step**)
