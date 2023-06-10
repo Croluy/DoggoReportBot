@@ -1,6 +1,6 @@
 {
   "name": "doggoreportbot",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "Telegram bot",
   "main": "index.js",
   "bin": "./index.js",
