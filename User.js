@@ -1,6 +1,6 @@
 /**
  * DoggoReportBot - User.js - User Class file to create User objects.
- * Copyright (C) 2022   Croluy
+ * Copyright (C) 2023   Croluy
  * 
  * This program comes with ABSOLUTELY NO WARRANTY;
  * This is free software, and you are welcome to redistribute it under certain conditions;
@@ -11,19 +11,19 @@ class User{
      * @class
      * User's Class Constructor
      * 
-     * @param {string}  id          = *Required*                    User ID.
-     * @param {string}  firstName   = *Required*                    First Name of User.
-     * @param {bool}    isBot       = [DEFAULT: false]              Is User a bot?
-     * @param {string}  lastName    = [DEFAULT: undefined]          Last Name of User.
-     * @param {string}  fullName    = [DEFAULT: firstName+lastName] Full Name of User.
-     * @param {string}  username    = [DEFAULT: undefined]          User's username.
-     * @param {string}  lang        = [DEFAULT: EN]                 User's IETF Language Tag (device dependant).
-     * @param {int}     timeZone    = [DEFAULT: 0]                  User's time zone relative to (UTC) Coordinated Universal Time.
-     * @param {bool}    isPrivate   = [DEFAULT: false]              Has the User restricted it's privacy forwarding settings?
-     * @param {bool}    isSuperior  = [DEFAULT: false]              Has the User permission to use superior admin commands?
-     * @param {bool}    isAdmin     = [DEFAULT: false]              Is User admin?
-     * @param {bool}    isBan       = [DEFAULT: false]              Is User banned?
-     * @param {bool}    isActive    = [DEFAULT: true]               Does User have active chat with BOT?
+     * @param {string}  id           *Required*                    User ID.
+     * @param {string}  firstName    *Required*                    First Name of User.
+     * @param {bool}    isBot        [DEFAULT: false]              Is User a bot?
+     * @param {string}  lastName     [DEFAULT: undefined]          Last Name of User.
+     * @param {string}  fullName     [DEFAULT: firstName+lastName] Full Name of User.
+     * @param {string}  username     [DEFAULT: undefined]          User's username.
+     * @param {string}  lang         [DEFAULT: EN]                 User's IETF Language Tag (device dependant).
+     * @param {int}     timeZone     [DEFAULT: 0]                  User's time zone relative to (UTC) Coordinated Universal Time.
+     * @param {bool}    isPrivate    [DEFAULT: false]              Has the User restricted it's privacy forwarding settings?
+     * @param {bool}    isSuperior   [DEFAULT: false]              Has the User permission to use superior admin commands?
+     * @param {bool}    isAdmin      [DEFAULT: false]              Is User admin?
+     * @param {bool}    isBan        [DEFAULT: false]              Is User banned?
+     * @param {bool}    isActive     [DEFAULT: true]               Does User have active chat with BOT?
      */
      constructor(id, firstName, isBot=false, lastName=undefined, fullName=firstName+' '+lastName, username=undefined, lang="EN", timeZone=0, isPrivate=false, isSuperior=false, isAdmin=false, isBan=false, isActive=true){
         //User infos
