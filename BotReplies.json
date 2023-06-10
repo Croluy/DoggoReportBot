@@ -81,7 +81,11 @@
             "no_message_info": "Please select a message to check the user info! 👍🏻"
         },
         "__setusername": {
-            "username_changed_setusername": "Username of the channel changed successfully! 🎉\nPlease remember to set this username to the main channel too.\n\nHave you done it already?\nThen you should be able to enter the channel from @{channel}."
+            "username_changed_setusername": "Username of the channel changed successfully! 🎉\nPlease remember to set this username to the main channel too.\n\nHave you done it already?\nThen you should be able to enter the channel from @${channel}.",
+            "log_username_changed_setusername_nousername": "📄 Username of main channel changed!\n~ By: 💎 Superior Admin ${admin_fullname} [<code>${id}</code>].\n~ New channel username: @${channel}. 🎉",
+            "log_username_changed_setusername_nousername_creator": "📄 Username of main channel changed!\n~ By: 👑 Creator ${admin_fullname} [<code>${id}</code>].\n~ New channel username: @${channel}. 🎉",
+            "log_username_changed_setusername_withusername": "📄 Username of main channel changed!\n~ By: 💎 Superior Admin ${admin_fullname} - @${username} [<code>${id}</code>].\n~ New channel username: @${channel}. 🎉",
+            "log_username_changed_setusername_withusername_creator": "📄 Username of main channel changed!\n~ By: 👑 Creator ${admin_fullname} - @${username} [<code>${id}</code>].\n~ New channel username: @${channel}. 🎉"
         },
         "__admin": {
             "banned_admin": "User: <b>${name}</b>\t-\t@${username} [<code>${id}</code>]\n can't be added to the admin list! 😣\nThe probable reason is cause he is currently banned. You have to unban him first by running <code>/unban ${id}</code> or by replying to one of his old messages with /unban",
@@ -94,6 +98,29 @@
 
             "promoted_admin": "User: <b>${name}</b>\t-\t@${username} [<code>${id}</code>]\nhas been added to the admin list! 🎉",
             "promoted_no_username_admin": "User: <b>${name}</b> [<code>${id}</code>]\nhas been added to the admin list! 🎉",
+
+            "log":{
+                "creator":{
+                    "c_username":{
+                        "c_promoted_username":"👮🏻‍♂️ User promoted to Admin!\n~ By: 👑 Creator ${name} - @${username} [<code>${id}</code>].\n~ ${promoted_user} - @${username_promoted} [<code>${id_promoted}</code>] got promoted! 🎉",
+                        "c_promoted_no_username":"👮🏻‍♂️ User promoted to Admin!\n~ By: 👑 Creator ${name} - @${username} [<code>${id}</code>].\n~ ${promoted_user} [<code>${id_promoted}</code>] got promoted! 🎉"
+                    },
+                    "c_no_username":{
+                        "c_no_promoted_username":"👮🏻‍♂️ User promoted to Admin!\n~ By: 👑 Creator ${name} [<code>${id}</code>].\n~ ${promoted_user} - @${username_promoted} [<code>${id_promoted}</code>] got promoted! 🎉",
+                        "c_no_promoted_no_username":"👮🏻‍♂️ User promoted to Admin!\n~ By: 👑 Creator ${name} [<code>${id}</code>].\n~ ${promoted_user} [<code>${id_promoted}</code>] got promoted! 🎉"
+                    }
+                },
+                "superior":{
+                    "s_username":{
+                        "s_promoted_username":"👮🏻‍♂️ User promoted to Admin!\n~ By: 💎 Superior Admin ${name} - @${username} [<code>${id}</code>].\n~ ${promoted_user} - @${username_promoted} [<code>${id_promoted}</code>] got promoted! 🎉",
+                        "s_promoted_no_username":"👮🏻‍♂️ User promoted to Admin!\n~ By: 💎 Superior Admin ${name} - @${username} [<code>${id}</code>].\n~ ${promoted_user} [<code>${id_promoted}</code>] got promoted! 🎉"
+                    },
+                    "s_no_username":{
+                        "s_no_promoted_username":"👮🏻‍♂️ User promoted to Admin!\n~ By: 💎 Superior Admin ${name} [<code>${id}</code>].\n~ ${promoted_user} - @${username_promoted} [<code>${id_promoted}</code>] got promoted! 🎉",
+                        "s_no_promoted_no_username":"👮🏻‍♂️ User promoted to Admin!\n~ By: 💎 Superior Admin ${name} [<code>${id}</code>].\n~ ${promoted_user} [<code>${id_promoted}</code>] got promoted! 🎉"
+                    }
+                }
+            },
 
             "self_admin": "You can't make yourself admin. You already are one.\nLmao. 😂",
             "bot_admin": "Bruh 😐, I'm delighted but you can't make me an admin. I already have more power than you do.\nThere's nothing you can offer to Doggo that it doesn't already have. Lmao. 😂",

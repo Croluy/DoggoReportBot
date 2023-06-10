@@ -9,7 +9,7 @@
 const editJsonFile = require("edit-json-file");
 let admins = editJsonFile('./admins.json', {autosave: true});
 let adminListIndex=admins.get("Admins Number");
-const banned = editJsonFile('./blacklist.json', {autosave: true});
+let banned = editJsonFile('./blacklist.json', {autosave: true});
 let bannedListIndex=banned.get("Banned Users");
 const User = require('./User');
 const fs = require("fs");
@@ -73,7 +73,7 @@ const {
  * 
  * @param {string} expression - string to interpret
  * @param {obj} variablesObj - object with variables to replace
- * @returns final string with replaced variables
+ * @returns {string} final string with replaced variables
  */
 function s(expression, variablesObj){
     const regexp = /\${\s?([^{}\s]*)\s?}/g;
@@ -105,7 +105,7 @@ function clearUser(){
  * Transforms unix time in human readable time.
  * Only works with time zones where difference from UTC is measured in hours, not minutes.
  * 
- * @param {obj} b - telegraf context
+ * @param {obj} b - Unix time to convert in human readable time
  * @returns {string} date and time
  */
 function UnixTimestamp(b){
@@ -626,9 +626,7 @@ function resetadmins(){
     // Reload file from the disk
     admins = editJsonFile(`./admins.json`, {autosave: true});
     admins.empty(); //clear the list of admins
-    console.log("Clearing the file");
     admins.save(); //save file
-    console.log("Admins cleared.");
     admins.set("Admins Number",null);
     initFiles(); //set the creator as admin again
 }
@@ -1086,10 +1084,14 @@ function adminNameFromDummy(a){
 function usernameFromDummy(a){
     const t = a.message.reply_to_message.text;
     const start = t.indexOf("@")+1;
-    const end = t.indexOf("\n\nR");
+    const end = t.indexOf("\n\nRe");
     var username = "";
     for(let i=start; i<end; i++)
         username = username +''+ t[i];
+    
+    //FIXME: getting username from dummy message when user doesn't have username is not working, this condition is a workaround
+    if(username.startsWith("👆 Message sent")) return undefined;
+
     return username;
 }
 
@@ -1233,6 +1235,21 @@ function update_admin_private(pos,user){
     }
 }
 
+/**
+ * Logs a message in the log channel.
+ * 
+ * @param {obj} ctx - telegram context 
+ * @param {string} msg - message to log
+ * @param {bool} html - [DEFAULT true] if the message is in html format
+ */
+function log(ctx,msg,html=true){
+    //TODO: uncomment the next line when commiting
+    if(bot_test==true) return;
+
+    if(html==true) ctx.telegram.sendMessage(LogChannel,msg,{parse_mode: 'HTML'});
+    else ctx.telegram.sendMessage(LogChannel,msg);
+}
+
 //Export functions
 module.exports = {
     s,
@@ -1272,5 +1289,6 @@ module.exports = {
     langFromDummy,
     adminsToMessage,
     bannedToMessage,
-    update_admin
+    update_admin,
+    log
 }

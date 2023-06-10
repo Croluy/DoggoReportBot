@@ -17,7 +17,7 @@ const functions = require('./functions');
 const fs = require("fs");
 const path = require("path");
 
-const bot_test=true;
+global.bot_test=true;
 
 //get the id of the bot from its token
 global.botID = process.env.BOT_TOKEN.toString().split(':')[0];
@@ -69,7 +69,11 @@ const {
             no_message_info
         },
         __setusername: {
-            username_changed_setusername
+            username_changed_setusername,
+            log_username_changed_setusername_nousername,
+            log_username_changed_setusername_nousername_creator,
+            log_username_changed_setusername_withusername,
+            log_username_changed_setusername_withusername_creator
         },
         __admin: {
             banned_admin,
@@ -79,6 +83,28 @@ const {
             become_admin,
             promoted_admin,
             promoted_no_username_admin,
+            log: {
+                creator:{
+                    c_username:{
+                        c_promoted_username,
+                        c_promoted_no_username
+                    },
+                    c_no_username:{
+                        c_no_promoted_username,
+                        c_no_promoted_no_username
+                    }
+                },
+                superior:{
+                    s_username:{
+                        s_promoted_username,
+                        s_promoted_no_username
+                    },
+                    s_no_username:{
+                        s_no_promoted_username,
+                        s_no_promoted_no_username
+                    }
+                }
+            },
             self_admin,
             bot_admin,
             no_user_admin,
@@ -311,6 +337,21 @@ bot.command('setusername', (ctx) => {
         channelName=input;
 
         ctx.reply(functions.s(BotReplies.index.__setusername.username_changed_setusername, {channel: channelName}));
+
+        //Log action on the log channel
+        if(current_user.username !== undefined){
+            //User has a username
+            if(current_user.id !== adminID) //Admin is not creator
+                functions.log(ctx,functions.s(BotReplies.index.__setusername.log_username_changed_setusername_withusername,{admin_fullname: current_user.fullName, username: current_user.username, id: current_user.id, channel: channelName}));
+            else //Admin is creator
+                functions.log(ctx,functions.s(BotReplies.index.__setusername.log_username_changed_setusername_withusername_creator,{admin_fullname: current_user.fullName, username: current_user.username, id: current_user.id, channel: channelName}));
+        }else{
+            //User does not have a username
+            if(current_user.id !== adminID) //Admin is not creator
+                functions.log(ctx,functions.s(BotReplies.index.__setusername.log_username_changed_setusername_nousername,{admin_fullname: current_user.fullName, id: current_user.id, channel: channelName}));
+            else //Admin is creator
+            functions.log(ctx,functions.s(BotReplies.index.__setusername.log_username_changed_setusername_nousername_creator,{admin_fullname: current_user.fullName, id: current_user.id, channel: channelName}));
+        }
     }
     functions.clearUser();
 });
@@ -368,10 +409,35 @@ bot.command(['admin'], (ctx) => {
                         if(functions.add_AdminToFile(current_user,ctx.message.date)){
                             //User can be promoted, he is not banned
                             //FIXME: bug, user in admins.json "isAdmin" field isn't set to true
-                            if(current_user.get_username != undefined && current_user.get_username != "")  //user has username
+                            if(current_user.get_username != undefined && current_user.get_username != ""){  //user to promote has username
                                 ctx.reply(functions.s(BotReplies.index.__admin.promoted_admin, {name: current_user.get_fullName, username: current_user.get_username, id: current_user.get_id}),{parse_mode: 'HTML'});
-                            else  //user doesn't have an username
+                                if(ctx.message.from.id==creator.get_id){ //Creator executed command
+                                    if(ctx.message.from.username != undefined && ctx.message.from.username != "")  //creator has username
+                                        functions.log(ctx,functions.s(BotReplies.index.__admin.log.creator.c_username.c_promoted_username, {name: creator.fullName, username: creator.username, id: creator.id, promoted_user: current_user.get_fullName, username_promoted: current_user.username, id_promoted: current_user.get_id}));
+                                    else   //creator doesn't have an username
+                                        functions.log(ctx,functions.s(BotReplies.index.__admin.log.creator.c_no_username.c_no_promoted_username, {name: creator.fullName, id: creator.id, promoted_user: current_user.get_fullName, username_promoted: current_user.username, id_promoted: current_user.get_id}));
+                                }else{ //Admin executed command
+                                    const sup_full_name=ctx.message.from.first_name+" "+ctx.message.from.last_name;
+                                    if(ctx.message.from.username != undefined && ctx.message.from.username != "")  //admin has username
+                                        functions.log(ctx,functions.s(BotReplies.index.__admin.log.superior.s_username.s_promoted_username, {name: sup_full_name, username: ctx.message.from.username, id: ctx.message.from.id, promoted_user: current_user.get_fullName, username_promoted: current_user.username, id_promoted: current_user.get_id}));
+                                    else //admin doesn't have an username
+                                        functions.log(ctx,functions.s(BotReplies.index.__admin.log.superior.s_no_username.s_no_promoted_username, {name: sup_full_name, id: ctx.message.from.id, promoted_user: current_user.get_fullName, username_promoted: current_user.username, id_promoted: current_user.get_id}));
+                                }
+                            }else{  //user doesn't have an username
                                 ctx.reply(functions.s(BotReplies.index.__admin.promoted_no_username_admin, {name: current_user.get_fullName, id: current_user.get_id}),{parse_mode: 'HTML'});
+                                if(ctx.message.from.id==creator.get_id){ //Creator executed command
+                                    if(ctx.message.from.username != undefined && ctx.message.from.username != "")  //creator has username
+                                        functions.log(ctx,functions.s(BotReplies.index.__admin.log.creator.c_username.c_promoted_no_username, {name: creator.fullName, username: creator.username, id: creator.get_id, promoted_user: current_user.get_fullName, id_promoted: current_user.get_id}));
+                                    else   //creator doesn't have an username
+                                        functions.log(ctx,functions.s(BotReplies.index.__admin.log.creator.c_no_username.c_no_promoted_no_username, {name: creator.fullName, id: creator.get_id, promoted_user: current_user.get_fullName, id_promoted: current_user.get_id}));
+                                }else{  //Admin executed command
+                                    const sup_full_name=ctx.message.from.first_name+" "+ctx.message.from.last_name;
+                                    if(ctx.message.from.username != undefined && ctx.message.from.username != "")  //admin has username
+                                        functions.log(ctx,functions.s(BotReplies.index.__admin.log.superior.s_username.s_promoted_no_username, {name: sup_full_name, username: ctx.message.from.username, id: ctx.message.from.id, promoted_user: current_user.get_fullName, id_promoted: current_user.get_id}));
+                                    else //admin doesn't have an username
+                                        functions.log(ctx,functions.s(BotReplies.index.__admin.log.superior.s_no_username.s_no_promoted_no_username, {name: sup_full_name, id: ctx.message.from.id, promoted_user: current_user.get_fullName, id_promoted: current_user.get_id}));
+                                }
+                            }
                             ctx.telegram.sendMessage(current_user.get_id,m);    //tell user of the admin privileges
                         }else if(functions.add_AdminToFile(current_user,ctx.message.date) == -1){
                             //User can NOT be promoted, he is currently banned.. have to unban first
@@ -414,7 +480,7 @@ bot.command(['unadmin','demote'], (ctx) => {
     //only superior admins can demote an admin
     if(functions.checkSuperiorId(ctx.message.chat.id)) {
         functions.setUser(ctx);
-        functions.update_admin(ctx,current_user);
+        //functions.update_admin(ctx,current_user);
         if(functions.checkBanned(current_user)) return;
         //check if user is creator and isn't a bot
         if(functions.checkAdmin(current_user) && !current_user.get_isBot) {
@@ -871,11 +937,9 @@ bot.command('resetadmins', async (ctx) => {
     let a=admins.toObject();
     functions.setUser(ctx);
     functions.update_admin(ctx,current_user);
-    console.log("\nNumber of active admins: " + admins.get("Admins Number"));
     //the only admin is the creator, nothing has to be reset
     //if(admins.get("Admins Number") == 1){
     if(a["Admins Number"] == 1){
-        console.log("There is only 1 admin, no reset possible.");
         ctx.reply(BotReplies.index.__resetadmins.only_one_resetadmins);
         functions.clearUser();
         return;
@@ -884,14 +948,11 @@ bot.command('resetadmins', async (ctx) => {
         //Creator of the bot
         //let a=admins.toObject();
         let n=admins.get("Admins Number")-1;
-        console.log("Number of admins to delete: "+n);
         //send communication to all former admins that they have been demoted
         for(let i=n;i>=1;i--,n--){
-            console.log("Admin #"+i+" is being removed from admin list.");
             //FIXME: can't find element 'i' in the array, so can't send message to user
             ctx.telegram.sendMessage(a.List[i].ID, BotReplies.index.__demote.message_to_user_demote);
             admins.pop("List");
-            console.log("Last element removed from admin list.");
             admins.save();
         }
         a.List.splice(1,n);
@@ -909,7 +970,6 @@ bot.command('resetadmins', async (ctx) => {
         ctx.reply(BotReplies.index.__resetadmins.cleared_resetadmins);
     }
     functions.clearUser();
-    console.log("User cleared, ending the function.");
 });
 
 //sender_chat
