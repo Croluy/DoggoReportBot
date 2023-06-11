@@ -120,6 +120,40 @@ const {
             success_to_user_no_username_demote,
             message_to_user_demote,
             couldnt_set_demote,
+            log:{
+                creator:{
+                    to_admin:{
+                        c_username:{
+                            ca_demoted_username,
+                            ca_demoted_no_username
+                        },
+                        c_no_username:{
+                            ca_no_demoted_username,
+                            ca_no_demoted_no_username
+                        }
+                    },
+                    to_user:{
+                        c_username:{
+                            cu_demoted_username,
+                            cu_demoted_no_username
+                        },
+                        c_no_username:{
+                            cu_no_demoted_username,
+                            cu_no_demoted_no_username
+                        }
+                    }
+                },
+                superior:{
+                    s_username:{
+                        s_demoted_username,
+                        s_demoted_no_username
+                    },
+                    s_no_username:{
+                        s_no_demoted_username,
+                        s_no_demoted_no_username
+                    }
+                }
+            },
             self_demote,
             bot_demote,
             no_user_demote,
@@ -480,6 +514,7 @@ bot.command(['unadmin','demote'], (ctx) => {
     //only superior admins can demote an admin
     if(functions.checkSuperiorId(ctx.message.chat.id)) {
         functions.setUser(ctx);
+        //If the admin is replying to a message the user will be the message he replies to, otherwise if he is demoting using id, the user will be the admin
         //functions.update_admin(ctx,current_user);
         if(functions.checkBanned(current_user)) return;
         //check if user is creator and isn't a bot
@@ -500,6 +535,7 @@ bot.command(['unadmin','demote'], (ctx) => {
                 //There is no text after the command
                 //check if I am actually replying to someone
                 if(ctx.message.hasOwnProperty('reply_to_message')){
+                    //current_user is the user to which the admin is replying to
                     //success condition - admin replied to user message or bot message if the user had privacy setting up
                     if(ctx.message.reply_to_message.hasOwnProperty('forward_from')  ||  (ctx.message.reply_to_message.from.id==botID && /^👆/.test(ctx.message.reply_to_message.text))){
 
@@ -524,23 +560,59 @@ bot.command(['unadmin','demote'], (ctx) => {
                                 break;
 
                             case -1:
-                                //SUCCESS: User has been successfully demoted back to admin role
-                                if(current_user.get_username != undefined && current_user.get_username != "")
+                                //SUCCESS: Superior Admin has been successfully demoted to admin role
+                                //Assume the admin who executed the command is the creator, because only creator can demote superior admins
+                                if(current_user.get_username != undefined && current_user.get_username != ""){   //demoted user has username
                                     ctx.reply(functions.s(BotReplies.index.__demote.success_to_admin_demote, {name: current_user.get_fullName, username: current_user.get_username, id: current_user.get_id}),{parse_mode: 'HTML'});
-                                else
+                                    if(ctx.message.from.hasOwnProperty('username'))   //creator has username
+                                        functions.log(ctx,functions.s(BotReplies.index.__demote.log.creator.to_admin.c_username.ca_demoted_username, {name: creator.get_fullName, username: creator.get_username, id: creator.get_id, demoted_user: current_user.get_fullName, username_demoted: current_user.get_username, id_demoted: current_user.get_id}));
+                                    else    //creator doesn't have username
+                                        functions.log(ctx,functions.s(BotReplies.index.__demote.log.creator.to_admin.c_no_username.ca_no_demoted_username, {name: creator.get_fullName, id: creator.get_id, demoted_user: current_user.get_fullName, username_demoted: current_user.get_username, id_demoted: current_user.get_id}));
+                                }else{    //demoted user doesn't have username
                                     ctx.reply(functions.s(BotReplies.index.__demote.success_to_admin_no_username_demote, {name: current_user.get_fullName, id: current_user.get_id}),{parse_mode: 'HTML'});
-                                
-                                const mm=BotReplies.index.__demote.message_to_admin_demote;
-                                ctx.telegram.sendMessage(current_user.get_id,mm);
+                                    if(ctx.message.from.hasOwnProperty('username'))   //creator has username
+                                        functions.log(ctx,functions.s(BotReplies.index.__demote.log.creator.to_admin.c_username.ca_demoted_no_username, {name: creator.get_fullName, username: creator.get_username, id: creator.get_id, demoted_user: current_user.get_fullName, id_demoted: current_user.get_id}));
+                                    else    //creator doesn't have username
+                                        functions.log(ctx,functions.s(BotReplies.index.__demote.log.creator.to_admin.c_no_username.ca_no_demoted_no_username, {name: creator.get_fullName, id: creator.get_id, demoted_user: current_user.get_fullName, id_demoted: current_user.get_id}));
+                                }
+                                ctx.telegram.sendMessage(current_user.get_id,BotReplies.index.__demote.message_to_admin_demote);   //send message to demoted user
                                 current_user.set_isSuperior=false;
                                 break;
 
                             case 1:
-                                //SUCCESS: User has been successfully demoted back to user role
-                                if(current_user.get_username != undefined && current_user.get_username != "")
-                                    ctx.reply(functions.s(BotReplies.index.__demote.success_to_user_demote, {name: current_user.get_fullName, username: current_user.get_username, id: current_user.get_id}),{parse_mode: 'HTML'});
-                                else
-                                    ctx.reply(functions.s(BotReplies.index.__demote.success_to_user_no_username_demote, {name: current_user.get_fullName, id: current_user.get_id}),{parse_mode: 'HTML'});
+                                //SUCCESS: Admin has been successfully demoted to user role
+                                //Both creator and any superior admin can demote an admin to user, check if the admin who executed the command is the creator
+                                if(ctx.message.from.id==creator.get_id){
+                                    //creator executed the command
+                                    if(current_user.get_username != undefined && current_user.get_username != ""){   //demoted user has username
+                                        ctx.reply(functions.s(BotReplies.index.__demote.success_to_user_demote, {name: current_user.get_fullName, username: current_user.get_username, id: current_user.get_id}),{parse_mode: 'HTML'});
+                                        if(ctx.message.from.hasOwnProperty('username')) //creator has username
+                                            functions.log(ctx,functions.s(BotReplies.index.__demote.log.creator.to_user.c_username.cu_demoted_username, {name: creator.get_fullName, username: creator.get_username, id: creator.get_id, demoted_user: current_user.get_fullName, username_demoted: current_user.get_username, id_demoted: current_user.get_id}));
+                                        else    //creator doesn't have username
+                                            functions.log(ctx,functions.s(BotReplies.index.__demote.log.creator.to_user.c_no_username.cu_no_demoted_username, {name: creator.get_fullName, id: creator.get_id, demoted_user: current_user.get_fullName, username_demoted: current_user.get_username, id_demoted: current_user.get_id}));
+                                    }else{    //demoted user doesn't have username
+                                        ctx.reply(functions.s(BotReplies.index.__demote.success_to_user_no_username_demote, {name: current_user.get_fullName, id: current_user.get_id}),{parse_mode: 'HTML'});
+                                        if(ctx.message.from.hasOwnProperty('username')) //creator has username
+                                            functions.log(ctx,functions.s(BotReplies.index.__demote.log.creator.to_user.c_username.cu_demoted_no_username, {name: creator.get_fullName, username: creator.get_username, id: creator.get_id, demoted_user: current_user.get_fullName, id_demoted: current_user.get_id}));
+                                        else    //creator doesn't have username
+                                            functions.log(ctx,functions.s(BotReplies.index.__demote.log.creator.to_user.c_no_username.cu_no_demoted_no_username, {name: creator.get_fullName, id: creator.get_id, demoted_user: current_user.get_fullName, id_demoted: current_user.get_id}));
+                                    }
+                                }else{
+                                    //superior admin executed the command
+                                    if(current_user.get_username != undefined && current_user.get_username != ""){   //demoted user has username
+                                        ctx.reply(functions.s(BotReplies.index.__demote.success_to_user_demote, {name: current_user.get_fullName, username: current_user.get_username, id: current_user.get_id}),{parse_mode: 'HTML'});
+                                        if(ctx.message.from.hasOwnProperty('username')) //superior admin has username
+                                            functions.log(ctx,functions.s(BotReplies.index.__demote.log.superior.s_username.su_demoted_username, {name: superior.get_fullName, username: superior.get_username, id: superior.get_id, demoted_user: current_user.get_fullName, username_demoted: current_user.get_username, id_demoted: current_user.get_id}));
+                                        else    //superior admin doesn't have username
+                                            functions.log(ctx,functions.s(BotReplies.index.__demote.log.superior.s_no_username.su_no_demoted_username, {name: superior.get_fullName, id: superior.get_id, demoted_user: current_user.get_fullName, username_demoted: current_user.get_username, id_demoted: current_user.get_id}));
+                                    }else{    //demoted user doesn't have username
+                                        ctx.reply(functions.s(BotReplies.index.__demote.success_to_user_no_username_demote, {name: current_user.get_fullName, id: current_user.get_id}),{parse_mode: 'HTML'});
+                                        if(ctx.message.from.hasOwnProperty('username')) //superior admin has username
+                                            functions.log(ctx,functions.s(BotReplies.index.__demote.log.superior.s_username.su_demoted_no_username, {name: superior.get_fullName, username: superior.get_username, id: superior.get_id, demoted_user: current_user.get_fullName, id_demoted: current_user.get_id}));
+                                        else    //superior admin doesn't have username
+                                            functions.log(ctx,functions.s(BotReplies.index.__demote.log.superior.s_no_username.su_no_demoted_no_username, {name: superior.get_fullName, id: superior.get_id, demoted_user: current_user.get_fullName, id_demoted: current_user.get_id}));
+                                    }
+                                }
                                 
                                 const m=BotReplies.index.__demote.message_to_user_demote;
                                 ctx.telegram.sendMessage(current_user.get_id,m);
@@ -570,7 +642,8 @@ bot.command(['unadmin','demote'], (ctx) => {
                 let user_set=false;
                 if(functions.setAdminUser(UserID)) user_set=true;
 
-                //admin has written something after the admin command
+                //admin has written something (ID of the user) after the admin command
+                //current_user is the admin who executes the command
                 switch(functions.demote_AdminToFile(UserID,is_creator)){
                     case -1000:
                         //ERROR: User is not admin, can't be demoted

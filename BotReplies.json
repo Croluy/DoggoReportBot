@@ -143,6 +143,41 @@
             "couldnt_set_to_admin_demote": "User with ID: <code>${id}</code> has been demoted from Superior Admin to Admin! ✓",
             "couldnt_set_to_user_demote": "User with ID: <code>${id}</code> has been removed from the admin list! ✓",
 
+            "log":{
+                "creator":{
+                    "to_admin":{
+                        "c_username":{
+                            "ca_demoted_username":"👮🏻‍♂️ Superior Admin demoted to Admin!\n~ By: 👑 Creator ${name} - @${username} [<code>${id}</code>].\n~ ${demoted_user} - @${username_demoted} [<code>${id_demoted}</code>] got demoted! 🎉",
+                            "ca_demoted_no_username":"👮🏻‍♂️ Superior Admin demoted to Admin!\n~ By: 👑 Creator ${name} - @${username} [<code>${id}</code>].\n~ ${demoted_user} [<code>${id_demoted}</code>] got demoted! 🎉"
+                        },
+                        "c_no_username":{
+                            "ca_no_demoted_username":"👮🏻‍♂️ Superior Admin demoted to Admin!\n~ By: 👑 Creator ${name} [<code>${id}</code>].\n~ ${demoted_user} - @${username_demoted} [<code>${id_demoted}</code>] got demoted! 🎉",
+                            "ca_no_demoted_no_username":"👮🏻‍♂️ Superior Admin demoted to Admin!\n~ By: 👑 Creator ${name} [<code>${id}</code>].\n~ ${demoted_user} [<code>${id_demoted}</code>] got demoted! 🎉"
+                        }
+                    },
+                    "to_user":{
+                        "c_username":{
+                            "cu_demoted_username":"👮🏻‍♂️ Admin demoted to User!\n~ By: 👑 Creator ${name} - @${username} [<code>${id}</code>].\n~ ${demoted_user} - @${username_demoted} [<code>${id_demoted}</code>] got demoted! 🎉",
+                            "cu_demoted_no_username":"👮🏻‍♂️ Admin demoted to User!\n~ By: 👑 Creator ${name} - @${username} [<code>${id}</code>].\n~ ${demoted_user} [<code>${id_demoted}</code>] got demoted! 🎉"
+                        },
+                        "c_no_username":{
+                            "cu_no_demoted_username":"👮🏻‍♂️ Admin demoted to User!\n~ By: 👑 Creator ${name} [<code>${id}</code>].\n~ ${demoted_user} - @${username_demoted} [<code>${id_demoted}</code>] got demoted! 🎉",
+                            "cu_no_demoted_no_username":"👮🏻‍♂️ Admin demoted to User!\n~ By: 👑 Creator ${name} [<code>${id}</code>].\n~ ${demoted_user} [<code>${id_demoted}</code>] got demoted! 🎉"
+                        }
+                    }
+                },
+                "superior":{
+                    "s_username":{
+                        "s_demoted_username":"👮🏻‍♂️ Admin demoted to User!\n~ By: 💎 Superior Admin ${name} - @${username} [<code>${id}</code>].\n~ ${demoted_user} - @${username_demoted} [<code>${id_demoted}</code>] got demoted! 🎉",
+                        "s_demoted_no_username":"👮🏻‍♂️ Admin demoted to User!\n~ By: 💎 Superior Admin ${name} - @${username} [<code>${id}</code>].\n~ ${demoted_user} [<code>${id_demoted}</code>] got demoted! 🎉"
+                    },
+                    "s_no_username":{
+                        "s_no_demoted_username":"👮🏻‍♂️ Admin demoted to User!\n~ By: 💎 Superior Admin ${name} [<code>${id}</code>].\n~ ${demoted_user} - @${username_demoted} [<code>${id_demoted}</code>] got demoted! 🎉",
+                        "s_no_demoted_no_username":"👮🏻‍♂️ Admin demoted to User!\n~ By: 💎 Superior Admin ${name} [<code>${id}</code>].\n~ ${demoted_user} [<code>${id_demoted}</code>] got demoted! 🎉"
+                    }
+                }
+            },
+
             "self_demote": "You can't demote yourself. Who will keep company to me?\nLmao. 😂",
             "bot_demote": "Bruh 😐, I'm not even angry, just disappointed.\nPlease remember I have more power than you do.\nThere's no way you could ever demote me. Lmao. 😂",
             "no_user_demote": "Who should I remove from the admin list? You haven't given me any target.\nReply to the message of the user you want to demote from admin position.",

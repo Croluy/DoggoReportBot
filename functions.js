@@ -1243,8 +1243,8 @@ function update_admin_private(pos,user){
  * @param {bool} html - [DEFAULT true] if the message is in html format
  */
 function log(ctx,msg,html=true){
-    //TODO: uncomment the next line when commiting
-    if(bot_test==true) return;
+    //TODO: uncomment the next line when committing
+    //if(bot_test==true) return;
 
     if(html==true) ctx.telegram.sendMessage(LogChannel,msg,{parse_mode: 'HTML'});
     else ctx.telegram.sendMessage(LogChannel,msg);
