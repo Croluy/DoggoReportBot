@@ -9,7 +9,7 @@ A Telegram bot coded in NodeJS, which allows admins of a channel to communicate 
 1. Read [Dev Infos](https://github.com/Croluy/DoggoReportBot/edit/master/README.md#-dev-infos) below (**do not skip this step**)
 2. If you don't have git, [install it](https://github.com/git-guides/install-git)
 3. Clone the repo executing: `git clone https://github.com/Croluy/DoggoReportBot` (check [this](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) for troubleshooting)
-4. Create a `.env` file inside the root directory
+4. Create a `.env` file inside the root directory of the bot
 5. Insert your infos in your local `.env` file
 6. Set `bot_test` to `false` in your local `index.js` file
 7. In your terminal, navigate to the root directory of the bot

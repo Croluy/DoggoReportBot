@@ -662,6 +662,7 @@ bot.command(['unadmin','demote'], (ctx) => {
 
                     case -1:
                         //SUCCESS: User has been successfully demoted back to admin role
+                        //TODO: send log messages
                         if(functions.setAdminUser(UserID)){
                             //User has been set successfully
                             if(current_user.get_username != undefined && current_user.get_username != "")
